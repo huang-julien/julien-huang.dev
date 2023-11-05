@@ -4,7 +4,7 @@
 
 
       <USlideover v-model="isOpen" side="left" class="lg:hidden">
-        <button class=" lg:hidden text-4xl  z-10 absolute top-2 left-4" @click="isOpen = !isOpen">
+        <button class=" lg:hidden text-4xl  z-10 absolute top-2 left-4" aria-label="sidebar menu" @click="isOpen = !isOpen">
           <Icon name="ci:hamburger" />
         </button>
         <SideBar />
@@ -14,7 +14,7 @@
     </div>
     <main class="lg:w-5/6 w-full flex flex-col">
       <div>
-        <button class=" lg:hidden text-4xl ml-4 " @click="isOpen = !isOpen">
+        <button class=" lg:hidden text-4xl ml-4 "  aria-label="sidebar menu"  @click="isOpen = !isOpen">
           <Icon name="ci:hamburger" />
         </button>
       </div>

@@ -1,6 +1,6 @@
 <template>
     <div class="border-solid border-p-yellow border-2 p-5 rounded-xl">
-        <NuxtLink external :href="url" :aria-label="`${name} repository url`" target="_blank" class="hover:cursor-pointer">
+        <NuxtLink external :href="url" :aria-label="name" target="_blank" class="hover:cursor-pointer">
             <article class="flex flex-col gap-3">
                 <header class="text-xl  font-bold">{{ name }} <Icon name="mdi:github" /></header>
                 <span>{{ description }}</span>
