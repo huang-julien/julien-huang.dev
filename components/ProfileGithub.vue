@@ -7,7 +7,7 @@
       <div class=" bg-primary relative rounded-full w-full aspect-square flex">
         <NuxtLink
          external 
-         alt="github profile"
+         aria-label="github profile"
          class="flex w-full h-full"
            href="https://github.com/huang-julien">
           <Icon name="bi:github"   
