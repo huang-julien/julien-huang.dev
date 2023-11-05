@@ -1,5 +1,5 @@
 <template>
-    <div class="lg:grid grid-cols-2 my-auto h-full px-4 md:px-20">
+    <div class="grid lg:grid-cols-2 my-auto h-full px-4 md:px-20">
         <div class="my-auto">
             <ProfileGithub class="w-1/2 md:w-1/4 mx-auto mb-10 lg:md-10" />
         </div>

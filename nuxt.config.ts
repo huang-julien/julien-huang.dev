@@ -6,6 +6,8 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
+  css: ['@/assets/style.scss'],
+
   app: {
     head: {
       title: "Julien Huang",
@@ -14,5 +16,15 @@ export default defineNuxtConfig({
       }
     }
   },
-  modules: ['@nuxtjs/tailwindcss', 'nuxt-icon']
+  modules: ['@nuxthq/ui', '@nuxtjs/tailwindcss', 'nuxt-icon'],
+
+  runtimeConfig: {
+    github: {
+      token: ''
+    }
+  },
+
+  experimental: {
+    componentIslands: true
+  }
 })

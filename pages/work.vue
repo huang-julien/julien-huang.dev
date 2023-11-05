@@ -1,24 +1,38 @@
 <template>
-  <div class="md:pt-[25vh] px-4">
-    <MainTitle class=" w-1/2 md:w-1/4">Work</MainTitle>
-    <section>
-      <h2 class="text-xl">Projects</h2>
-    </section>
-    <section>
-      <h2 class="text-xl">Actively contributing to</h2>
-    </section>
+  <div class="px-4 h-full flex">
+    <div class="mt-5 lg:my-auto w-full">
+      <MainTitle class="w-1/2 md:w-1/4">Work</MainTitle>
+      <section class="my-5">
+        <h2 class="text-2xl text-p-yellow font-bold">Projects</h2>
+        <div class="px-5 md:px-[4rem]">
+          <ProjectsList :projects="myProjects" />
+        </div>
+
+      </section>
+      <section class="my-5">
+        <h2 class="text-2xl text-p-yellow font-bold">Actively contributing to</h2>
+        <div class="px-5 md:px-[4rem]">
+          <ProjectsList :projects="contributingToProjects" />
+        </div>
+      </section>
+    </div>
+
   </div>
 </template>
 
 <script lang="ts" setup>
 
-const projects = [
+const myProjects = ['nitro-applicationinsights', 'nuxt-applicationinsights', 'nuxt-runtime-compiler', 'nuxt-hydration'].map((p) => ({
+  org: 'huang-julien',
+  repo: p
+}))
 
-]
+const contributingToProjects = [{
+  org: 'nuxt',
+  repo: 'nuxt'
+}]
 
 </script>
 
-<style>
-
-</style>
+<style></style>
 

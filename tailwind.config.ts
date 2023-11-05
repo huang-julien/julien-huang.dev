@@ -4,10 +4,10 @@ export default <Partial<Config>>{
     theme: {
     extend: {
       colors: {
-        primary: '#172554',
-        secondary: '#3083DC',
-        tertiary: '#EBBE46',
-        quaternary: '#D9DBF1',
+        'p-blue': '#172554',
+        's-blue': '#3083DC',
+        'p-yellow': '#EBBE46',
+        'light-gray': '#D9DBF1',
       }
     }
   }
