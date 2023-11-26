@@ -18,7 +18,7 @@
     "@nuxtjs/tailwindcss": "^6.8.1",
     "@vueuse/core": "^10.4.0",
     "eslint": "^8.52.0",
-    "nuxt": "^3.8.0",
+    "nuxt": "^3.8.2",
     "nuxt-icon": "^0.6.1",
     "radix-vue": "^0.1.27",
     "sass": "^1.66.1"
