@@ -14,6 +14,8 @@ const props = defineProps<{
     }[]
 }>()
 
+const runtimeConfig = useRuntimeConfig()
+
 interface GithubApiRepoResponse {
     name: string,
     full_name: string,
@@ -21,6 +23,13 @@ interface GithubApiRepoResponse {
     language: string,
     html_url: string
 }
+const headers: HeadersInit = {}
 
-const projects = await Promise.all(props.projects.map((p) => $fetch<GithubApiRepoResponse>(`https://api.github.com/repos/${p.org}/${p.repo}`)))
+if(runtimeConfig.github.token) {
+    headers.Authorization = `Bearer ${runtimeConfig.github.token}`
+}
+
+const projects = await Promise.all(props.projects.map((p) => $fetch<GithubApiRepoResponse>(`https://api.github.com/repos/${p.org}/${p.repo}`, {
+   headers
+})))
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="border-solid border-p-yellow border-2 p-5 rounded-xl project-card">
+    <div class="p-5  project-card">
         <NuxtLink external :href="url" :aria-label="name" target="_blank" class="hover:cursor-pointer">
             <article class="flex flex-col gap-3">
                 <header class="text-xl  font-bold">{{ name }} <Icon name="mdi:github" /></header>
@@ -19,11 +19,9 @@ defineProps<{
 }>() 
 </script>
 
-<style lang="scss" scoped> 
-.project-card {
-    transition: all 0.2s ease-in-out;
-    &:hover {
-        @apply bg-s-blue;
-    }
+<style lang="scss" scoped>
+@import '@/assets/mixins';
+ .project-card {
+    @include border-animated(#58afd1, #ffe593, #233a83, 4px, bottom, right, 0.25s);
 }
 </style>
