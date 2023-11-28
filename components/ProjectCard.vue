@@ -1,13 +1,11 @@
 <template>
-    <div class="p-5  project-card">
-        <NuxtLink external :href="url" :aria-label="name" target="_blank" class="hover:cursor-pointer">
-            <article class="flex flex-col gap-3">
+    <article class="p-5  project-card">
+        <NuxtLink external :href="url" :aria-label="name" target="_blank" class="flex flex-col gap-3 justify-between h-full hover:cursor-pointer h-full">
                 <header class="text-xl  font-bold">{{ name }} <Icon name="mdi:github" /></header>
                 <span>{{ description }}</span>
                 <span>Language: {{ lang.join(', ') }}</span>
-            </article>
         </NuxtLink>
-    </div>
+    </article>
 </template>
 
 <script lang="ts" setup>
