@@ -808,10 +808,10 @@
   dependencies:
     "@iconify/types" "*"
 
-"@iconify/collections@^1.0.366":
-  version "1.0.373"
-  resolved "https://registry.yarnpkg.com/@iconify/collections/-/collections-1.0.373.tgz#53290420615cc65e4e5df5cbdccbf683402d70c0"
-  integrity sha512-LBuRqoeS1mzFOFPIMNO2J6UyOoJlut7GP2mmoCT3LECKFWdOV1VZwjpkoxrtkEDM3B3SEBLwE+naSlunQmBg5A==
+"@iconify/collections@^1.0.374":
+  version "1.0.374"
+  resolved "https://registry.yarnpkg.com/@iconify/collections/-/collections-1.0.374.tgz#8cd00b8abb64063cb9587327584784b3e558c737"
+  integrity sha512-7M8ruZSWACypaR+OpBQIk/b5Vf/fzggMlfVv7JqSYrQ9YjCPtIAMgPi7Kbbm1Rinvp5mVXIylGZKaBqqjqKNJQ==
   dependencies:
     "@iconify/types" "*"
 
@@ -1438,7 +1438,7 @@
   resolved "https://registry.yarnpkg.com/@nuxt/devalue/-/devalue-2.0.2.tgz#5749f04df13bda4c863338d8dabaf370f45ef7c7"
   integrity sha512-GBzP8zOc7CGWyFQS6dv1lQz8VVpz5C2yRszbXufwG/9zhStTIH50EtD87NmWbTMwXDvZLNg8GIpb1UFdH93JCA==
 
-"@nuxt/devtools-kit@1.0.6", "@nuxt/devtools-kit@^1.0.4":
+"@nuxt/devtools-kit@1.0.6", "@nuxt/devtools-kit@^1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@nuxt/devtools-kit/-/devtools-kit-1.0.6.tgz#e4a96fc20a9bb88fe58a3d775fcc1e317e3438cb"
   integrity sha512-CUSE++NRTIwvBWbLsPzLZIDMpXr6oyllaWm8tOR3Wgr/04jW31uyWbXjU/fxRuDotQwZfcTe19uunRoCoBnk1Q==
@@ -7124,14 +7124,14 @@ nuxi@^3.10.0:
     fsevents "~2.3.3"
 
 nuxt-icon@^0.6.1:
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/nuxt-icon/-/nuxt-icon-0.6.7.tgz#48a4896f362f88682d3074d50625ddee8d9c4d03"
-  integrity sha512-0QnQM0yqJCb8PWt+gAn6RiXy1/CHScFuOPbsfIIwHMvyKkea+blj5/unq7F9ZHMkfrHozyCID8ErFPSzwEYLeA==
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/nuxt-icon/-/nuxt-icon-0.6.8.tgz#15c36e92e4baa03adf322938dba86bb872b6251f"
+  integrity sha512-6eWlNOb6Uvp63uXFdhcmsB1JlubDv76Pot/VwmIu0yJxDYhwytbnv3WAjw2khl2l7W/65V4eMGIEeX9C5Ahxng==
   dependencies:
-    "@iconify/collections" "^1.0.366"
+    "@iconify/collections" "^1.0.374"
     "@iconify/vue" "^4.1.1"
-    "@nuxt/devtools-kit" "^1.0.4"
-    "@nuxt/kit" "^3.8.2"
+    "@nuxt/devtools-kit" "^1.0.6"
+    "@nuxt/kit" "^3.9.0"
 
 nuxt@^3.9.0:
   version "3.9.0"
