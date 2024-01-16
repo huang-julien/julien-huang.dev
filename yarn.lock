@@ -1378,19 +1378,19 @@
     typescript "^5.2.2"
 
 "@nuxt/image@^1.0.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@nuxt/image/-/image-1.1.0.tgz#71726a472e9c4f3332604b56107cff4fc271964c"
-  integrity sha512-+zZqsjVfR83UOrChGeaYuWZeLYMkFD0gNY0T6L4W1y4YaRbKNN5iynZJ71Bmg7lcOPRbf5OmSPBTSU0ieYJq4w==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@nuxt/image/-/image-1.2.0.tgz#38b21cfba60c53c01da197b3d6a7d82ce17cf866"
+  integrity sha512-DxR1RVHZgVHVRHyZTFhAB5149Vbe3eyTLk32h8GLj/5Nt4WN1Du6VZs89fjbTP4sfjQTSYKBKgIJDdetf61heQ==
   dependencies:
-    "@nuxt/kit" "^3.8.2"
+    "@nuxt/kit" "^3.9.1"
     consola "^3.2.3"
-    defu "^6.1.3"
-    h3 "^1.9.0"
+    defu "^6.1.4"
+    h3 "^1.10.0"
     image-meta "^0.2.0"
-    node-fetch-native "^1.4.1"
+    node-fetch-native "^1.6.1"
     ohash "^1.1.3"
-    pathe "^1.1.1"
-    std-env "^3.5.0"
+    pathe "^1.1.2"
+    std-env "^3.7.0"
     ufo "^1.3.2"
   optionalDependencies:
     ipx "^2.0.2"
@@ -3269,7 +3269,7 @@ ci-info@^4.0.0:
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-4.0.0.tgz#65466f8b280fc019b9f50a5388115d17a63a44f2"
   integrity sha512-TdHqgGf9odd8SXNuxtUBVx8Nv+qZOejE6qyqiy5NtbYYQOeFa6zmHkxlPzmaLxWWHsU6nJmB7AETdVPi+2NBUg==
 
-citty@^0.1.4, citty@^0.1.5:
+citty@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/citty/-/citty-0.1.5.tgz#fe37ceae5dc764af75eb2fece99d2bf527ea4e50"
   integrity sha512-AS7n5NSc0OQVMV9v6wt3ByujNIrne0/cTjiC2MYqhvao57VNfiuVksTSr2p17nVOhEr2KtqiAkGwHcgMC/qUuQ==
@@ -3550,7 +3550,7 @@ css-select@^5.1.0:
     domutils "^3.0.1"
     nth-check "^2.0.1"
 
-css-tree@^2.2.1, css-tree@^2.3.1:
+css-tree@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-2.3.1.tgz#10264ce1e5442e8572fc82fbe490644ff54b5c20"
   integrity sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==
@@ -3629,7 +3629,7 @@ cssnano@^6.0.3:
     cssnano-preset-default "^6.0.3"
     lilconfig "^3.0.0"
 
-csso@5.0.5, csso@^5.0.5:
+csso@^5.0.5:
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/csso/-/csso-5.0.5.tgz#f9b7fe6cc6ac0b7d90781bb16d5e9874303e2ca6"
   integrity sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==
@@ -3883,9 +3883,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.601:
-  version "1.4.632"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.632.tgz#df6253483b802eb83eee2fdc0e5067bd46f36f11"
-  integrity sha512-JGmudTwg7yxMYvR/gWbalqqQiyu7WTFv2Xu3vw4cJHXPFxNgAk0oy8UHaer8nLF4lZJa+rNoj6GsrKIVJTV6Tw==
+  version "1.4.633"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.633.tgz#df8831d2fef994fe9c013e61db6cfb98eeebf52d"
+  integrity sha512-7BvxzXrHFliyQ1oZc6NRMjyEaKOO1Ma1NY98sFZofogWlm+klLWSgrDw7EhatiMgi4R4NV+iWxDdxuIKXtPbOw==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -5267,25 +5267,25 @@ ip@^2.0.0:
   integrity sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==
 
 ipx@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/ipx/-/ipx-2.0.2.tgz#a259a8800f0a1afb7b0d12b1e53f86c1675aa3c5"
-  integrity sha512-avedYlD04mN3alN4BYoXtZuMrQP/Fln86uN1hUFRCjzIZxl7Et3oKX+V1YTEodFvPs8tk5NAQJXZeowu0OgOKQ==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/ipx/-/ipx-2.1.0.tgz#235d37f789b6c5100f34a0bb3b3bef9852af4d76"
+  integrity sha512-AVnPGXJ8L41vjd11Z4akIF2yd14636Klxul3tBySxHA6PKfCOQPxBDkCFK5zcWh0z/keR6toh1eg8qzdBVUgdA==
   dependencies:
     "@fastify/accept-negotiator" "^1.1.0"
-    citty "^0.1.4"
+    citty "^0.1.5"
     consola "^3.2.3"
-    defu "^6.1.3"
+    defu "^6.1.4"
     destr "^2.0.2"
     etag "^1.8.1"
-    h3 "^1.8.2"
+    h3 "^1.10.0"
     image-meta "^0.2.0"
-    listhen "^1.5.5"
+    listhen "^1.5.6"
     ofetch "^1.3.3"
-    pathe "^1.1.1"
+    pathe "^1.1.2"
     sharp "^0.32.6"
-    svgo "^3.0.3"
-    ufo "^1.3.1"
-    unstorage "^1.9.0"
+    svgo "^3.2.0"
+    ufo "^1.3.2"
+    unstorage "^1.10.1"
     xss "^1.0.14"
 
 iron-webcrypto@^1.0.0:
@@ -5803,7 +5803,7 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.2.4.tgz#eca284f75d2965079309dc0ad9255abb2ebc1632"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
-listhen@^1.5.5:
+listhen@^1.5.5, listhen@^1.5.6:
   version "1.5.6"
   resolved "https://registry.yarnpkg.com/listhen/-/listhen-1.5.6.tgz#8dc8cdccef225e39c69bcc6f6bd704447b499b51"
   integrity sha512-gTpEJhT5L85L0bFgmu+Boqu5rP4DwDtEb4Exq5gdQUxWRwx4jbzdInZkmyLONo5EwIcQB0k7ZpWlpCDPdL77EQ==
@@ -6843,9 +6843,9 @@ nitropack@^2.8.1:
     unstorage "^1.10.1"
 
 node-abi@^3.3.0:
-  version "3.52.0"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.52.0.tgz#ffba0a85f54e552547e5849015f40f9514d5ba7c"
-  integrity sha512-JJ98b02z16ILv7859irtXn4oUaFWADtvkzy2c0IAatNVX2Mc9Yoh8z6hZInn3QwvMEYhHuQloYi+TTQy67SIdQ==
+  version "3.54.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.54.0.tgz#f6386f7548817acac6434c6cba02999c9aebcc69"
+  integrity sha512-p7eGEiQil0YUV3ItH4/tBb781L5impVmmx2E9FRKF7d18XXzp4PGT2tdYMFY6wQqgxD0IwNZOiSJ0/K0fSi/OA==
   dependencies:
     semver "^7.3.5"
 
@@ -8902,19 +8902,6 @@ svg-tags@^1.0.0:
   resolved "https://registry.yarnpkg.com/svg-tags/-/svg-tags-1.0.0.tgz#58f71cee3bd519b59d4b2a843b6c7de64ac04764"
   integrity sha512-ovssysQTa+luh7A5Weu3Rta6FJlFBBbInjOh722LIt6klpU2/HtdUbszju/G4devcvk8PGt7FCLv5wftu3THUA==
 
-svgo@^3.0.3:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/svgo/-/svgo-3.1.0.tgz#7e63855c8da73297d5d5765e968f9679a0f8d24a"
-  integrity sha512-R5SnNA89w1dYgNv570591F66v34b3eQShpIBcQtZtM5trJwm1VvxbIoMpRYY3ybTAutcKTLEmTsdnaknOHbiQA==
-  dependencies:
-    "@trysound/sax" "0.2.0"
-    commander "^7.2.0"
-    css-select "^5.1.0"
-    css-tree "^2.2.1"
-    css-what "^6.1.0"
-    csso "5.0.5"
-    picocolors "^1.0.0"
-
 svgo@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/svgo/-/svgo-3.2.0.tgz#7a5dff2938d8c6096e00295c2390e8e652fa805d"
@@ -9480,7 +9467,7 @@ unplugin@^1.3.1, unplugin@^1.5.0, unplugin@^1.5.1, unplugin@^1.6.0:
     webpack-sources "^3.2.3"
     webpack-virtual-modules "^0.6.1"
 
-unstorage@^1.10.1, unstorage@^1.9.0:
+unstorage@^1.10.1:
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/unstorage/-/unstorage-1.10.1.tgz#bf8cc00a406e40a6293e893da9807057d95875b0"
   integrity sha512-rWQvLRfZNBpF+x8D3/gda5nUCQL2PgXy2jNG4U7/Rc9BGEv9+CAJd0YyGCROUBKs9v49Hg8huw3aih5Bf5TAVw==
