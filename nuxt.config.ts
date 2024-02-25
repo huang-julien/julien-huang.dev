@@ -30,7 +30,7 @@ export default defineNuxtConfig({
     }
   },
   routeRules: {
-    '/api/__nuxt_island/**': {
+    '/__nuxt_island/**': {
       headers: {
         'Access-Control-Allow-Origin': "*"
       }

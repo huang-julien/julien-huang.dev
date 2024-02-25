@@ -1,12 +1,15 @@
 <template>
     <div class=" md:grid md:grid-cols-2">
-        <div class="m-4" v-for="project of projects">
-            <ProjectCard class="project-card h-full" :name="project.full_name" :description="project.description" :lang="[project.language]" :url="project.html_url" />
+        <div class="m-4" v-for="project of repos">
+            <ProjectCard class="project-card h-full" :name="project.data.name" :description="project.data.description"
+                :lang="[project.data.language ?? '']" :url="project.data.html_url" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { Octokit } from "octokit"
+
 const props = defineProps<{
     projects: {
         org: string,
@@ -14,6 +17,7 @@ const props = defineProps<{
     }[]
 }>()
 
+const octokit = new Octokit()
 const runtimeConfig = useRuntimeConfig()
 
 interface GithubApiRepoResponse {
@@ -25,19 +29,25 @@ interface GithubApiRepoResponse {
 }
 const headers: HeadersInit = {}
 
-if(runtimeConfig.github.token) {
+if (runtimeConfig.github.token) {
     headers.Authorization = `Bearer ${runtimeConfig.github.token}`
 }
 
-const projects = await Promise.all(props.projects.map((p) => $fetch<GithubApiRepoResponse>(`https://api.github.com/repos/${p.org}/${p.repo}`, {
-   headers
-})))
+const repos = await Promise.all(props.projects.map((p) =>
+
+    octokit.rest.repos.get({
+        owner: p.org,
+        repo: p.repo,
+         
+    }))
+    )
 </script>
 
 <style lang="scss" scoped>
 // temporary fix, seems like sub components styles are not send to the client
 @import '@/assets/mixins';
- .project-card {
+
+.project-card {
     @include border-animated(#58afd1, #ffe593, #233a83, 4px, bottom, right, 0.25s);
 }
 </style>

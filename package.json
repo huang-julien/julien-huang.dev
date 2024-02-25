@@ -21,6 +21,13 @@
     "nuxt": "^3.10.3",
     "nuxt-icon": "^0.6.1",
     "radix-vue": "^1.0.0",
-    "sass": "^1.66.1"
+    "sass": "^1.66.1",
+    "typescript": "5.2.2"
+  },
+  "dependencies": {
+    "octokit": "^3.1.2"
+  },
+  "resolutions": {
+    "vue": "3.4.8"
   }
 }
