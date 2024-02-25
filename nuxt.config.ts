@@ -28,5 +28,12 @@ export default defineNuxtConfig({
     componentIslands: {
       selectiveClient: true
     }
+  },
+  routeRules: {
+    '/api/__nuxt_island/**': {
+      headers: {
+        'Access-Control-Allow-Origin': "*"
+      }
+    }
   }
 })
