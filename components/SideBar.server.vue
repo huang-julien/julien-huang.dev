@@ -11,12 +11,11 @@
       </ul>
     </nav>
 
-    <p class="mt-auto text-sm px-2 absolute bottom-0">© 2023 Julien Huang. CC BY-SA 4.0</p>
+    <p class="mt-auto text-sm px-2 absolute bottom-0">© 2023-2024 Julien Huang. CC BY-SA 4.0</p>
   </div>
 </template>
 
 <script lang="ts" setup>
-const currentYear = new Date().getFullYear()
 
 </script>
 
