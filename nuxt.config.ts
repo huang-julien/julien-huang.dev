@@ -19,7 +19,8 @@ export default defineNuxtConfig({
       }
     }
   },
-  modules: ['@nuxt/image', '@nuxthq/ui', '@nuxtjs/tailwindcss', 'nuxt-icon'],
+
+  modules: ['@nuxt/image', '@nuxthq/ui', '@nuxtjs/tailwindcss', 'nuxt-icon', '@nuxt/fonts'],
 
   runtimeConfig: {
     github: {
