@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   nitro: {
     preset: 'netlify',
+    future: {
+      nativeSWR: true
+    }
   },
   devtools: {
     enabled: true,
@@ -33,7 +36,8 @@ export default defineNuxtConfig({
     '/__nuxt_island/**': {
       headers: {
         'Access-Control-Allow-Origin': "*"
-      }
+      },
+      swr: 1000 * 60 * 60 * 24
     }
-  }
+  },
 })
