@@ -17,7 +17,7 @@
     "@nuxtjs/i18n": "8.3.0",
     "@nuxtjs/icon": "^3.0.0-beta.16",
     "@nuxtjs/prismic": "^3.3.2", 
-    "@vueuse/core": "^10.4.0",
+    "@vueuse/core": "^11.0.0",
     "eslint": "^8.52.0",
     "nuxt": "3.13.0",
     "nuxt-icon": "^0.6.1",
