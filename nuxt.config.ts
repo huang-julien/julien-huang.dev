@@ -5,6 +5,7 @@ export default defineNuxtConfig({
       nativeSWR: true
     }
   },
+
   devtools: {
     enabled: true,
   },
@@ -18,9 +19,15 @@ export default defineNuxtConfig({
         lang: "en",
       }
     }
-  },
+  }, 
 
-  modules: ['@nuxt/image', '@nuxthq/ui', '@nuxtjs/tailwindcss', 'nuxt-icon', '@nuxt/fonts'],
+  modules: [
+    '@nuxt/image', 
+    'nuxt-icon',
+    '@nuxt/fonts',
+    "@nuxtjs/prismic",
+    '@nuxt/ui',
+  ],
 
   runtimeConfig: {
     github: {
@@ -28,11 +35,31 @@ export default defineNuxtConfig({
     }
   },
 
+  tailwindcss: {
+    config: {
+      theme: {
+        extend: {
+          colors: {
+            'p-blue': '#172554',
+            's-blue': '#3083DC',
+            'p-yellow': '#EBBE46',
+            'light-gray': '#D9DBF1',
+          }
+        }
+    }
+    }
+  },
+
   experimental: {
     componentIslands: {
       selectiveClient: true
-    }
+    },
   },
+
+  future: {
+   compatibilityVersion: 4 
+  },
+
   routeRules: {
     '/__nuxt_island/**': {
       headers: {
@@ -41,4 +68,6 @@ export default defineNuxtConfig({
       swr: 1000 * 60 * 60 * 24
     }
   },
+
+  compatibilityDate: '2024-08-25',
 })

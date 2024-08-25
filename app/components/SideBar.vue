@@ -2,11 +2,11 @@
   <div class="h-screen grid relative">
     <nav class="h-[50vh] my-auto text-2xl font-bold  border-quaternary border-solid border-r-[1px] px-2">
       <ul>
-        <li>
-          <NuxtLink nuxt-client href="/" class="text-tertiary text-4xl">J-Huang</NuxtLink>
+        <li class="my-5">
+          <NuxtLink href="/" class="text-tertiary text-4xl">J-Huang</NuxtLink>
         </li>
-        <li>
-          <NuxtLink nuxt-client href="/work">Work</NuxtLink>
+        <li class="my-5">
+          <NuxtLink href="/work">Work</NuxtLink>
         </li>
       </ul>
     </nav>
@@ -18,10 +18,3 @@
 <script lang="ts" setup>
 
 </script>
-
-<style>
-li {
-  @apply my-5;
-}
-</style>
-
