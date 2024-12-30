@@ -53,7 +53,7 @@ importers:
         version: 0.6.10(magicast@0.3.5)(rollup@4.29.1)(vite@6.0.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.83.0)(terser@5.31.6)(yaml@2.6.1))(vue@3.5.13(typescript@5.7.2))
       radix-vue:
         specifier: ^1.0.0
-        version: 1.9.11(vue@3.5.13(typescript@5.7.2))
+        version: 1.9.12(vue@3.5.13(typescript@5.7.2))
       sass:
         specifier: ^1.66.1
         version: 1.83.0
@@ -5320,8 +5320,8 @@ packages:
   queue-tick@1.0.1:
     resolution: {integrity: sha512-kJt5qhMxoszgU/62PLP1CJytzd2NKetjSRnyuj31fDd3Rlcz3fzlFdFLD1SItunPwyqEOkca6GbV612BWfaBag==}
 
-  radix-vue@1.9.11:
-    resolution: {integrity: sha512-C+MtJ66jf8J28DO5bKgNwhGCi6WQYuEosD/tY/Orry9BTDcuF/Mps4HlFd2Tq4YlXF44BEPLQ2Paz89Mz70ZgA==}
+  radix-vue@1.9.12:
+    resolution: {integrity: sha512-zkr66Jqxbej4+oR6O/pZRzyM/VZi66ndbyIBZQjJKAXa1lIoYReZJse6W1EEDZKXknD7rXhpS+jM9Sr23lIqfg==}
     peerDependencies:
       vue: '>= 3.2.0'
 
@@ -5959,9 +5959,6 @@ packages:
 
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
-
-  tslib@2.7.0:
-    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -10596,7 +10593,7 @@ snapshots:
       minimatch: 9.0.5
       semver: 7.6.3
       stable-hash: 0.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -10616,7 +10613,7 @@ snapshots:
       minimatch: 9.0.5
       semver: 7.6.3
       stable-hash: 0.0.4
-      tslib: 2.7.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -13215,7 +13212,7 @@ snapshots:
 
   queue-tick@1.0.1: {}
 
-  radix-vue@1.9.11(vue@3.5.13(typescript@5.7.2)):
+  radix-vue@1.9.12(vue@3.5.13(typescript@5.7.2)):
     dependencies:
       '@floating-ui/dom': 1.6.12
       '@floating-ui/vue': 1.1.5(vue@3.5.13(typescript@5.7.2))
@@ -13882,12 +13879,12 @@ snapshots:
 
   synckit@0.6.2:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   synckit@0.9.1:
     dependencies:
       '@pkgr/core': 0.1.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   system-architecture@0.1.0: {}
 
@@ -14062,8 +14059,6 @@ snapshots:
       typescript: 5.7.2
 
   ts-interface-checker@0.1.13: {}
-
-  tslib@2.7.0: {}
 
   tslib@2.8.1: {}
 
