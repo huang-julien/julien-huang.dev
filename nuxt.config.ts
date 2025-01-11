@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     "@nuxtjs/prismic",
     '@nuxt/ui',
+    '@nuxthub/core'
   ],
 
   runtimeConfig: {
