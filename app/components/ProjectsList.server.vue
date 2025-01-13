@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import * as o from "octokit"
+import { Octokit } from "octokit"
 
 const props = defineProps<{
     projects: {
@@ -17,14 +17,14 @@ const props = defineProps<{
     }[]
 }>()
 
-const octokit = new o.Octokit()
+const octokit = new Octokit()
  
 const repos = await Promise.all(props.projects.map((p) =>
-    octokit.rest.repos.get({
+    octokit.request('GET /repos/{owner}/{repo}', {
         owner: p.org,
         repo: p.repo,
-    }))
-)
+  }) 
+))
 </script>
 
 <style lang="scss" scoped>
