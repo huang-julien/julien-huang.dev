@@ -7,16 +7,24 @@
     </div>
 </template>
 
-<script setup lang="ts"> 
+<script setup lang="ts">
+import * as o from "octokit"
+
 const props = defineProps<{
     projects: {
         org: string,
         repo: string
     }[]
 }>()
+
+const octokit = new o.Octokit()
  
- 
-const repos = []
+const repos = await Promise.all(props.projects.map((p) =>
+    octokit.rest.repos.get({
+        owner: p.org,
+        repo: p.repo,
+    }))
+)
 </script>
 
 <style lang="scss" scoped>
