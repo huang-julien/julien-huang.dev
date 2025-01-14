@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 
-const myProjects = ['nitro-applicationinsights', 'nuxt-applicationinsights', 'nuxt-runtime-compiler', 'nuxt-hydration'].map((p) => ({
+const myProjects = ['nitro-applicationinsights', 'nuxt-applicationinsights', 'nitro-opentelemetry', 'nuxt-hydration'].map((p) => ({
   org: 'huang-julien',
   repo: p
 }))
@@ -30,7 +30,10 @@ const myProjects = ['nitro-applicationinsights', 'nuxt-applicationinsights', 'nu
 const contributingToProjects = [{
   org: 'nuxt',
   repo: 'nuxt'
-}]
+},{
+  org: 'nuxt',
+  repo: 'scripts'
+},]
 
 </script>
 
