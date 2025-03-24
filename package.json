@@ -11,7 +11,7 @@
     "@antfu/eslint-config": "^2.0.0",
     "@nuxt/content": "^2.7.2",
     "@nuxt/eslint-config": "^0.7.0",
-    "@nuxt/fonts": "^0.10.0",
+    "@nuxt/fonts": "^0.11.0",
     "@nuxt/image": "^1.0.0",
     "@nuxt/ui": "^2.18.4",
     "@nuxthub/core": "^0.8.11",
@@ -20,11 +20,11 @@
     "@nuxtjs/prismic": "^3.3.2",
     "@vueuse/core": "^13.0.0",
     "eslint": "^9.0.0",
-    "nuxt": "3.16.0",
+    "nuxt": "3.16.1",
     "nuxt-icon": "^0.6.1",
     "radix-vue": "^1.0.0",
     "sass": "^1.66.1",
-    "typescript": "5.7.2"
+    "typescript": "5.8.2"
   },
   "dependencies": {
     "octokit": "^4.1.0"
