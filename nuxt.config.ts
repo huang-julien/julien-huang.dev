@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "Julien Huang",
+      title: "Julien Huang - Open source developer",
       htmlAttrs: {
         lang: "en",
       }
