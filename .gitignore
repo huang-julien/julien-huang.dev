@@ -95,3 +95,5 @@ sw.*
 
 # Vercel
 .vercel
+
+.data

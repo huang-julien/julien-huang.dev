@@ -3,7 +3,6 @@
         <NuxtLink external :href="url" :aria-label="name" target="_blank" class="flex flex-col gap-3 justify-between h-full hover:cursor-pointer h-full">
                 <header class="text-xl  font-bold">{{ name }} <Icon name="mdi:github" /></header>
                 <span>{{ description }}</span>
-                <span>Language: {{ lang.join(', ') }}</span>
         </NuxtLink>
     </article>
 </template>
@@ -12,7 +11,6 @@
 defineProps<{
     name: string,
     description: string,
-    lang: string[],
     url: string
 }>() 
 </script>
