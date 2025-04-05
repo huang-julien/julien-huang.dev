@@ -18,17 +18,10 @@ export default defineNuxtConfig({
     '@nuxt/image', 
     'nuxt-icon',
     '@nuxt/fonts',
-    "@nuxtjs/prismic",
     '@nuxt/ui',
     '@nuxthub/core',
     "@nuxt/content",
   ],
-
-  runtimeConfig: {
-    github: {
-      token: ''
-    }
-  },
 
   tailwindcss: {
     config: {
@@ -53,15 +46,6 @@ export default defineNuxtConfig({
 
   future: {
    compatibilityVersion: 4 
-  },
-
-  routeRules: {
-    '/__nuxt_island/**': {
-      headers: {
-        'Access-Control-Allow-Origin': "*"
-      },
-      swr: 1000 * 60 * 60 * 24
-    }
   },
 
   compatibilityDate: '2024-08-25',
