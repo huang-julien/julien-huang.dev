@@ -12,10 +12,12 @@ export default defineNuxtConfig({
         lang: "en",
       }
     }
-  }, 
-
+  },
+  hub: {
+    database: true,
+  },
   modules: [
-    '@nuxt/image', 
+    '@nuxt/image',
     'nuxt-icon',
     '@nuxt/fonts',
     '@nuxt/ui',
@@ -34,7 +36,7 @@ export default defineNuxtConfig({
             'light-gray': '#D9DBF1',
           }
         }
-    }
+      }
     }
   },
 
@@ -45,8 +47,8 @@ export default defineNuxtConfig({
   },
 
   future: {
-   compatibilityVersion: 4 
+    compatibilityVersion: 4
   },
 
-  compatibilityDate: '2024-08-25',
+  compatibilityDate: '2025-04-05'
 })
