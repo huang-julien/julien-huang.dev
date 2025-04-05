@@ -40,8 +40,8 @@ importers:
         specifier: 3.0.0-beta.16
         version: 3.0.0-beta.16
       '@nuxtjs/prismic':
-        specifier: ^3.4.8
-        version: 3.4.8(magicast@0.3.5)(vite@6.2.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^4.0.0
+        version: 4.1.0(magicast@0.3.5)(vite@6.2.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))
       '@vueuse/core':
         specifier: ^13.0.0
         version: 13.0.0(vue@3.5.13(typescript@5.8.2))
@@ -970,8 +970,8 @@ packages:
   '@nuxtjs/mdc@0.16.1':
     resolution: {integrity: sha512-di9Ox9QY5pO2eIkQPyKFe9O8L3RvIrGbmjI3rJQRj1xGYRFj2S9RvBPCFbvfaqQGOTjOfxHLg8KtQIGj1Iw/lg==}
 
-  '@nuxtjs/prismic@3.4.8':
-    resolution: {integrity: sha512-rfuskdlA+VBpUvwruqN/DGAOnFHJgV0ishA4nKbHvgG/dxNi3o1/P1lxXjrxMEsFCDsXe0A4wZ5J5nTUwcVCxw==}
+  '@nuxtjs/prismic@4.1.0':
+    resolution: {integrity: sha512-HCCOZPcOyTJeACgzgHqeQmhmSlDX0NSNzac30ib/UgAMaOnmI9fbXFN4A1NKTAgz6TLuBBN30Am7dUU+hd6mjw==}
     engines: {node: '>=16.10.0'}
 
   '@nuxtjs/pwa-utils@3.0.0-beta.16':
@@ -1338,8 +1338,8 @@ packages:
     resolution: {integrity: sha512-/CozojXyPYU62SOJ7Ln65wOmHhlWi03n7Vplciao9k+J3HvdxoSFa+RB2IAYY0Xd7wuXCCesscgCjbNy70pGPA==}
     engines: {node: '>=14.15.0'}
 
-  '@prismicio/vue@4.3.2':
-    resolution: {integrity: sha512-HnPLDIBqKUFXtPQ3R1qrUOa68mJkeh+WkxG4hV0em380xahDs7o6J5HtPMDsvcBW17h9u7V1LSpyL8Gm6HSXTA==}
+  '@prismicio/vue@5.2.1':
+    resolution: {integrity: sha512-3f6VhzqPJtNuKPWxYcB0fOLfN0lt7CrDCllhu3P7ZCJDpo0b+GTPaCJVYq8eBNQpOIq8c86ysbKBd/ewoDZyRA==}
     engines: {node: '>=16.10.0'}
     peerDependencies:
       vue: ^3.0.0
@@ -2177,6 +2177,9 @@ packages:
 
   birpc@0.2.19:
     resolution: {integrity: sha512-5WeXXAvTmitV1RqJFppT5QtUiz2p1mRSYU000Jkft5ZUCLJIk4uQriYNO50HknxKwM6jd8utNc66K1qGIwwWBQ==}
+
+  birpc@2.2.0:
+    resolution: {integrity: sha512-1/22obknhoj56PcE+pZPp6AbWDdY55M81/ofpPW3Ltlp9Eh4zoFFLswvZmNpRTb790CY5tsNfgbYeNOqIARJfQ==}
 
   birpc@2.3.0:
     resolution: {integrity: sha512-ijbtkn/F3Pvzb6jHypHRyve2QApOCZDR25D/VnkY2G/lBNcXCTsnsCxgY4k4PkVB7zfwzYbY3O9Lcqe3xufS5g==}
@@ -3042,6 +3045,9 @@ packages:
       jiti:
         optional: true
 
+  esm-env@1.2.2:
+    resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
+
   espree@10.3.0:
     resolution: {integrity: sha512-0QYC8b24HWY8zjRnDTL6RiHfDbAWn63qb4LMj1Z4b076A4une81+z03Kg7l7mn/48PUTqoLptSXez8oknU8Clg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -3695,9 +3701,6 @@ packages:
   isexe@3.1.1:
     resolution: {integrity: sha512-LpB/54B+/2J5hqQ7imZHfdU31OlgQqx7ZicVlkm9kzg9/w8GKLEcFfJl/t7DCEDueOyBAD6zCCwTO6Fzs0NoEQ==}
     engines: {node: '>=16'}
-
-  isomorphic-unfetch@3.1.0:
-    resolution: {integrity: sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==}
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
@@ -5510,9 +5513,6 @@ packages:
 
   unenv@2.0.0-rc.15:
     resolution: {integrity: sha512-J/rEIZU8w6FOfLNz/hNKsnY+fFHWnu9MH4yRbSZF3xbbGHovcetXPs7sD+9p8L6CeNC//I9bhRYAOsBt2u7/OA==}
-
-  unfetch@4.2.0:
-    resolution: {integrity: sha512-F9p7yYCn6cIW9El1zi0HI6vqpeIvBsr3dSuRO6Xuppb1u5rXpCPmMvLSyECLhybr9isec8Ohl0hPekMVrEinDA==}
 
   unhead@2.0.3:
     resolution: {integrity: sha512-l2O1DSzEid8Fp+I+FMMhFnl1IewyAvBhbdYipaq9Jh2AMndv//yWZ2amjzDLpYpUmDr9E8WTcdoAXkm9wH60Aw==}
@@ -7541,20 +7541,18 @@ snapshots:
       - magicast
       - supports-color
 
-  '@nuxtjs/prismic@3.4.8(magicast@0.3.5)(vite@6.2.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))':
+  '@nuxtjs/prismic@4.1.0(magicast@0.3.5)(vite@6.2.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))(vue@3.5.13(typescript@5.8.2))':
     dependencies:
       '@nuxt/devtools-kit': 1.7.0(magicast@0.3.5)(vite@6.2.5(@types/node@22.5.0)(jiti@2.4.2)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))
       '@nuxt/kit': 3.16.2(magicast@0.3.5)
       '@prismicio/client': 7.17.1
-      '@prismicio/vue': 4.3.2(vue@3.5.13(typescript@5.8.2))
-      birpc: 0.2.19
-      consola: 3.4.2
+      '@prismicio/vue': 5.2.1(vue@3.5.13(typescript@5.8.2))
+      birpc: 2.2.0
       defu: 6.1.4
-      pathe: 1.1.2
+      pathe: 2.0.3
       sirv: 3.0.1
       terminate: 2.8.0
     transitivePeerDependencies:
-      - encoding
       - magicast
       - vite
       - vue
@@ -7894,14 +7892,12 @@ snapshots:
     dependencies:
       imgix-url-builder: 0.0.6
 
-  '@prismicio/vue@4.3.2(vue@3.5.13(typescript@5.8.2))':
+  '@prismicio/vue@5.2.1(vue@3.5.13(typescript@5.8.2))':
     dependencies:
       '@prismicio/client': 7.17.1
-      isomorphic-unfetch: 3.1.0
+      esm-env: 1.2.2
       vue: 3.5.13(typescript@5.8.2)
       vue-router: 4.5.0(vue@3.5.13(typescript@5.8.2))
-    transitivePeerDependencies:
-      - encoding
 
   '@rollup/plugin-alias@5.1.1(rollup@4.39.0)':
     optionalDependencies:
@@ -8749,6 +8745,8 @@ snapshots:
       file-uri-to-path: 1.0.0
 
   birpc@0.2.19: {}
+
+  birpc@2.2.0: {}
 
   birpc@2.3.0: {}
 
@@ -9684,6 +9682,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  esm-env@1.2.2: {}
+
   espree@10.3.0:
     dependencies:
       acorn: 8.14.1
@@ -10470,13 +10470,6 @@ snapshots:
   isexe@2.0.0: {}
 
   isexe@3.1.1: {}
-
-  isomorphic-unfetch@3.1.0:
-    dependencies:
-      node-fetch: 2.7.0
-      unfetch: 4.2.0
-    transitivePeerDependencies:
-      - encoding
 
   jackspeak@3.4.3:
     dependencies:
@@ -12882,8 +12875,6 @@ snapshots:
       ohash: 2.0.11
       pathe: 2.0.3
       ufo: 1.5.4
-
-  unfetch@4.2.0: {}
 
   unhead@2.0.3:
     dependencies:
