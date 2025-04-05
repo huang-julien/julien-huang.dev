@@ -16,11 +16,11 @@
 
 <style scoped lang="scss">
 .wrapper::before {
+  @apply from-p-yellow to-s-blue absolute -top-[2px] -left-[2px] -right-[2px] -bottom-[2px] rounded-full;
   content: " ";
   inset: 0;
   z-index: 0;
   padding: 5px;
-  @apply from-p-yellow to-s-blue absolute -top-[2px] -left-[2px] -right-[2px] -bottom-[2px] rounded-full;
 }
 </style>
 

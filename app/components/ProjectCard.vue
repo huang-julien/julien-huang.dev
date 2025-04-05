@@ -16,7 +16,7 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/mixins';
+@use '@/assets/mixins' as *;
 .project-card {
     @include border-animated(#58afd1, #ffe593, #233a83, 4px, bottom, right, 0.25s);
 }
