@@ -13,9 +13,7 @@ export default defineNuxtConfig({
       }
     }
   },
-  hub: {
-    database: true,
-  },
+
   modules: [
     '@nuxt/image',
     'nuxt-icon',
