@@ -39,6 +39,12 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    prerender: {
+      routes: ['/cv-fr', '/cv-en']
+    }
+  },
+
   experimental: {
     componentIslands: {
       selectiveClient: true
