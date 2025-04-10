@@ -7,7 +7,7 @@ export interface OssTeams {
 export interface OssProjects {
     name: string
     role: string[]
-    url: string
+    url?: string
     description?: string
 }
 

@@ -62,8 +62,7 @@
                                     <NuxtLink external :href="project.url" target="_blank" rel="noopener noreferrer"
                                         class="flex flex-col gap-1">
                                         <span>{{ project.name }}</span>
-                                        <span class="text-xs text-gray-500">{{ project.url }}</span>
-                                        <span class="text-xs text-gray-500">{{ project.role.join(', ') }}</span>
+                                         <span class="text-xs text-gray-500">{{ project.role.join(', ') }}</span>
                                         <span class="text-xs text-gray-500">{{ project.description }}</span>
                                     </NuxtLink>
                                 </li>
@@ -291,6 +290,11 @@ const ossProjects = computed<OssProjects[]>(() => [
         role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
         url: 'https://scripts.nuxt.com/',
         description: t('oss.projects.nuxtScripts.description')
+    },
+    {
+        name: '@nuxt/hints (private)',
+        role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
+        description: t('oss.projects.nuxtHints.description')
     }
 ]) 
 
@@ -370,6 +374,9 @@ const workExperience  = computed<WorkExperience[]>(() => [
                 },
                 "nuxtScripts": {
                     "description": "A module created in collaboration between the (former) Aurora Team and the Nuxt WebPerf team, providing best practices for third-party scripts in Nuxt."
+                },
+                "nuxtHints": {
+                    "description": "In progress. Nuxt module to actively detect bad development and performance practices in Nuxt."
                 }
             }
         },
@@ -443,6 +450,9 @@ const workExperience  = computed<WorkExperience[]>(() => [
                 },
                 "nuxtScripts": {
                     "description": "Module créé en collaboration entre l'équipe Aurora et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
+                },
+                "nuxtHints": {
+                    "description": "In progress. Module Nuxt pour activement détecter les mauvaises pratiques de développement et de performance dans Nuxt."
                 }
             }
         },
