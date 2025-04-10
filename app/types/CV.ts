@@ -25,3 +25,9 @@ export interface Skills {
     name: string
     level: number
 }
+
+export interface Education {
+    title: string
+    place: string
+    date: string
+}

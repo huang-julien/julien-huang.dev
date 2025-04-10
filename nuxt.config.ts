@@ -14,8 +14,13 @@ export default defineNuxtConfig({
     },
     pageTransition: { name: 'page', mode: 'out-in' },
   },
+  
+  icon: {
+    mode: 'svg'
+  },
 
   modules: [
+    '@nuxtjs/i18n',
     '@nuxt/image',
     '@nuxt/icon',
     '@nuxt/fonts',
@@ -23,6 +28,11 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     "@nuxt/content",
   ],
+
+  i18n: {
+    locales: ['fr', 'en'],
+    defaultLocale: 'en', 
+  },
 
   tailwindcss: {
     config: {
@@ -37,18 +47,6 @@ export default defineNuxtConfig({
         }
       }
     }
-  },
-
-  nitro: {
-    prerender: {
-      routes: ['/cv-fr', '/cv-en']
-    }
-  },
-
-  experimental: {
-    componentIslands: {
-      selectiveClient: true
-    },
   },
 
   future: {

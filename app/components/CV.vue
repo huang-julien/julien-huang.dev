@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white text-gray-900 p-8 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
+    <div class="page bg-white text-gray-900 p-8 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
         <header class="grid grid-cols-12 gap-8 px-2 pb-5 items-center border-b border-p-yellow">
             <NuxtPicture src="/amsterdam_profile.jpg" class="rounded-full col-span-2 overflow-hidden" />
 
@@ -12,22 +12,31 @@
             </div>
 
             <div class="text-xs col-span-5 flex flex-col justify-around h-full">
-                <a href="https://github.com/huang-julien" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/huang-julien" target="_blank" rel="noopener noreferrer"
+                    class="flex items-center gap-2">
                     <Icon name="bi:github" />
-                    https://github.com/huang-julien
+                    @huang-julien
                 </a>
-                <a href="https://linkedin.com/in/julien-huang/" target="_blank" rel="noopener noreferrer">
+                <a href="https://linkedin.com/in/julien-huang/" target="_blank" rel="noopener noreferrer"
+                    class="flex items-center gap-2">
                     <Icon name="bi:linkedin" />
-                    https://linkedin.com/in/julien-huang
+                    julien-huang
                 </a>
-                <a href="https://www.julien-huang.dev/" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.julien-huang.dev/" target="_blank" rel="noopener noreferrer"
+                    class="flex items-center gap-2">
                     <Icon name="mdi:web" />
                     https://www.julien-huang.dev/
                 </a>
             </div>
         </header>
 
-        <main class="grid grid-cols-2 gap-8 text-xl">
+        <section>
+            <p class="text-sm text-gray-500 text-justify whitespace-pre-wrap">
+                {{ t('introduction') }}
+            </p>
+        </section>
+
+        <main class="grid gap-8 text-lg grid-cols-[40%_1fr]">
             <div class="flex flex-col gap-4">
                 <section class="flex flex-col gap-4">
                     <h2 class="column-title">
@@ -35,21 +44,21 @@
 
                         Open-source
                     </h2>
-                    <div class="flex flex-col gap-4 text-sm">
-                        <section class="flex flex-col gap-2">
-                            <h3 class="text-sm font-bold">OSS Teams</h3>
-                            <ul class="list-disc pl-5">
-                                <li v-for="team in ossTeams" :key="team.title" class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-2 text-sm">
+                        <section class="flex flex-col gap-1">
+                            <h3 class="text-sm font-bold">Teams</h3>
+                            <ul class="list-disc pl-2">
+                                <li v-for="team in ossTeams" :key="team.title" class="text-xs flex flex-col gap-1">
                                     <span>{{ team.title }}</span>
-                                    <span class="text-xs text-gray-500">{{ team.timeline[0] }} - {{ team.timeline[1]
+                                    <span class="text-gray-500">{{ team.timeline[0] }} - {{ team.timeline[1]
                                     }}</span>
                                 </li>
                             </ul>
                         </section>
-                        <section class="flex flex-col gap-2">
-                            <h3 class="text-sm font-bold">OSS Projects</h3>
-                            <ul class="list-disc pl-5">
-                                <li v-for="project in ossProjects" :key="project.name" class="flex my-2">
+                        <section class="flex flex-col gap-1">
+                            <h3 class="text-sm font-bold">{{ t('oss.projects.title') }}</h3>
+                            <ul class="list-disc pl-2 text-xs grid gap-2">
+                                <li v-for="project in ossProjects" :key="project.name" class="flex">
                                     <NuxtLink external :href="project.url" target="_blank" rel="noopener noreferrer"
                                         class="flex flex-col gap-1">
                                         <span>{{ project.name }}</span>
@@ -68,17 +77,19 @@
 
                         Contact
                     </h2>
-                    
-                    <div class="mt-4 text-sm">
+
+                    <div class="mt-4 text-xs">
                         <ul class="list-disc pl-5">
                             <li class="flex flex-col gap-1">
-                                <span>{{ contact.email }}</span>
+                                <a :href="`mailto:${contact.email}`">
+                                    {{ contact.email }}
+                                </a>
                                 <span class="text-xs text-gray-500">{{ contact.phone }}</span>
                                 <span class="text-xs text-gray-500">{{ contact.address }}</span>
                             </li>
                         </ul>
                     </div>
-                    
+
                 </section>
             </div>
             <div class="flex flex-col gap-4">
@@ -87,21 +98,23 @@
                     <h2 class="column-title">
                         <Icon name="material-symbols:work" />
 
-                        work experience
+                        {{ t('work.title') }}
                     </h2>
                     <div class="flex flex-col gap-4 mt-4 text-sm">
                         <div class="flex flex-col gap-2">
                             <ul class="list-disc pl-5">
                                 <li v-for="work in workExperience" :key="work.company" class="mb-2 flex flex-col gap-1">
                                     <span class="font-bold">{{ work.company }} - {{ work.country }}</span>
-                                    <span class="text-xs text-gray-500">{{ work.title }}</span>
-                                    <span class="text-xs text-gray-500">{{ work.timeline[0] }} - {{ work.timeline[1]
-                                        }}</span>
+                                    <span class="inline-flex justify-between items-center">
+                                        <span class="text-xs text-gray-500">{{ work.title }}</span>
+                                        <span class="text-xs text-gray-500">{{ work.timeline[0] }} - {{
+                                            work.timeline[1] }}</span>
+                                    </span>
                                     <span class="text-xs text-gray-500">{{ work.subtitle }}</span>
                                     <ul class="list-disc pl-5">
                                         <li v-for="desc in work.description" :key="desc" class="text-xs text-gray-500">
-                                            {{
-                                                desc }}</li>
+                                            {{ desc }}
+                                        </li>
                                     </ul>
                                 </li>
                             </ul>
@@ -113,29 +126,47 @@
                     <h2 class="column-title">
                         <Icon name="carbon:skill-level" />
 
-                        Skills
+                        {{ t('skills.title') }}
                     </h2>
 
                     <div class="mt-4 text-sm">
-                        <ul class="list-disc grid grid-cols-2 pl-5">
-                            <li v-for="skill in skills" class="flex flex-col gap-1">
+                        <ul class="list-disc grid grid-cols-2 pl-5 gap-x-4">
+                            <li v-for="skill in skills" class="flex justify-between">
                                 <span>{{ skill.name }}</span>
                                 <span class="text-xs text-gray-500">{{ skill.level }}/5</span>
                             </li>
                         </ul>
                     </div>
                 </section>
- 
+
                 <section>
                     <h2 class="column-title">
                         <Icon name="material-symbols:school" />
 
-                        Education
+                        {{ t('education.title') }}
                     </h2>
-                    <div class="mt-4 text-sm">
+                    <div class="mt-4 text-xs">
                         <ul class="list-disc pl-5">
-                            <li v-for="education in education" :key="education" class="flex flex-col gap-1">
-                                <span>{{ education }}</span>
+                            <li v-for="edu in education" class="flex flex-col gap-1">
+                                <span class="font-bold">{{ edu.title }}</span>
+                                <span>
+                                    {{ edu.place }} - {{ edu.date }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="column-title">
+                        <Icon name="proicons:game" />
+
+                        Hobbies
+                    </h2>
+                    <div class="mt-4 text-xs">
+                        <ul class="list-disc pl-5 grid grid-cols-2">
+                            <li v-for="hobby in tm('hobbies')">
+                                {{ rt(hobby) }}
                             </li>
                         </ul>
                     </div>
@@ -146,23 +177,21 @@
 </template>
 
 <script setup lang="ts">
-import type { OssTeams, OssProjects, WorkExperience, Skills } from '~/types/CV';
+import type { OssTeams, OssProjects, WorkExperience, Skills, Education } from '~/types/CV';
+import type { VueMessageType } from 'vue-i18n';
 
-defineProps<{
-    ossTeams: OssTeams[]
-    ossProjects: OssProjects[]
-    workExperience: WorkExperience[]
-    education: string[]
-}>()
+const { t, tm, rt } = useI18n({
+    useScope: 'local'
+})
 
 const skills: Skills[] = [
     {
-        name: 'JavaScript',
+        name: 'TypeScript',
         level: 5
     },
     {
-        name: 'TypeScript',
-        level: 5
+        name: 'React',
+        level: 3
     },
     {
         name: 'Vue.js',
@@ -173,20 +202,20 @@ const skills: Skills[] = [
         level: 5
     },
     {
-        name: 'Tailwind CSS',
-        level: 4
-    },
-    {
         name: 'Cypress',
         level: 3
+    },
+    {
+        name: 'Playwright',
+        level: 4
     },
     {
         name: 'ASP.NET',
         level: 2
     },
     {
-        name:'Playwright',
-        level: 4
+        name: 'React Native',
+        level: 2
     }
 ]
 
@@ -201,6 +230,91 @@ const contact: Contact = {
     phone: '+33 6 52 14 92 22',
     address: 'Asnière-sur-seine, 92600, France'
 }
+
+const education = computed< Education[]>(() =>[
+    {
+        title: t('education.devweb.title'),
+        place:  t('education.devweb.place'),
+        date: '2020',
+    },
+    {
+        title: t('education.lea.title'),
+        place: t('education.lea.place'),
+        date: '2018',
+    },
+    {
+        title: t('education.bac.title'),
+        place: t('education.bac.place'),
+        date: '2015',
+    }
+] ) 
+
+const ossTeams: OssTeams[] = [
+    {
+        title: 'Nuxt Core Team',
+        timeline: ['02/2024', 'Present']
+    },
+    {
+        title: 'Nuxt Insider Team',
+        timeline: ['2023', '2024']
+    },
+    {
+        title: 'VueUse PR&Triage Team',
+        timeline: ['2024', 'Present']
+    },
+]
+
+const ossProjects = computed<OssProjects[]>(() => [
+    {
+        name: 'Nuxt',
+        role: [ t('oss.role.coreTeam'), t('oss.role.maintainer')],
+        url: 'https://nuxt.com',
+        description: t('oss.projects.nuxt.description')
+    },
+    {
+        name: 'nuxt-applicationinsights',
+        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        url: 'https://github.com/huang-julien/nuxt-applicationinsights',
+    },
+    {
+        name: 'nitro-applicationinsights',
+        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        url: 'https://github.com/huang-julien/nitro-applicationinsights',
+    },
+    {
+        name: 'nitro-opentelemetry',
+        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        url: 'https://github.com/huang-julien/nitro-opentelemetry',
+    },
+    {
+        name: '@nuxt/scripts',
+        role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
+        url: 'https://scripts.nuxt.com/',
+        description: t('oss.projects.nuxtScripts.description')
+    }
+]) 
+
+const workExperience  = computed<WorkExperience[]>(() => [
+    {
+        company: 'Leetchi',
+        country: 'France',
+        title: 'Frontend Developer',
+        timeline: ['2022', 'Present'],
+        subtitle: t('work.experience.leetchi.subtitle'),
+        stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
+        description: (tm('work.experience.leetchi.description') as VueMessageType[]).map((desc) => rt(desc))
+    },
+    {
+        company: 'HSK Digital',
+        country: 'France',
+        title: t('work.experience.hskDigital.title'),
+        timeline: ['2020', '2022'],
+        stack: ['Nuxt 2', 'Vue 2', 'Vue 3', 'Magento'],
+        description: (tm('work.experience.hskDigital.description') as VueMessageType[]).map((desc) => rt(desc))
+    }
+]
+) 
+
 </script>
 
 <style scoped lang="scss">
@@ -211,6 +325,154 @@ const contact: Contact = {
 }
 
 .column-title {
-    @apply flex items-center gap-2 border-b border-p-yellow pb-2 px-4 w-fit font-bold text-lg;
+    @apply flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg;
 }
 </style>
+
+
+<i18n lang="json">{
+    "en": {
+        "introduction": "Web developer passionate about open source. \nI love the challenges that are given to me and co-building with product teams. \nNuxt Core Team Member. Sharing my knowledge and learning from others is what motivates me on a daily basis.",
+        "education": {
+            "title": "Education",
+            "devweb": {
+                "title": "Web Developer Training",
+                "place": "OpenClassrooms"
+            },
+            "lea": {
+                "title": "Bachelor's Degree in Applied Foreign Languages",
+                "place": "UPJV, Amiens"
+            },
+            "bac": {
+                "title": "Scientific Baccalaureate with Mathematics Specialization",
+                "place": "Lycée Robert de luzarches, Amiens"
+            }
+        },
+        "hobbies": [
+            "Conferences",
+            "Video Games",
+            "Programming",
+            "Piano",
+            "Flute",
+            "Powerlifting"
+        ],
+        "oss": {
+            "role": {
+                "coreTeam": "Core Team",
+                "maintainer": "Maintainer",
+                "author": "Author",
+                "co-author": "Co-author"
+            },
+            "projects": {
+                "title": "Projects",
+                "nuxt": {
+                    "description": "Part of the Nuxt Core Team, maintaining and developing Nuxt and its ecosystem."
+                },
+                "nuxtScripts": {
+                    "description": "A module created in collaboration between the (former) Aurora Team and the Nuxt WebPerf team, providing best practices for third-party scripts in Nuxt."
+                }
+            }
+        },
+        "work": {
+            "title": "Work Experience",
+            "experience": {
+                "leetchi": {
+                    "name": "Leetchi",
+                    "title": "Frontend Developer",
+                    "subtitle": "Frontend Lead",
+                    "description": [
+                        "Developed the complete redesign of Leetchi's front office using Nuxt 3",
+                        "Developed new features and maintained both the front office and back office",
+                        "Gained expertise in ASP.NET",
+                        "Supported QA with Cypress testing",
+                        "Participated in technical decisions and design",
+                        "Responsible for frontend architecture decisions",
+                        "Training and mentoring other frontend developers"
+                    ]
+                },
+                "hskDigital": {
+                    "name": "HSK Digital",
+                    "title": "Frontend Developer",
+                    "description": [
+                        "Development of an internal project from scratch using Vue.js",
+                        "Magento 2 integrator"
+                    ]
+                }
+            }
+        },
+        "skills": {
+            "title": "Skills"
+        }
+    },
+    "fr": {
+        "introduction": "Développeur web passionné par l'open source. \nJ'adore les défis qui me sont donnés et co-construire avec les équipes produits. \nMembre de la Nuxt Core Team. Partager mes connaissances et apprendre des autres est ce qui me motive au quotidien.",
+        "education": {
+            "title": "Formations",
+            "devweb": {
+                "title": "Formation Devéloppeur Web",
+                "place": "OpenClassrooms"
+            },
+            "lea": {
+                "title": "Licence en langues étrangères appliquées",
+                "place": "UPJV, Amiens"
+            },
+            "bac": {
+                "title": "Baccaulauréat Scientifique Spé Math",
+                "place": "Lycée Robert de luzarches, Amiens"
+            }
+        },
+        "hobbies": [
+            "Conférencier",
+            "Jeux Vidéo",
+            "Programmation",
+            "Piano",
+            "Flute",
+            "Force athlétique"
+        ],
+        "oss": {
+            "role": {
+                "coreTeam": "Core Team",
+                "maintainer": "Mainteneur",
+                "author": "Auteur",
+                "co-author": "Co-auteur"
+            },
+            "projects": {
+                "title": "Projets",
+                "nuxt": {
+                    "description": "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème."
+                },
+                "nuxtScripts": {
+                    "description": "Module créé en collaboration entre l'équipe Aurora et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
+                }
+            }
+        },
+        "work": {
+            "title": "Expérience professionnelle",
+            "experience": {
+                "leetchi": {
+                    "title": "Développeur frontend",
+                    "subtitle": "Référent Front",
+                    "description": [
+                        "Développement de la refonte complète du frontoffice de Leetchi en utilisant Nuxt 3",
+                        "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
+                        "Montée en compétence sur ASP.NET",
+                        "Support de l'équipe QA avec les tests Cypress",
+                        "Participation aux décisions techniques et à la conception",
+                        "Responsable des décisions d'architecture frontend",
+                        "Formation et mentorat des autres développeurs frontend"
+                    ]
+                },
+                "hskDigital": {
+                    "title": "Développeur Frontend",
+                    "description": [
+                        "Développement d'un projet interne from scratch en utilisant Vue.js",
+                        "Intégrateur Magento 2"
+                    ]
+                }
+            }
+        },
+        "skills": {
+            "title": "Compétences"
+        }
+    }
+}</i18n>
