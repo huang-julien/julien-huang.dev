@@ -9,13 +9,13 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.27.3",
-    "@nuxt/content": "3.3.0",
+    "@nuxt/content": "3.5.0",
     "@nuxt/eslint-config": "^0.7.6",
     "@nuxt/fonts": "^0.11.1",
     "@nuxt/image": "^1.10.0",
     "@nuxt/ui": "^2.21.1",
     "@nuxthub/core": "^0.8.23",
-    "@nuxtjs/i18n": "9.5.2",
+    "@nuxtjs/i18n": "9.5.3",
     "@nuxtjs/icon": "3.0.0-beta.16",
     "@vueuse/core": "^13.0.0",
     "eslint": "^9.24.0",
@@ -23,7 +23,7 @@
     "nuxt-icon": "^0.6.10",
     "radix-vue": "^1.9.17",
     "sass": "^1.86.3",
-    "typescript": "5.8.2"
+    "typescript": "5.8.3"
   },
   "dependencies": {
     "@nuxt/icon": "^1.11.0"
