@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.27.3",
-    "@nuxt/content": "3.5.0",
+    "@nuxt/content": "3.5.1",
     "@nuxt/eslint-config": "^0.7.6",
     "@nuxt/fonts": "^0.11.1",
     "@nuxt/image": "^1.10.0",
