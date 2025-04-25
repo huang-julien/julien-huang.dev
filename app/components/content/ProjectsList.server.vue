@@ -17,7 +17,7 @@ const projects = [
     },
     
     {
-        name: 'nuxt-applicationinsights',
+        name: 'nitro-applicationinsights',
         description: 'ApplicationInsights module for Nitro.',
         url: 'https://github.com/huang-julien/nitro-applicationinsights'
     },
@@ -34,6 +34,5 @@ const projects = [
         url: 'https://github.com/nuxt/nuxt'
     }
 ]
-
 </script>
  

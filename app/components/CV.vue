@@ -1,14 +1,14 @@
 <template>
     <div class="page bg-white text-gray-900 p-8 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
         <header class="grid grid-cols-12 gap-8 px-2 pb-5 items-center border-b border-p-yellow">
-            <NuxtPicture src="/amsterdam_profile.jpg" class="rounded-full col-span-2 overflow-hidden" />
+            <NuxtPicture :modifiers="{}" src="/amsterdam_profile.jpg" class="rounded-full col-span-2 overflow-hidden" />
 
             <h1 class="col-span-2 text-2xl font-bold text-p-blue">
                 Julien Huang
             </h1>
 
             <div class="col-span-3">
-                <h2 class="text-lg">JS Developer</h2>
+                <h2 class="text-lg">{{ t('title') }}</h2>
             </div>
 
             <div class="text-xs col-span-5 flex flex-col justify-around h-full">
@@ -31,12 +31,12 @@
         </header>
 
         <section>
-            <p class="text-sm text-gray-500 text-justify whitespace-pre-wrap">
+            <p class="text-xs text-gray-500 text-justify whitespace-pre-wrap">
                 {{ t('introduction') }}
             </p>
         </section>
 
-        <main class="grid gap-8 text-lg grid-cols-[40%_1fr]">
+        <main class="grid gap-8 text-lg grid-cols-[30%_1fr]">
             <div class="flex flex-col gap-4">
                 <section class="flex flex-col gap-4">
                     <h2 class="column-title">
@@ -60,10 +60,10 @@
                             <ul class="list-disc pl-2 text-xs grid gap-2">
                                 <li v-for="project in ossProjects" :key="project.name" class="flex">
                                     <NuxtLink external :href="project.url" target="_blank" rel="noopener noreferrer"
-                                        class="flex flex-col gap-1">
-                                        <span>{{ project.name }}</span>
-                                         <span class="text-xs text-gray-500">{{ project.role.join(', ') }}</span>
-                                        <span class="text-xs text-gray-500">{{ project.description }}</span>
+                                        class="flex flex-col ">
+                                        <span class="mb-1">{{ project.name }}</span>
+                                        <span class="text-2xs text-gray-500">{{ project.role.join(', ') }}</span>
+                                        <span class="text-2xs text-gray-500">{{ project.description }}</span>
                                     </NuxtLink>
                                 </li>
                             </ul>
@@ -99,11 +99,11 @@
 
                         {{ t('work.title') }}
                     </h2>
-                    <div class="flex flex-col gap-4 mt-4 text-sm">
+                    <div class="flex flex-col gap-4 mt-4">
                         <div class="flex flex-col gap-2">
                             <ul class="list-disc pl-5">
                                 <li v-for="work in workExperience" :key="work.company" class="mb-2 flex flex-col gap-1">
-                                    <span class="font-bold">{{ work.company }} - {{ work.country }}</span>
+                                    <span class="text-sm font-bold">{{ work.company }} - {{ work.country }}</span>
                                     <span class="inline-flex justify-between items-center">
                                         <span class="text-xs text-gray-500">{{ work.title }}</span>
                                         <span class="text-xs text-gray-500">{{ work.timeline[0] }} - {{
@@ -111,7 +111,7 @@
                                     </span>
                                     <span class="text-xs text-gray-500">{{ work.subtitle }}</span>
                                     <ul class="list-disc pl-5">
-                                        <li v-for="desc in work.description" :key="desc" class="text-xs text-gray-500">
+                                        <li v-for="desc in work.description" :key="desc" class="text-2xs text-gray-500">
                                             {{ desc }}
                                         </li>
                                     </ul>
@@ -128,7 +128,7 @@
                         {{ t('skills.title') }}
                     </h2>
 
-                    <div class="mt-4 text-sm">
+                    <div class="mt-4 text-xs">
                         <ul class="list-disc grid grid-cols-2 pl-5 gap-x-4">
                             <li v-for="skill in skills" class="flex justify-between">
                                 <span>{{ skill.name }}</span>
@@ -336,7 +336,8 @@ const workExperience  = computed<WorkExperience[]>(() => [
 
 <i18n lang="json">{
     "en": {
-        "introduction": "Web developer passionate about open source. \nI love the challenges that are given to me and co-building with product teams. \nNuxt Core Team Member. Sharing my knowledge and learning from others is what motivates me on a daily basis.",
+        "title": "JS Developer",
+        "introduction": "Web developer passionate about open source. \nI love the challenges that are given to me and co-building with product teams. \nAs a Core member of the Nuxt Team, sharing my knowledge and learning from others is what motivates me on a daily basis.",
         "education": {
             "title": "Education",
             "devweb": {
@@ -386,15 +387,16 @@ const workExperience  = computed<WorkExperience[]>(() => [
                 "leetchi": {
                     "name": "Leetchi",
                     "title": "Frontend Developer",
-                    "subtitle": "Frontend Lead",
+                    "subtitle": "Frontend Technical Lead",
                     "description": [
-                        "Developed the complete redesign of Leetchi's front office using Nuxt 3",
-                        "Developed new features and maintained both the front office and back office",
-                        "Gained expertise in ASP.NET",
-                        "Supported QA with Cypress testing",
-                        "Participated in technical decisions and design",
+                        "Participated in technical decisions and design of features",
                         "Responsible for frontend architecture decisions",
-                        "Training and mentoring other frontend developers"
+                        "Training and mentoring other frontend developers",
+                        "Developed the complete redesign of Leetchi's front office using Nuxt 2 (bridge) with technical debt management",
+                        "Migration from Nuxt 2 to Nuxt 3",
+                        "Developed new features and maintained both the front office and back office",
+                        "Increased my skills in ASP.NET",
+                        "Supported QA with Cypress E2E testing"
                     ]
                 },
                 "hskDigital": {
@@ -412,7 +414,8 @@ const workExperience  = computed<WorkExperience[]>(() => [
         }
     },
     "fr": {
-        "introduction": "Développeur web passionné par l'open source. \nJ'adore les défis qui me sont donnés et co-construire avec les équipes produits. \nMembre de la Nuxt Core Team. Partager mes connaissances et apprendre des autres est ce qui me motive au quotidien.",
+        "title": "Développeur JS",
+        "introduction": "Développeur web passionné par l'open source. \nJ'adore les défis qui me sont donnés et co-construire avec les équipes produits. \nEn tant que membre de la Nuxt Core Team, partager mes connaissances et apprendre des autres est ce qui me motive au quotidien.",
         "education": {
             "title": "Formations",
             "devweb": {
@@ -463,13 +466,14 @@ const workExperience  = computed<WorkExperience[]>(() => [
                     "title": "Développeur frontend",
                     "subtitle": "Référent Front",
                     "description": [
-                        "Développement de la refonte complète du frontoffice de Leetchi en utilisant Nuxt 3",
+                        "Participation aux décisions et à la conception technique des features",
+                        "Responsable des décisions d'architecture frontend",
+                        "Formation et mentorat des autres développeurs frontend",
+                        "Développement de la refonte complète du frontoffice de Leetchi en utilisant Nuxt 2 (bridge) avec la gestion de la dette technique",
+                        "Résponsable de la migration de Nuxt 2 vers Nuxt 3",
                         "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
                         "Montée en compétence sur ASP.NET",
-                        "Support de l'équipe QA avec les tests Cypress",
-                        "Participation aux décisions techniques et à la conception",
-                        "Responsable des décisions d'architecture frontend",
-                        "Formation et mentorat des autres développeurs frontend"
+                        "Support de l'équipe QA avec les tests Cypress"
                     ]
                 },
                 "hskDigital": {

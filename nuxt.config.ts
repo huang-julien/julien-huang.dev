@@ -12,7 +12,7 @@ export default defineNuxtConfig({
         lang: "en",
       }
     },
-    pageTransition: { name: 'page', mode: 'out-in' },
+    pageTransition: { name: 'fade', mode: 'out-in' },
   },
   
   icon: {
@@ -43,9 +43,12 @@ export default defineNuxtConfig({
             's-blue': '#3083DC',
             'p-yellow': '#EBBE46',
             'light-gray': '#D9DBF1',
-          }
+          },
+          fontSize: {
+            '2xs': ['0.625rem', '0.875rem'],
+          }, 
         }
-      }
+      },
     }
   },
 
