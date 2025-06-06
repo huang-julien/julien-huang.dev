@@ -1,5 +1,5 @@
 <template>
-    <header class="flex w-full items-center p-4 gap-10 backdrop-blur-sm sticky top-0">
+    <header class="flex items-center p-4 gap-10 backdrop-blur-sm fixed top-0 left-0 right-0 h-20">
         <NuxtLink to="/">
             <NuxtPicture src="/profile.jpg" sizes="64px" alt="Julien Huang profile picture" class="rounded-full aspect-square" :img-attrs="{
                 class: 'rounded-full aspect-square',
@@ -11,7 +11,10 @@
         </NuxtLink>
 
         <nav class="ml-auto">
-            <ul class="flex">
+            <ul class="flex gap-3">
+                <li class="my-5">
+                    <NuxtLink to="/sponsors">Sponsors</NuxtLink>
+                </li>
                 <li class="my-5">
                     <NuxtLink to="/work">Work</NuxtLink>
                 </li>
