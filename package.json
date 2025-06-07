@@ -19,13 +19,19 @@
     "@nuxtjs/icon": "3.0.0-beta.16",
     "@vueuse/core": "^13.0.0",
     "eslint": "^9.24.0",
-    "nuxt": "^4.0.0-alpha.1",
+    "nuxt": "4.0.0-alpha.1",
     "nuxt-icon": "^0.6.10",
     "radix-vue": "^1.9.17",
     "sass": "^1.86.3",
     "typescript": "5.8.3"
   },
   "dependencies": {
-    "@nuxt/icon": "^1.11.0"
+    "@nuxt/icon": "^1.11.0",
+    "sponsorkit": "^16.4.2"
+  },
+  "resolutions": {
+    "nuxt": "4.0.0-alpha.1",
+    "@nuxt/schema": "4.0.0-alpha.1",
+    "@nuxt/kit": "4.0.0-alpha.1"
   }
 }

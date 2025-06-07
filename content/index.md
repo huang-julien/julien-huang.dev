@@ -3,7 +3,7 @@ title: Julien Huang - Open-source developer
 description: Open-source developer, contributing to anything I work with.
 ---
 
-::TwoCols
+::TwoCols{class="py-auto" left-class="grid items-center" right-class="my-auto"}
 
 #left
 
@@ -14,15 +14,14 @@ description: Open-source developer, contributing to anything I work with.
 
 # Julien Huang
 
-## Hello ! 👋
+Hello! 👋
 
-**I'm Julien.**
-Frontend developer by day, open-source contributor by night.
+I'm Julien -- a frontend developer by day, open-source contributor by night.
 
-I'm currently working for Leetchi in France as a frontend technical lead.
+I currently work at Leetchi in France as a frontend technical lead.
 
-Outside my day job, i'm also part of the Nuxt Core Team. And as a self taught developer, open-source is my way to learn and improve myself.
+Outside of my day job, I'm part of the Nuxt Core Team. As a self-taught developer, open source has been a huge part of how I learn and grow.
 
-When i'm not programming, I like to spend time playing video games, music and powerlifting.
+When I’m not coding, you’ll probably find me playing video games, making music, or powerlifting.
 
 ::
