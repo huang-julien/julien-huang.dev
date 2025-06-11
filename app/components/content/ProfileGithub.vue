@@ -15,6 +15,8 @@
 </template>
 
 <style scoped lang="scss">
+@reference "@/assets/style.css";
+
 .wrapper::before {
   @apply from-p-yellow to-s-blue absolute -top-[2px] -left-[2px] -right-[2px] -bottom-[2px] rounded-full;
   content: " ";
