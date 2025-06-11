@@ -39,7 +39,7 @@
         <main class="grid gap-8 text-lg grid-cols-[30%_1fr]">
             <div class="flex flex-col gap-4">
                 <section class="flex flex-col gap-4">
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="bi:github" />
 
                         Open-source
@@ -71,7 +71,7 @@
                     </div>
                 </section>
                 <section>
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="mdi:contact" />
 
                         Contact
@@ -94,7 +94,7 @@
             <div class="flex flex-col gap-4">
                 <section>
 
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="material-symbols:work" />
 
                         {{ t('work.title') }}
@@ -122,7 +122,7 @@
                 </section>
 
                 <section>
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="carbon:skill-level" />
 
                         {{ t('skills.title') }}
@@ -139,7 +139,7 @@
                 </section>
 
                 <section>
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="material-symbols:school" />
 
                         {{ t('education.title') }}
@@ -157,7 +157,7 @@
                 </section>
 
                 <section>
-                    <h2 class="column-title">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="proicons:game" />
 
                         Hobbies
@@ -328,9 +328,7 @@ const workExperience  = computed<WorkExperience[]>(() => [
     size: A4 portrait;
 }
 
-.column-title {
-    @apply flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg;
-}
+ 
 </style>
 
 

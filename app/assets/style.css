@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+    --color-p-blue: #172554;
+    --color-s-blue: #3083DC;
+    --color-p-yellow: #EBBE46;
+    --color-light-gray: #D9DBF1;
+
+    --font-size-2xs: 0.625rem;
+    --font-size--line-height: 0.875rem;
+}
+
+.aspect-square {
+    aspect-ratio: 1;
+}
+
+body {
+    font-family: 'JetBrains Mono', sans-serif;
+}
