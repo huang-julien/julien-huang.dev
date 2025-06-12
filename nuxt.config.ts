@@ -10,7 +10,8 @@ export default defineNuxtConfig({
       title: "Julien Huang - Open source developer",
       htmlAttrs: {
         lang: "en",
-      }
+      },
+      titleTemplate: '%s - Julien Huang',
     },
     pageTransition: { name: 'fade', mode: 'out-in' },
   },

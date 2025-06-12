@@ -1,5 +1,5 @@
 ---
-title: Julien Huang - Open-source developer
+title: Open-source developer
 description: Open-source developer, contributing to anything I work with.
 ---
 
