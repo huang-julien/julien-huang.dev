@@ -9,7 +9,7 @@ const route = useRoute()
 console.log('route', route)
 const { data: content } = await useAsyncData(computed(() => route.fullPath),() => queryCollection('content').path(route.path).first())
 console.log(await queryCollection('content').all())
-  console.log('content', content)
+  console.log('content', content.value)
 useSeoMeta({
   title: content.value?.title,
   description: content.value?.description
