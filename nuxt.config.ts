@@ -15,7 +15,9 @@ export default defineNuxtConfig({
     },
     pageTransition: { name: 'fade', mode: 'out-in' },
   },
-  
+  hub: {
+    database: true,
+  },
   icon: {
     mode: 'svg'
   },
