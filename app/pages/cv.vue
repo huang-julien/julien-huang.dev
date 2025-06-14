@@ -2,8 +2,8 @@
 
 <template>
     <div>
-        <div class="text-white print:hidden">
-            <USelect  v-model="locale" :options="locales" class="mx-auto my-3 w-fit" />
+        <div class="text-white print:hidden flex">
+            <USelect v-model="locale" :items="locales" class="mx-auto my-3 w-fit" />
         </div>
         <CV  />
     </div>

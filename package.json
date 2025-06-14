@@ -21,9 +21,10 @@
     "eslint": "^9.24.0",
     "nuxt": "4.0.0-alpha.2",
     "nuxt-icon": "^0.6.10",
-     "sass": "^1.89.2",
+    "sass": "^1.89.2",
     "tailwindcss": "^4.1.10",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "wrangler": "^4.20.0"
   },
   "dependencies": {
     "@nuxt/icon": "^1.11.0",

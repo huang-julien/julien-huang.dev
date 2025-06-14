@@ -328,7 +328,9 @@ const workExperience  = computed<WorkExperience[]>(() => [
     size: A4 portrait;
 }
 
- 
+.text-2xs {
+    font-size: 0.625rem;
+}
 </style>
 
 
