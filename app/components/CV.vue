@@ -292,7 +292,7 @@ const ossProjects = computed<OssProjects[]>(() => [
         description: t('oss.projects.nuxtScripts.description')
     },
     {
-        name: '@nuxt/hints (private)',
+        name: '@nuxt/hints',
         role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
         description: t('oss.projects.nuxtHints.description')
     }
@@ -337,7 +337,7 @@ const workExperience  = computed<WorkExperience[]>(() => [
 <i18n lang="json">{
     "en": {
         "title": "JS Developer",
-        "introduction": "Web developer passionate about open source. \nI love the challenges that are given to me and co-building with product teams. \nAs a Core member of the Nuxt Team, sharing my knowledge and learning from others is what motivates me on a daily basis.",
+        "introduction": "Web developer passionate about open source. \nI love challenges and working in collaboration with product teams. \nAs a Core member of the Nuxt Team, sharing my knowledge and learning from others is what motivates me on a daily basis.",
         "education": {
             "title": "Education",
             "devweb": {
@@ -389,14 +389,14 @@ const workExperience  = computed<WorkExperience[]>(() => [
                     "title": "Frontend Developer",
                     "subtitle": "Frontend Technical Lead",
                     "description": [
-                        "Participated in technical decisions and design of features",
+                        "Participation in technical decisions and design of features",
                         "Responsible for frontend architecture decisions",
                         "Training and mentoring other frontend developers",
                         "Developed the complete redesign of Leetchi's front office using Nuxt 2 (bridge) with technical debt management",
-                        "Migration from Nuxt 2 to Nuxt 3",
-                        "Developed new features and maintained both the front office and back office",
-                        "Increased my skills in ASP.NET",
-                        "Supported QA with Cypress E2E testing"
+                        "Nuxt 2 to Nuxt 3 migration",
+                        "Feature development and maintenance of the front office and back office",
+                        "ASP.NET skill development",
+                        "QA support with Cypress E2E testing"
                     ]
                 },
                 "hskDigital": {
@@ -419,7 +419,7 @@ const workExperience  = computed<WorkExperience[]>(() => [
         "education": {
             "title": "Formations",
             "devweb": {
-                "title": "Formation Devéloppeur Web",
+                "title": "Formation Développeur Web",
                 "place": "OpenClassrooms"
             },
             "lea": {
@@ -469,7 +469,7 @@ const workExperience  = computed<WorkExperience[]>(() => [
                         "Participation aux décisions et à la conception technique des features",
                         "Responsable des décisions d'architecture frontend",
                         "Formation et mentorat des autres développeurs frontend",
-                        "Développement de la refonte complète du frontoffice de Leetchi en utilisant Nuxt 2 (bridge) avec la gestion de la dette technique",
+                        "Développement de la refonte complète du frontoffice de Leetchi en Nuxt 2 (bridge) avec la gestion de la dette technique",
                         "Résponsable de la migration de Nuxt 2 vers Nuxt 3",
                         "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
                         "Montée en compétence sur ASP.NET",
