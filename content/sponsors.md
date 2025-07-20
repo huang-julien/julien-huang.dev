@@ -9,4 +9,4 @@ Open source is something I love doing in my free time. I usually spend at least 
 
 Huge thanks to all my past and current sponsors — your support seriously means a lot!
 
-<NuxtImg class="mx-auto" src="/sponsorskit.webp" sizes="800 xs:100vw sm:100vw md:100vw lg:800"  />
+<NuxtImg class="mx-auto" src="/sponsorskit.webp" height="400" sizes="s:100vw sm:100vw md:100vw lg:800px"  />
