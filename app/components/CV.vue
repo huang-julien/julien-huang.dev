@@ -51,7 +51,7 @@
                                 <li v-for="team in ossTeams" :key="team.title" class="text-xs flex flex-col gap-1">
                                     <span>{{ team.title }}</span>
                                     <span class="text-gray-500">{{ team.timeline[0] }} - {{ team.timeline[1]
-                                    }}</span>
+                                        }}</span>
                                 </li>
                             </ul>
                         </section>
@@ -69,26 +69,6 @@
                             </ul>
                         </section>
                     </div>
-                </section>
-                <section>
-                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
-                        <Icon name="mdi:contact" />
-
-                        Contact
-                    </h2>
-
-                    <div class="mt-4 text-xs">
-                        <ul class="list-disc pl-5">
-                            <li class="flex flex-col gap-1">
-                                <a :href="`mailto:${contact.email}`">
-                                    {{ contact.email }}
-                                </a>
-                                <span class="text-xs text-gray-500">{{ contact.phone }}</span>
-                                <span class="text-xs text-gray-500">{{ contact.address }}</span>
-                            </li>
-                        </ul>
-                    </div>
-
                 </section>
             </div>
             <div class="flex flex-col gap-4">
@@ -156,22 +136,46 @@
                     </div>
                 </section>
 
-                <section>
-                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
-                        <Icon name="proicons:game" />
-
-                        Hobbies
-                    </h2>
-                    <div class="mt-4 text-xs">
-                        <ul class="list-disc pl-5 grid grid-cols-2">
-                            <li v-for="hobby in tm('hobbies')">
-                                {{ rt(hobby) }}
-                            </li>
-                        </ul>
-                    </div>
-                </section>
             </div>
         </main>
+
+        <footer class="flex gap-4">
+            <section>
+                <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
+                    <Icon name="mdi:contact" />
+
+                    Contact
+                </h2>
+
+                <div class="mt-4 text-xs">
+                    <ul class="list-disc pl-5">
+                        <li class="flex flex-col gap-1">
+                            <a :href="`mailto:${contact.email}`">
+                                {{ contact.email }}
+                            </a>
+                            <span class="text-xs text-gray-500">{{ contact.phone }}</span>
+                            <span class="text-xs text-gray-500">{{ contact.address }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </section>
+
+            <section class="flex-1">
+                <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
+                    <Icon name="proicons:game" />
+
+                    Hobbies
+                </h2>
+                <div class="mt-4 text-xs">
+                    <ul class="list-disc pl-5 grid grid-cols-2">
+                        <li v-for="hobby in tm('hobbies')">
+                            {{ rt(hobby) }}
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </footer>
     </div>
 </template>
 
@@ -230,10 +234,10 @@ const contact: Contact = {
     address: 'Asnière-sur-seine, 92600, France'
 }
 
-const education = computed< Education[]>(() =>[
+const education = computed<Education[]>(() => [
     {
         title: t('education.devweb.title'),
-        place:  t('education.devweb.place'),
+        place: t('education.devweb.place'),
         date: '2020',
     },
     {
@@ -246,7 +250,7 @@ const education = computed< Education[]>(() =>[
         place: t('education.bac.place'),
         date: '2015',
     }
-] ) 
+])
 
 const ossTeams: OssTeams[] = [
     {
@@ -266,39 +270,39 @@ const ossTeams: OssTeams[] = [
 const ossProjects = computed<OssProjects[]>(() => [
     {
         name: 'Nuxt',
-        role: [ t('oss.role.coreTeam'), t('oss.role.maintainer')],
+        role: [t('oss.role.coreTeam'), t('oss.role.maintainer')],
         url: 'https://nuxt.com',
         description: t('oss.projects.nuxt.description')
     },
     {
         name: 'nuxt-applicationinsights',
-        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        role: [t('oss.role.author'), t('oss.role.maintainer')],
         url: 'https://github.com/huang-julien/nuxt-applicationinsights',
     },
     {
         name: 'nitro-applicationinsights',
-        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        role: [t('oss.role.author'), t('oss.role.maintainer')],
         url: 'https://github.com/huang-julien/nitro-applicationinsights',
     },
     {
         name: 'nitro-opentelemetry',
-        role: [ t('oss.role.author'),  t('oss.role.maintainer')],
+        role: [t('oss.role.author'), t('oss.role.maintainer')],
         url: 'https://github.com/huang-julien/nitro-opentelemetry',
     },
     {
         name: '@nuxt/scripts',
-        role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
+        role: [t('oss.role.co-author'), t('oss.role.maintainer')],
         url: 'https://scripts.nuxt.com/',
         description: t('oss.projects.nuxtScripts.description')
     },
     {
         name: '@nuxt/hints',
-        role: [ t('oss.role.co-author'),  t('oss.role.maintainer')],
+        role: [t('oss.role.co-author'), t('oss.role.maintainer')],
         description: t('oss.projects.nuxtHints.description')
     }
-]) 
+])
 
-const workExperience  = computed<WorkExperience[]>(() => [
+const workExperience = computed<WorkExperience[]>(() => [
     {
         company: 'Leetchi',
         country: 'France',
@@ -317,7 +321,7 @@ const workExperience  = computed<WorkExperience[]>(() => [
         description: (tm('work.experience.hskDigital.description') as VueMessageType[]).map((desc) => rt(desc))
     }
 ]
-) 
+)
 
 </script>
 
@@ -326,6 +330,10 @@ const workExperience  = computed<WorkExperience[]>(() => [
     margin: 0;
     padding: 0;
     size: A4 portrait;
+}
+
+p {
+    margin: 0;
 }
 
 .text-2xs {
@@ -396,7 +404,8 @@ const workExperience  = computed<WorkExperience[]>(() => [
                         "Nuxt 2 to Nuxt 3 migration",
                         "Feature development and maintenance of the front office and back office",
                         "ASP.NET skill development",
-                        "QA support with Cypress E2E testing"
+                        "QA support with Cypress E2E testing",
+                        "Design Core Team - Dev reviewer"
                     ]
                 },
                 "hskDigital": {
@@ -473,7 +482,8 @@ const workExperience  = computed<WorkExperience[]>(() => [
                         "Résponsable de la migration de Nuxt 2 vers Nuxt 3",
                         "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
                         "Montée en compétence sur ASP.NET",
-                        "Support de l'équipe QA avec les tests Cypress"
+                        "Support de l'équipe QA avec les tests Cypress",
+                        "Team Design Core - Dev reviewer"
                     ]
                 },
                 "hskDigital": {
