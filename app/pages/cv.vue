@@ -3,9 +3,9 @@
 <template>
     <div>
         <div class="text-white print:hidden flex">
-            <USelect v-model="locale" :items="locales" class="mx-auto my-3 w-fit" />
+            <USelect v-model="locale" :items="options" class="mx-auto my-3 w-fit" />
         </div>
-        <CV  />
+        <CV />
     </div>
 </template>
 
@@ -15,4 +15,8 @@ definePageMeta({
 })
 
 const { locales, locale } = useI18n()
+
+const options = computed(() => locales.value.map((l) => {
+    return l.code
+}))
 </script>
