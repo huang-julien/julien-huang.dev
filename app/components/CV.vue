@@ -255,15 +255,15 @@ const education = computed<Education[]>(() => [
 const ossTeams: OssTeams[] = [
     {
         title: 'Nuxt Core Team',
-        timeline: ['02/2024', t('present')]
+        timeline: ['02/2024', t('today')]
     },
     {
         title: 'Nuxt Ecosystem Team',
-        timeline: ['2023', t('present')]
+        timeline: ['2023', t('today')]
     },
     {
         title: 'VueUse PR&Triage Team',
-        timeline: ['2024', t('present')]
+        timeline: ['2024', t('today')]
     },
 ]
 
@@ -307,7 +307,7 @@ const workExperience = computed<WorkExperience[]>(() => [
         company: 'Leetchi',
         country: 'France',
         title: 'Frontend Developer',
-        timeline: ['2022', t('present')],
+        timeline: ['2022', t('today')],
         subtitle: t('work.experience.leetchi.subtitle'),
         stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
         description: (tm('work.experience.leetchi.description') as VueMessageType[]).map((desc) => rt(desc))
@@ -344,7 +344,7 @@ p {
 
 <i18n lang="json">{
     "en": {
-        "present": "Present",
+        "today": "today",
         "title": "JS Developer",
         "introduction": "Web developer passionate about open source. I love challenges and working in collaboration with product teams. \nAs a Core member of the Nuxt Team, sharing my knowledge and learning from others is what motivates me on a daily basis.",
         "education": {
@@ -424,7 +424,7 @@ p {
         }
     },
     "fr": {
-        "present": "Présent",
+        "today": "Aujourd'hui",
         "title": "Développeur JS",
         "introduction": "Développeur web passionné par l'open source. J'adore les défis qui me sont donnés et co-construire avec les équipes produits. \nEn tant que membre de la Nuxt Core Team, partager mes connaissances et apprendre des autres est ce qui me motive au quotidien.",
         "education": {
