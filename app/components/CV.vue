@@ -1,6 +1,6 @@
 <template>
-    <div class="page bg-white text-gray-900 p-8 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
-        <header class="grid grid-cols-12 gap-8 px-2 pb-5 items-center border-b border-p-yellow">
+    <div class="page bg-white text-gray-900 p-4 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
+        <header class="grid grid-cols-12 gap-8 px-2 pb-4 items-center border-b border-p-yellow">
             <NuxtPicture :modifiers="{}" src="/amsterdam_profile.jpg" class="rounded-full col-span-2 overflow-hidden" />
 
             <h1 class="col-span-2 text-2xl font-bold text-p-blue">
@@ -89,7 +89,7 @@
                                         <span class="text-xs text-gray-500">{{ work.timeline[0] }} - {{
                                             work.timeline[1] }}</span>
                                     </span>
-                                    <span class="text-xs text-gray-500">{{ work.subtitle }}</span>
+                                    <span class="text-2xs text-gray-500">{{ work.subtitle }}</span>
                                     <ul class="list-disc pl-5">
                                         <li v-for="desc in work.description" :key="desc" class="text-2xs text-gray-500">
                                             {{ desc }}
@@ -109,10 +109,9 @@
                     </h2>
 
                     <div class="mt-4 text-xs">
-                        <ul class="list-disc grid grid-cols-2 pl-5 gap-x-4">
+                        <ul class="list-disc grid grid-cols-4 pl-5 gap-x-4">
                             <li v-for="skill in skills" class="flex justify-between">
-                                <span>{{ skill.name }}</span>
-                                <span class="text-xs text-gray-500">{{ skill.level }}/5</span>
+                                <span>{{ skill.name }}</span> 
                             </li>
                         </ul>
                     </div>
@@ -193,10 +192,6 @@ const skills: Skills[] = [
         level: 5
     },
     {
-        name: 'React',
-        level: 3
-    },
-    {
         name: 'Vue.js',
         level: 5
     },
@@ -205,12 +200,16 @@ const skills: Skills[] = [
         level: 5
     },
     {
+        name: 'Playwright',
+        level: 4
+    },
+    {
         name: 'Cypress',
         level: 3
     },
     {
-        name: 'Playwright',
-        level: 4
+        name: 'React',
+        level: 3
     },
     {
         name: 'ASP.NET',
@@ -260,11 +259,7 @@ const ossTeams: OssTeams[] = [
     {
         title: 'Nuxt Ecosystem Team',
         timeline: ['2023', t('today')]
-    },
-    {
-        title: 'VueUse PR&Triage Team',
-        timeline: ['2024', t('today')]
-    },
+    }, 
 ]
 
 const ossProjects = computed<OssProjects[]>(() => [
@@ -306,7 +301,7 @@ const workExperience = computed<WorkExperience[]>(() => [
     {
         company: 'Leetchi',
         country: 'France',
-        title: 'Frontend Developer',
+        title: t('work.experience.leetchi.title'),
         timeline: ['2022', t('today')],
         subtitle: t('work.experience.leetchi.subtitle'),
         stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
@@ -395,11 +390,11 @@ p {
             "experience": {
                 "leetchi": {
                     "name": "Leetchi",
-                    "title": "Frontend Developer",
-                    "subtitle": "Frontend Technical Lead",
+                    "title": "Frontend Developer - Frontend Technical Lead",
+                    "subtitle": "Joined the team as part of the complete redesign of the Leetchi platform, within an Agile environment based on microservices architecture. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery and maintenance. A project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration",
                     "description": [
-                        "Participation in technical decisions and design of features",
                         "Responsible for frontend architecture decisions",
+                        "Participation in technical decisions and design of features",
                         "Training and mentoring other frontend developers",
                         "Developed the complete redesign of Leetchi's front office using Nuxt 2 (bridge) with technical debt management",
                         "Nuxt 2 to Nuxt 3 migration",
@@ -474,18 +469,18 @@ p {
             "title": "Expérience professionnelle",
             "experience": {
                 "leetchi": {
-                    "title": "Développeur frontend",
-                    "subtitle": "Référent Front",
+                    "title": "Développeur frontend - Référent Frontend",
+                    "subtitle": "Arrivé dans le cadre de la refonte complète de la plateforme Leetchi, dans un environnement agile organisé autour de microservices. La phase build s'est étalée sur 8 mois, avant de passer en mode \"run/build\" pour assurer la continuité évolutive et corrective. Projet à fort enjeu technique et stratégique, avec des problématiques de scalabilité, dette technique et migration technologique",
                     "description": [
-                        "Participation aux décisions et à la conception technique des features",
                         "Responsable des décisions d'architecture frontend",
+                        "Participation aux décisions et à la conception technique des features",
                         "Formation et mentorat des autres développeurs frontend",
+                        "Team Design Core - Dev reviewer",
                         "Développement de la refonte complète du frontoffice de Leetchi en Nuxt 2 (bridge) avec la gestion de la dette technique",
-                        "Résponsable de la migration de Nuxt 2 vers Nuxt 3",
+                        "Résponsable de la migration de Nuxt 2 vers Nuxt 3 suite à la refonte",
                         "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
                         "Montée en compétence sur ASP.NET",
-                        "Support de l'équipe QA avec les tests Cypress",
-                        "Team Design Core - Dev reviewer"
+                        "Support de l'équipe QA avec les tests Cypress"
                     ]
                 },
                 "hskDigital": {
