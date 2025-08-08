@@ -8,7 +8,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.27.3",
+    "@antfu/eslint-config": "^5.0.0",
     "@iconify-json/bi": "^1.2.4",
     "@iconify-json/lucide": "^1.2.58",
     "@nuxt/content": "3.6.3",
