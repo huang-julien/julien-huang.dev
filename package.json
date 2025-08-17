@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "@nuxt/icon": "^2.0.0",
-    "sponsorkit": "^16.4.2"
+    "sponsorkit": "^17.0.0"
   }
 }
