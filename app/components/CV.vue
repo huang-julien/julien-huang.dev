@@ -409,7 +409,8 @@ p {
                     "title": "Frontend Developer",
                     "description": [
                         "Development of an internal project from scratch using Vue.js",
-                        "Magento 2 integrator"
+                        "Magento 2 integrator",
+                        "Development of Visual prospect for Stellantis using Laravel and Vue.JS"
                     ]
                 }
             }
@@ -487,7 +488,8 @@ p {
                     "title": "Développeur Frontend",
                     "description": [
                         "Développement d'un projet interne from scratch en utilisant Vue.js",
-                        "Intégrateur Magento 2"
+                        "Intégrateur Magento 2",
+                        "Développement de Visual prospect pour Stellantis en utilisant Laravel et Vue.JS"
                     ]
                 }
             }
