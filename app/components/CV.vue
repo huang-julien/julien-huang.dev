@@ -200,6 +200,10 @@ const skills: Skills[] = [
         level: 5
     },
     {
+        name: 'NodeJS',
+        level: 5
+    },
+    {
         name: 'Playwright',
         level: 4
     },
@@ -215,10 +219,6 @@ const skills: Skills[] = [
         name: 'ASP.NET',
         level: 2
     },
-    {
-        name: 'NodeJS',
-        level: 5
-    }
 ]
 
 interface Contact {
