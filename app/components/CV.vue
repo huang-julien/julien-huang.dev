@@ -216,8 +216,8 @@ const skills: Skills[] = [
         level: 2
     },
     {
-        name: 'React Native',
-        level: 2
+        name: 'NodeJS',
+        level: 5
     }
 ]
 
