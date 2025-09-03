@@ -1,0 +1,26 @@
+diff --git a/dist/module.cjs b/dist/module.cjs
+index 739916f259f54cc7633d33890e242b529e28f340..6cfbbaa1fbec054eb474d07fdea13e93698c3637 100644
+--- a/dist/module.cjs
++++ b/dist/module.cjs
+@@ -1577,7 +1577,7 @@ const componentsManifestTemplate = (manifest) => {
+       }).reduce((map, c) => {
+         map[c.pascalName] = map[c.pascalName] || [
+           c.pascalName,
+-          `${knitwork.genDynamicImport(pathe.isAbsolute(c.filePath) ? "./" + pathe.relative(pathe.join(nuxt.options.buildDir, "content"), c.filePath).replace(/\b\.(?!vue)\w+$/g, "") : c.filePath.replace(/\b\.(?!vue)\w+$/g, ""), { wrapper: false, singleQuotes: true })}`,
++          `${knitwork.genDynamicImport('virtual:vsc:' + (pathe.isAbsolute(c.filePath) ? "./" + pathe.relative(pathe.join(nuxt.options.buildDir, "content"), c.filePath).replace(/\b\.(?!vue)\w+$/g, "") : c.filePath.replace(/\b\.(?!vue)\w+$/g, "")), { wrapper: false, singleQuotes: true })}`,
+           c.global
+         ];
+         return map;
+diff --git a/dist/module.mjs b/dist/module.mjs
+index e7f2e323a2840a528277bde1c710c18a5032c2d7..5a61a7242eedb635b219681a6409339d38859f77 100644
+--- a/dist/module.mjs
++++ b/dist/module.mjs
+@@ -1549,7 +1549,7 @@ const componentsManifestTemplate = (manifest) => {
+       }).reduce((map, c) => {
+         map[c.pascalName] = map[c.pascalName] || [
+           c.pascalName,
+-          `${genDynamicImport(isAbsolute(c.filePath) ? "./" + relative(join(nuxt.options.buildDir, "content"), c.filePath).replace(/\b\.(?!vue)\w+$/g, "") : c.filePath.replace(/\b\.(?!vue)\w+$/g, ""), { wrapper: false, singleQuotes: true })}`,
++          `${genDynamicImport('virtual:vsc:' + (isAbsolute(c.filePath) ? "./" + relative(join(nuxt.options.buildDir, "content"), c.filePath).replace(/\b\.(?!vue)\w+$/g, "") : c.filePath.replace(/\b\.(?!vue)\w+$/g, "")), { wrapper: false, singleQuotes: true })}`,
+           c.global
+         ];
+         return map;

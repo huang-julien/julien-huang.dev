@@ -30,6 +30,12 @@ export default defineNuxtConfig({
     '@nuxthub/core',
   ],
 
+  experimental: {
+    componentIslands: {
+      selectiveClient: true
+    }
+  },
+
   i18n: {
     locales: ['fr', 'en'],
     defaultLocale: 'en', 

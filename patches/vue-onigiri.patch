@@ -1,0 +1,42 @@
+diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
+index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326e6b08130 100644
+--- a/dist/runtime/serialize.js
++++ b/dist/runtime/serialize.js
+@@ -28,6 +28,7 @@ export function serializeApp(app, context = {}) {
+   const vnode = createVNode(input._component, input._props);
+   const instance = createComponentInstance(vnode, input._instance, null);
+   instance.appContext = input._context;
++  instance.provides = (input._context.provides);
+   return app.runWithContext(async () => {
+     const res = await setupComponent(instance, true);
+     return await app.runWithContext(async () => {
+@@ -120,6 +121,9 @@ export async function serializeVNode(vnode, parentInstance) {
+             }
+             console.warn("Component is missing chunk information");
+           }
++          if(child.shapeFlag & ShapeFlags.ELEMENT) {
++            return serializeVNode(child, parentInstance);
++          }
+           return [
+             VServerComponentType.Fragment,
+             serializeChildren(child.children, parentInstance)
+@@ -225,6 +229,9 @@ function renderComponent(_vnode, parentInstance) {
+     });
+     return p.then(() => {
+       const vnode = renderComponentRoot(instance);
++      if(vnode.shapeFlag & ShapeFlags.COMPONENT) {
++        return renderComponent(vnode, instance);
++      }
+       const { dirs: dirs2, props: props2 } = vnode;
+       if (dirs2) {
+         vnode.props = applySSRDirectives(vnode, props2, dirs2);
+@@ -234,6 +241,9 @@ function renderComponent(_vnode, parentInstance) {
+     });
+   }
+   const child = renderComponentRoot(instance);
++      if(child.shapeFlag & ShapeFlags.COMPONENT) {
++        return renderComponent(child, instance);
++      }
+   const { dirs, props } = child;
+   if (dirs) {
+     child.props = applySSRDirectives(child, props, dirs);

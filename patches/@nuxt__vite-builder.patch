@@ -1,0 +1,386 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c5b9682b6 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
+ import { filename as filename$1 } from 'pathe/utils';
+ import { resolveTSConfig, readTSConfig } from 'pkg-types';
+ import { resolveModulePath } from 'exsolve';
+-import vuePlugin from '@vitejs/plugin-vue';
++import { vueOnigiriPluginFactory } from 'vue-onigiri';
+ import viteJsxPlugin from '@vitejs/plugin-vue-jsx';
+ import { getPort } from 'get-port-please';
+ import defu$1, { defu } from 'defu';
+@@ -314,6 +314,10 @@ function ViteNodePlugin(nuxt) {
+           root: nuxt.options.srcDir,
+           entryPath: resolveServerEntry(ssrServer.config),
+           base: ssrServer.config.base || "/_nuxt/",
++          maxRetryAttempts: nuxt.options.vite.viteNode?.maxRetryAttempts,
++          baseRetryDelay: nuxt.options.vite.viteNode?.baseRetryDelay,
++          maxRetryDelay: nuxt.options.vite.viteNode?.maxRetryDelay,
++          requestTimeout: nuxt.options.vite.viteNode?.requestTimeout,
+           // TODO: remove baseURL in future
+           baseURL: nuxt.options.devServer.url
+         };
+@@ -553,14 +557,19 @@ async function writeDevServer(nuxt) {
+   const serverResolvedPath = resolve(distDir, "runtime/vite-node.mjs");
+   const manifestResolvedPath = resolve(distDir, "runtime/client.manifest.mjs");
+   await mkdir(join(nuxt.options.buildDir, "dist/server"), { recursive: true });
++  const island = resolve(distDir, "runtime/island.mjs");
+   await Promise.all([
+     writeFile(
+       resolve(nuxt.options.buildDir, "dist/server/server.mjs"),
+-      `export { default } from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}`
++      `export * from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}; export { default } from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}`
+     ),
+     writeFile(
+       resolve(nuxt.options.buildDir, "dist/server/client.manifest.mjs"),
+       `export { default } from ${JSON.stringify(pathToFileURL(manifestResolvedPath).href)}`
++    ),
++    writeFile(
++      resolve(nuxt.options.buildDir, "dist/server/components.islands.mjs"),
++      `export { default } from ${JSON.stringify(pathToFileURL(island).href)}`
+     )
+   ]);
+ }
+@@ -774,7 +783,7 @@ function createViteLogger(config, ctx = {}) {
+   return viteLogger;
+ }
+ 
+-async function buildClient(nuxt, ctx) {
++async function buildClient(nuxt, ctx, vue) {
+   const nodeCompat = nuxt.options.experimental.clientNodeCompat ? {
+     alias: defineEnv({ nodeCompat: true, resolve: true }).env.alias,
+     define: { global: "globalThis" }
+@@ -932,7 +941,7 @@ async function buildClient(nuxt, ctx) {
+   }
+   await nuxt.callHook("vite:extendConfig", clientConfig, { isClient: true, isServer: false });
+   clientConfig.plugins.unshift(
+-    vuePlugin(clientConfig.vue),
++    ...vue(clientConfig.vue),
+     viteJsxPlugin(clientConfig.vueJsx)
+   );
+   await nuxt.callHook("vite:configResolved", clientConfig, { isClient: true, isServer: false });
+@@ -1161,7 +1170,7 @@ function VueFeatureFlagsPlugin(nuxt) {
+   };
+ }
+ 
+-async function buildServer(nuxt, ctx) {
++async function buildServer(nuxt, ctx, vue) {
+   const serverEntry = nuxt.options.ssr ? ctx.entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
+   const serverConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
+     configFile: false,
+@@ -1198,7 +1207,8 @@ async function buildServer(nuxt, ctx) {
+         "nitro/runtime",
+         // TODO: remove in v5
+         "#internal/nitro",
+-        "#internal/nitro/utils"
++        "#internal/nitro/utils",
++        "vue-onigiri"
+       ],
+       noExternal: [
+         ...transpile({ isServer: true, isDev: nuxt.options.dev }),
+@@ -1216,7 +1226,7 @@ async function buildServer(nuxt, ctx) {
+       outDir: resolve(nuxt.options.buildDir, "dist/server"),
+       ssr: true,
+       rollupOptions: {
+-        input: { server: serverEntry },
++        input: { "server": serverEntry, "components.islands": resolve(ctx.nuxt.options.buildDir, "components.islands") },
+         external: [
+           "nitro/runtime",
+           // TODO: remove in v5
+@@ -1262,7 +1272,7 @@ async function buildServer(nuxt, ctx) {
+   serverConfig.customLogger = createViteLogger(serverConfig, { hideOutput: !nuxt.options.dev });
+   await nuxt.callHook("vite:extendConfig", serverConfig, { isClient: false, isServer: true });
+   serverConfig.plugins.unshift(
+-    vuePlugin(serverConfig.vue),
++    ...vue(serverConfig.vue),
+     viteJsxPlugin(serverConfig.vueJsx)
+   );
+   await nuxt.callHook("vite:configResolved", serverConfig, { isClient: false, isServer: true });
+@@ -1682,6 +1692,84 @@ const bundle = async (nuxt) => {
+       viteConfig
+     )
+   };
++  const { client, server, serverChunks, clientChunks } = vueOnigiriPluginFactory({
++    serverAssetsDir: "_nuxt/",
++    clientAssetsDir: "_nuxt/",
++    includeClientChunks: ctx.nuxt.apps.default.components.map((c) => relative(ctx.nuxt.options.rootDir, c.filePath)),
++    rootDir: ctx.nuxt.options.rootDir
++  });
++  nuxt.hook("vite:extendConfig", (ctx2, { isServer }) => {
++    if (isServer) {
++      const allComponents = nuxt.apps.default.components;
++      ctx2.plugins.push({
++        name: "nuxt:vue-onigiri",
++        load: {
++          order: "pre",
++          handler(id) {
++            if (id === "virtual:vue-onigiri") {
++              const imports = /* @__PURE__ */ new Set();
++              const mapValues = /* @__PURE__ */ new Map();
++              for (const chunk of clientChunks) {
++                const components = allComponents.filter((c) => (c.mode === "client" || c.mode === "all") && normalize(c.filePath) === normalize(chunk.originalPath));
++                if (!components.length) {
++                  continue;
++                }
++                for (const component of components) {
++                  const serverSideCounterPart = allComponents.find((c) => normalize(c.filePath) === normalize(chunk.originalPath) && (c.mode === "server" || c.mode === "all"));
++                  if (!serverSideCounterPart) {
++                    continue;
++                  }
++                  imports.add(`import { ${component.export} as ${component.pascalName} } from 'virtual:vsc:${serverSideCounterPart.filePath}'`);
++                  mapValues.set(`/${chunk.filename}__${component.export}`, component.pascalName);
++                }
++              }
++              return {
++                code: `
++                  ${[...imports].join("\n")}
++                  export default new Map([ ${[...mapValues].map(([k, v]) => `['${k}', ${v}]`).join(", ")}] )
++                `
++              };
++            }
++          }
++        }
++      });
++    }
++  });
++  useNitro().hooks.hook("rollup:before", (_, rollupConfig) => {
++    const allComponents = nuxt.apps.default.components;
++    rollupConfig.plugins.push({
++      name: "nuxt:vue-onigiri",
++      load: {
++        order: "pre",
++        handler(id) {
++          if (id === "virtual:vue-onigiri") {
++            const imports = /* @__PURE__ */ new Set();
++            const mapValues = /* @__PURE__ */ new Map();
++            for (const chunk of clientChunks) {
++              const components = allComponents.filter((c) => (c.mode === "client" || c.mode === "all") && normalize(c.filePath) === normalize(chunk.originalPath));
++              if (!components.length) {
++                continue;
++              }
++              for (const component of components) {
++                const serverSideCounterPart = allComponents.find((c) => normalize(c.filePath) === normalize(chunk.originalPath) && (c.mode === "server" || c.mode === "all"));
++                if (!serverSideCounterPart) {
++                  continue;
++                }
++                imports.add(`import { ${component.export} as ${component.pascalName} } from 'virtual:vsc:${serverSideCounterPart.filePath}'`);
++                mapValues.set(`/${chunk.filename}__${component.export}`, component.pascalName);
++              }
++            }
++            return {
++              code: `
++                  ${[...imports].join("\n")}
++                  export default new Map([ ${[...mapValues].map(([k, v]) => `['${k}', ${v}]`).join(", ")}] )
++                `
++            };
++          }
++        }
++      }
++    });
++  });
+   if (!nuxt.options.dev) {
+     ctx.config.server.watch = void 0;
+     ctx.config.build.watch = void 0;
+@@ -1765,24 +1853,24 @@ const bundle = async (nuxt) => {
+       }
+     });
+   }
+-  nuxt.hook("vite:serverCreated", (server, env) => {
++  nuxt.hook("vite:serverCreated", (server2, env) => {
+     nuxt.hook("app:templatesGenerated", async (_app, changedTemplates) => {
+       await Promise.all(changedTemplates.map(async (template) => {
+-        for (const mod of server.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
+-          server.moduleGraph.invalidateModule(mod);
+-          await server.reloadModule(mod);
++        for (const mod of server2.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
++          server2.moduleGraph.invalidateModule(mod);
++          await server2.reloadModule(mod);
+         }
+       }));
+     });
+     if (nuxt.options.vite.warmupEntry !== false) {
+       useNitro().hooks.hookOnce("compiled", () => {
+         const start = Date.now();
+-        warmupViteServer(server, [ctx.entry], env.isServer).then(() => logger.info(`Vite ${env.isClient ? "client" : "server"} warmed up in ${Date.now() - start}ms`)).catch(logger.error);
++        warmupViteServer(server2, [ctx.entry], env.isServer).then(() => logger.info(`Vite ${env.isClient ? "client" : "server"} warmed up in ${Date.now() - start}ms`)).catch(logger.error);
+       });
+     }
+   });
+-  await withLogs(() => buildClient(nuxt, ctx), "Vite client built", nuxt.options.dev);
+-  await withLogs(() => buildServer(nuxt, ctx), "Vite server built", nuxt.options.dev);
++  await withLogs(() => buildClient(nuxt, ctx, client), "Vite client built", nuxt.options.dev);
++  await withLogs(() => buildServer(nuxt, ctx, server), "Vite server built", nuxt.options.dev);
+ };
+ async function withLogs(fn, message, enabled = true) {
+   if (!enabled) {
+diff --git a/dist/runtime/island.d.mts b/dist/runtime/island.d.mts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d604bdd8dc5fe041b5a64f62d17c3517dc8cff1c
+--- /dev/null
++++ b/dist/runtime/island.d.mts
+@@ -0,0 +1,2 @@
++declare function _default(): Promise<() => Promise<any>>;
++export default _default;
+diff --git a/dist/runtime/island.mjs b/dist/runtime/island.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..d5c8870def937f83d901e9d0ef58ba0a9383052a
+--- /dev/null
++++ b/dist/runtime/island.mjs
+@@ -0,0 +1,112 @@
++// @ts-check
++
++import { performance } from 'node:perf_hooks'
++import { createError } from 'h3'
++import { ViteNodeRunner } from 'vite-node/client'
++import { consola } from 'consola'
++import { viteNodeFetch, viteNodeOptions } from './vite-node-shared.mjs'
++
++const runner = createRunner()
++
++/** @type {() => Promise<any>} */
++let render
++
++/** @param ssrContext {import('#app').NuxtSSRContext} */
++export default async () => {
++  // Workaround for stub mode
++  // https://github.com/nuxt/framework/pull/3983
++  // eslint-disable-next-line nuxt/prefer-import-meta
++  process.server = true
++  import.meta.server = true
++
++  // Invalidate cache for files changed since last rendering
++  const invalidates = await viteNodeFetch.getInvalidates()
++  const updates = runner.moduleCache.invalidateDepTree(invalidates)
++
++  // Execute SSR bundle on demand
++  const start = performance.now()
++
++  render = (updates.has('#build/components.islands.mjs') || !render) ? (await runner.executeId('#build/components.islands.mjs')) : render
++  if (updates.size) {
++    const time = Math.round((performance.now() - start) * 1000) / 1000
++    consola.success(`Vite server hmr ${updates.size} files`, time ? `in ${time}ms` : '')
++  }
++
++  return render
++}
++
++function createRunner () {
++  return new ViteNodeRunner({
++    debug: true,
++    root: viteNodeOptions.root, // Equals to Nuxt `srcDir`
++    base: viteNodeOptions.base,
++    async resolveId (id, importer) {
++      return await viteNodeFetch.resolveId(id, importer)
++    },
++    async fetchModule (id) {
++      id = id.replace(/\/\//g, '/') // TODO: fix in vite-node
++      return await viteNodeFetch.fetchModule(id).catch((err) => {
++        const errorData = err?.data?.data
++        if (!errorData) {
++          throw err
++        }
++        let _err
++        try {
++          const { message, stack } = formatViteError(errorData, id)
++          _err = createError({
++            statusMessage: 'Vite Error',
++            message,
++            stack,
++          })
++        } catch (formatError) {
++          consola.warn('Internal nuxt error while formatting vite-node error. Please report this!', formatError)
++          const message = `[vite-node] [TransformError] ${errorData?.message || '-'}`
++          consola.error(message, errorData)
++          throw createError({
++            statusMessage: 'Vite Error',
++            message,
++            stack: `${message}\nat ${id}\n` + (errorData?.stack || ''),
++          })
++        }
++        throw _err
++      })
++    },
++  })
++}
++
++/**
++ * @param errorData {any}
++ * @param id {string}
++ */
++function formatViteError (errorData, id) {
++  const errorCode = errorData.name || errorData.reasonCode || errorData.code
++  const frame = errorData.frame || errorData.source || errorData.pluginCode
++
++  /** @param locObj {{ file?: string, id?: string, url?: string }} */
++  const getLocId = (locObj = {}) => locObj.file || locObj.id || locObj.url || id || ''
++  /** @param locObj {{ line?: string, column?: string }} */
++  const getLocPos = (locObj = {}) => locObj.line ? `${locObj.line}:${locObj.column || 0}` : ''
++  const locId = getLocId(errorData.loc) || getLocId(errorData.location) || getLocId(errorData.input) || getLocId(errorData)
++  const locPos = getLocPos(errorData.loc) || getLocPos(errorData.location) || getLocPos(errorData.input) || getLocPos(errorData)
++  const loc = locId.replace(process.cwd(), '.') + (locPos ? `:${locPos}` : '')
++
++  const message = [
++    '[vite-node]',
++    errorData.plugin && `[plugin:${errorData.plugin}]`,
++    errorCode && `[${errorCode}]`,
++    loc,
++    errorData.reason && `: ${errorData.reason}`,
++    frame && `<br><pre>${frame.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre><br>`,
++  ].filter(Boolean).join(' ')
++
++  const stack = [
++    message,
++    `at ${loc}`,
++    errorData.stack,
++  ].filter(Boolean).join('\n')
++
++  return {
++    message,
++    stack,
++  }
++}
+diff --git a/dist/runtime/vite-node-shared.mjs b/dist/runtime/vite-node-shared.mjs
+index 76598e5173571399edc31d8855ed1c0b4a5d17cd..60755e57bea274cb9167541d264b587697ca645d 100644
+--- a/dist/runtime/vite-node-shared.mjs
++++ b/dist/runtime/vite-node-shared.mjs
+@@ -16,10 +16,10 @@ let requestIdCounter = 0
+ let clientSocket
+ /** @type {Promise<Socket> | undefined} */
+ let currentConnectPromise
+-const MAX_RETRY_ATTEMPTS = 5
+-const BASE_RETRY_DELAY_MS = 100
+-const MAX_RETRY_DELAY_MS = 2000
+-const REQUEST_TIMEOUT_MS = 10000
++const MAX_RETRY_ATTEMPTS = viteNodeOptions.maxRetryAttempts ?? 5
++const BASE_RETRY_DELAY_MS = viteNodeOptions.baseRetryDelay ?? 100
++const MAX_RETRY_DELAY_MS = viteNodeOptions.maxRetryDelay ?? 2000
++const REQUEST_TIMEOUT_MS = viteNodeOptions.requestTimeout ?? 60000
+ 
+ /**
+  * Calculates exponential backoff delay with jitter.
+diff --git a/dist/runtime/vite-node.d.mts b/dist/runtime/vite-node.d.mts
+index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdbbe715f98 100644
+--- a/dist/runtime/vite-node.d.mts
++++ b/dist/runtime/vite-node.d.mts
+@@ -1,2 +1,3 @@
++export function executeFile(src: any): Promise<any>;
+ declare function _default(ssrContext: any): Promise<any>;
+ export default _default;
+diff --git a/dist/runtime/vite-node.mjs b/dist/runtime/vite-node.mjs
+index 609242a7f14c3389d6e7bd95cbb3ef17c086f9ef..1ba62cd381202e4cbca1e728a4917712880b5292 100644
+--- a/dist/runtime/vite-node.mjs
++++ b/dist/runtime/vite-node.mjs
+@@ -11,6 +11,11 @@ const runner = createRunner()
+ /** @type {(ssrContext: import('#app').NuxtSSRContext) => Promise<any>} */
+ let render
+ 
++export function executeFile(src) {
++  /// ??????
++  return runner.executeId(src.replace('/_nuxt/app', ''))
++}
++
+ /** @param {import('#app').NuxtSSRContext} ssrContext */
+ export default async (ssrContext) => {
+   // Workaround for stub mode

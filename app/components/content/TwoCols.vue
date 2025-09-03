@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="lg:grid lg:grid-cols-2">
+    <div class="lg:grid lg:grid-cols-2 two-cols">
         <div :class="leftClass">
             <slot name="left" />
         </div>
