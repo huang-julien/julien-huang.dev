@@ -41,7 +41,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
    if (dirs) {
      child.props = applySSRDirectives(child, props, dirs);
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
-index bbf89c47dba800aef026ca58b56de6bc40eef382..374c9e6b8024f00ce4a5635225edffd624ae8736 100644
+index bbf89c47dba800aef026ca58b56de6bc40eef382..47192a7f1905bc70ff45a1f214963d4b8be71a9f 100644
 --- a/dist/vite/chunk.js
 +++ b/dist/vite/chunk.js
 @@ -146,6 +146,14 @@ export function vueOnigiriPluginFactory(options = {}) {
@@ -99,6 +99,17 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..374c9e6b8024f00ce4a5635225edffd6
                  );
                  if (resolved) {
                    return VSC_PREFIX + resolved?.id;
+@@ -261,8 +269,8 @@ export function vueOnigiriPluginFactory(options = {}) {
+               const list = serverChunks.values().map((ref) => ref.id).toArray();
+               if (list.includes(chunk.fileName)) {
+                 chunk.isEntry = false;
+-                chunk.isImplicitEntry = true;
+-                chunk.isDynamicEntry = true;
++                chunk.isImplicitEntry = false;
++                chunk.isDynamicEntry = false;
+               }
+             }
+           }
 @@ -285,16 +293,21 @@ export function vueOnigiriPluginFactory(options = {}) {
                    return node.type === "ExportNamedDeclaration" && node.specifiers.some((specifier) => specifier.exported.type === "Identifier" && specifier.exported.name === exportName);
                  });

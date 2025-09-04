@@ -42,6 +42,18 @@ export default defineNuxtConfig({
     strategy: 'no_prefix'
   },
  
+  vite: {
+    plugins: [
+      {
+        name: 'configure-vue-onigiri',
+        load(id) {
+          if(id === 'virtual:vue-onigiri') {
+            return "export default {}"
+          }
+        }
+      }
+    ]
+  },
 
   compatibilityDate: '2025-04-05'
 })
