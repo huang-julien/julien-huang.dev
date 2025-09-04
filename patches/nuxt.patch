@@ -1,25 +1,22 @@
-diff --git a/dist/app/compat/idle-callback.js b/dist/app/compat/idle-callback.js
-index f313e2d2cf70adba3947e355c7b56f07d50f3ab5..c6195c700823196694ef9a6e2b1f786294cf3802 100644
---- a/dist/app/compat/idle-callback.js
-+++ b/dist/app/compat/idle-callback.js
-@@ -1,5 +1,5 @@
--export const requestIdleCallback = import.meta.server ? () => {
--} : globalThis.requestIdleCallback || ((cb) => {
-+export const requestIdleCallback = import.meta.server ? (() => {
-+}) : globalThis.requestIdleCallback || ((cb) => {
-   const start = Date.now();
-   const idleDeadline = {
-     didTimeout: false,
-@@ -9,7 +9,7 @@ export const requestIdleCallback = import.meta.server ? () => {
-     cb(idleDeadline);
-   }, 1);
- });
--export const cancelIdleCallback = import.meta.server ? () => {
--} : globalThis.cancelIdleCallback || ((id) => {
-+export const cancelIdleCallback = import.meta.server ? (() => {
-+}) : globalThis.cancelIdleCallback || ((id) => {
-   clearTimeout(id);
- });
+diff --git a/dist/app/compat/interval.d.ts b/dist/app/compat/interval.d.ts
+index 9c88d28c5ee24c46b4b23354106a16c2764b2c13..b9909ed310e782fb871a58845d12f7b291b15b2c 100644
+--- a/dist/app/compat/interval.d.ts
++++ b/dist/app/compat/interval.d.ts
+@@ -1 +1 @@
+-export declare const setInterval: (((handler: TimerHandler, timeout?: number, ...arguments: any[]) => number) & typeof globalThis.setInterval) | (() => void);
++export declare const setInterval: typeof globalThis.setInterval | (() => void);
+diff --git a/dist/app/compat/interval.js b/dist/app/compat/interval.js
+index 484356f26e0df2a4a55dddc9e9a3873b80b36837..93d0da41f95a97b4d5456a010e4c0dc2a991416f 100644
+--- a/dist/app/compat/interval.js
++++ b/dist/app/compat/interval.js
+@@ -1,6 +1,6 @@
+ import { createError } from "../composables/error.js";
+ const intervalError = "[nuxt] `setInterval` should not be used on the server. Consider wrapping it with an `onNuxtReady`, `onBeforeMount` or `onMounted` lifecycle hook, or ensure you only call it in the browser by checking `import.meta.client`.";
+-export const setInterval = import.meta.client ? window.setInterval : () => {
++export const setInterval = import.meta.client ? globalThis.setInterval : () => {
+   if (import.meta.dev) {
+     throw createError({
+       statusCode: 500,
 diff --git a/dist/app/components/client-only.d.ts b/dist/app/components/client-only.d.ts
 index 57cc2c294e911310f97b73ee4a788d692653890a..67897283994572f9335730fd359c60a0bd353a88 100644
 --- a/dist/app/components/client-only.d.ts
@@ -92,24 +89,6 @@ index f7de60ee125295a395374c1ec9e022d7a33d4943..4ec8838deaebc9fad570b1ccef7c87ce
      }
    ],
    style: [
-diff --git a/dist/app/components/error-404.vue.d.ts b/dist/app/components/error-404.vue.d.ts
-index f36f632999b75ce13946c0edc7e5a31039aa0f9e..b7c94f6bbed1e51156126d43edbe46512acc215f 100644
---- a/dist/app/components/error-404.vue.d.ts
-+++ b/dist/app/components/error-404.vue.d.ts
-@@ -4,6 +4,12 @@ declare const _default: import("vue").DefineComponent<{}, {
-     statusMessage: string;
-     description: string;
-     backHome: string;
--    $props: any;
-+    $props: {
-+        readonly appName?: string | undefined;
-+        readonly statusCode?: number | undefined;
-+        readonly statusMessage?: string | undefined;
-+        readonly description?: string | undefined;
-+        readonly backHome?: string | undefined;
-+    };
- }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
- export default _default;
 diff --git a/dist/app/components/error-500.vue b/dist/app/components/error-500.vue
 index 701b21ad7c0310825552d62a0e81dfca0bb7411a..4f0463028c2edba813f30707acfa8c75b90aa19a 100644
 --- a/dist/app/components/error-500.vue
@@ -123,24 +102,6 @@ index 701b21ad7c0310825552d62a0e81dfca0bb7411a..4f0463028c2edba813f30707acfa8c75
      }
    ],
    style: [
-diff --git a/dist/app/components/error-500.vue.d.ts b/dist/app/components/error-500.vue.d.ts
-index f9799b13280b5609fcd7aa0c8b19aa4b84110239..b6527eeff51d9a7aef860a5f6e0a6793eb095b9f 100644
---- a/dist/app/components/error-500.vue.d.ts
-+++ b/dist/app/components/error-500.vue.d.ts
-@@ -4,6 +4,12 @@ declare const _default: import("vue").DefineComponent<{}, {
-     statusMessage: string;
-     description: string;
-     refresh: string;
--    $props: any;
-+    $props: {
-+        readonly appName?: string | undefined;
-+        readonly statusCode?: number | undefined;
-+        readonly statusMessage?: string | undefined;
-+        readonly description?: string | undefined;
-+        readonly refresh?: string | undefined;
-+    };
- }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
- export default _default;
 diff --git a/dist/app/components/error-dev.vue b/dist/app/components/error-dev.vue
 index 77833df60927cdf86f5abb19db1afd879e7e2454..8e0243ec92e2285ede7516f28fd464e0bfff723e 100644
 --- a/dist/app/components/error-dev.vue
@@ -154,37 +115,12 @@ index 77833df60927cdf86f5abb19db1afd879e7e2454..8e0243ec92e2285ede7516f28fd464e0
      }
    ],
    style: [
-diff --git a/dist/app/components/error-dev.vue.d.ts b/dist/app/components/error-dev.vue.d.ts
-index 654bae62c9f43f1bdfe048fcd0545cc7c3aa28c7..89b8deae9098a638ab83adcb43c9a2860ad4a03e 100644
---- a/dist/app/components/error-dev.vue.d.ts
-+++ b/dist/app/components/error-dev.vue.d.ts
-@@ -4,6 +4,12 @@ declare const _default: import("vue").DefineComponent<{}, {
-     statusMessage: string;
-     description: string;
-     stack: string;
--    $props: any;
-+    $props: {
-+        readonly appName?: string | undefined;
-+        readonly statusCode?: number | undefined;
-+        readonly statusMessage?: string | undefined;
-+        readonly description?: string | undefined;
-+        readonly stack?: string | undefined;
-+    };
- }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
- export default _default;
-diff --git a/dist/app/components/nuxt-error-page.vue.d.ts b/dist/app/components/nuxt-error-page.vue.d.ts
-index a00b8eee398fc232191487318b1840e3850ab9c7..306ace4c24586193d14f13b553d99a088cc99f50 100644
---- a/dist/app/components/nuxt-error-page.vue.d.ts
-+++ b/dist/app/components/nuxt-error-page.vue.d.ts
-@@ -1,5 +1,7 @@
- declare const _default: import("vue").DefineComponent<{}, {
-     error?: Record<string, any> | undefined;
--    $props: any;
-+    $props: {
-+        readonly error?: Record<string, any> | undefined;
-+    };
- }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
- export default _default;
+diff --git a/dist/app/components/island-renderer.d.ts b/dist/app/components/island-renderer.d.ts
+deleted file mode 100644
+index 33ebee4e499af20ebae33ab7489f144ca7f9253a..0000000000000000000000000000000000000000
+diff --git a/dist/app/components/island-renderer.js b/dist/app/components/island-renderer.js
+deleted file mode 100644
+index 29d6a08a9f611f63a14a420ff1445b70a45379d4..0000000000000000000000000000000000000000
 diff --git a/dist/app/components/nuxt-island.d.ts b/dist/app/components/nuxt-island.d.ts
 index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2e038962a 100644
 --- a/dist/app/components/nuxt-island.d.ts
@@ -524,78 +460,38 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
      };
    }
  });
-diff --git a/dist/app/components/nuxt-time.vue b/dist/app/components/nuxt-time.vue
-index 904d29861f194f3aab1014d4d504d147e0ac71ab..ecd720db676dad73cb48750f328d07c89874711d 100644
---- a/dist/app/components/nuxt-time.vue
-+++ b/dist/app/components/nuxt-time.vue
-@@ -57,20 +57,26 @@ const formatter = computed(() => {
-   return new Intl.DateTimeFormat(_locale ?? propsLocale, rest);
- });
- const formattedDate = computed(() => {
--  if (props.relative) {
--    const diffInSeconds = (date.value.getTime() - now.value.getTime()) / 1e3;
--    const units = [
--      { unit: "second", value: diffInSeconds },
--      { unit: "minute", value: diffInSeconds / 60 },
--      { unit: "hour", value: diffInSeconds / 3600 },
--      { unit: "day", value: diffInSeconds / 86400 },
--      { unit: "month", value: diffInSeconds / 2592e3 },
--      { unit: "year", value: diffInSeconds / 31536e3 }
--    ];
--    const { unit, value } = units.find(({ value: value2 }) => Math.abs(value2) < 60) || units[units.length - 1];
--    return formatter.value.format(Math.round(value), unit);
-+  if (!props.relative) {
-+    return formatter.value.format(date.value);
+diff --git a/dist/app/components/nuxt-root.vue b/dist/app/components/nuxt-root.vue
+index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..017c67866082f15c45f2b0110aed0955d670c59c 100644
+--- a/dist/app/components/nuxt-root.vue
++++ b/dist/app/components/nuxt-root.vue
+@@ -4,11 +4,7 @@
+     <ErrorComponent
+       v-else-if="error"
+       :error="error"
+-    />
+-    <IslandRenderer
+-      v-else-if="islandContext"
+-      :context="islandContext"
+-    />
++    /> 
+     <component
+       :is="SingleRenderer"
+       v-else-if="SingleRenderer"
+@@ -25,8 +21,6 @@ import { useRoute, useRouter } from "../composables/router";
+ import { PageRouteSymbol } from "../components/injections";
+ import AppComponent from "#build/app-component.mjs";
+ import ErrorComponent from "#build/error-component.mjs";
+-import { componentIslands } from "#build/nuxt.config.mjs";
+-const IslandRenderer = import.meta.server && componentIslands ? defineAsyncComponent(() => import("./island-renderer").then((r) => r.default || r)) : () => null;
+ const nuxtApp = useNuxtApp();
+ const onResolve = nuxtApp.deferHydration();
+ if (import.meta.client && nuxtApp.isHydrating) {
+@@ -56,5 +50,4 @@ onErrorCaptured((err, target, info) => {
+     return false;
    }
--  return formatter.value.format(date.value);
-+  const diffInSeconds = (date.value.getTime() - now.value.getTime()) / 1e3;
-+  const units = [
-+    { unit: "second", seconds: 1, threshold: 60 },
-+    // 60 seconds → minute
-+    { unit: "minute", seconds: 60, threshold: 60 },
-+    // 60 minutes → hour
-+    { unit: "hour", seconds: 3600, threshold: 24 },
-+    // 24 hours → day
-+    { unit: "day", seconds: 86400, threshold: 30 },
-+    // ~30 days → month
-+    { unit: "month", seconds: 2592e3, threshold: 12 },
-+    // 12 months → year
-+    { unit: "year", seconds: 31536e3, threshold: Infinity }
-+  ];
-+  const { unit, seconds } = units.find(({ seconds: seconds2, threshold }) => Math.abs(diffInSeconds / seconds2) < threshold) || units[units.length - 1];
-+  const value = diffInSeconds / seconds;
-+  return formatter.value.format(Math.round(value), unit);
  });
- const isoDate = computed(() => date.value.toISOString());
- const title = computed(() => props.title === true ? isoDate.value : typeof props.title === "string" ? props.title : void 0);
-@@ -104,14 +110,20 @@ if (import.meta.server) {
-     if (options.relative) {
-       const diffInSeconds = (date2.getTime() - now2) / 1e3;
-       const units = [
--        { unit: "second", value: diffInSeconds },
--        { unit: "minute", value: diffInSeconds / 60 },
--        { unit: "hour", value: diffInSeconds / 3600 },
--        { unit: "day", value: diffInSeconds / 86400 },
--        { unit: "month", value: diffInSeconds / 2592e3 },
--        { unit: "year", value: diffInSeconds / 31536e3 }
-+        { unit: "second", seconds: 1, threshold: 60 },
-+        // 60 seconds → minute
-+        { unit: "minute", seconds: 60, threshold: 60 },
-+        // 60 minutes → hour
-+        { unit: "hour", seconds: 3600, threshold: 24 },
-+        // 24 hours → day
-+        { unit: "day", seconds: 86400, threshold: 30 },
-+        // ~30 days → month
-+        { unit: "month", seconds: 2592e3, threshold: 12 },
-+        // 12 months → year
-+        { unit: "year", seconds: 31536e3, threshold: Infinity }
-       ];
--      const { unit, value } = units.find(({ value: value2 }) => Math.abs(value2) < 60) || units[units.length - 1];
-+      const { unit, seconds } = units.find(({ seconds: seconds2, threshold }) => Math.abs(diffInSeconds / seconds2) < threshold) || units[units.length - 1];
-+      const value = diffInSeconds / seconds;
-       const formatter2 = new Intl.RelativeTimeFormat(options.locale, options);
-       el2.textContent = formatter2.format(Math.round(value), unit);
-     } else {
+-const islandContext = import.meta.server && nuxtApp.ssrContext.islandContext;
+ </script>
 diff --git a/dist/app/components/utils.d.ts b/dist/app/components/utils.d.ts
 index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..1ad5b2d50159dad5c007df0258063c695ff4388d 100644
 --- a/dist/app/components/utils.d.ts
@@ -647,7 +543,7 @@ index a1404a6721fb288b4a85697eb0133f39c7ff18ec..904ed639017596b5e3315d9bc90d7d32
 -  return element.nodeName === "#comment" && element.nodeValue === "]";
 -}
 diff --git a/dist/app/components/welcome.vue b/dist/app/components/welcome.vue
-index dbaebd0b26357adf9fb2004826ede26c0b98356f..984ae75cc538d112e15d41fb625f54b0fcb2344d 100644
+index f96b90bef3a874ad226308160b4343bc83184812..d5f863f620ef7a31a4dc629531d2db5bffcdf87b 100644
 --- a/dist/app/components/welcome.vue
 +++ b/dist/app/components/welcome.vue
 @@ -14,7 +14,7 @@ useHead({
@@ -659,46 +555,30 @@ index dbaebd0b26357adf9fb2004826ede26c0b98356f..984ae75cc538d112e15d41fb625f54b0
      }
    ],
    style: [
-diff --git a/dist/app/components/welcome.vue.d.ts b/dist/app/components/welcome.vue.d.ts
-index 6d86ef4675e2d7e1d1deba83fa3c731c4afffd02..c08eefa05561c32873a97b5dbb135440b7c5c508 100644
---- a/dist/app/components/welcome.vue.d.ts
-+++ b/dist/app/components/welcome.vue.d.ts
-@@ -1,6 +1,9 @@
- declare const _default: import("vue").DefineComponent<{}, {
-     appName: string;
-     title: string;
--    $props: any;
-+    $props: {
-+        readonly appName?: string | undefined;
-+        readonly title?: string | undefined;
-+    };
- }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<{}> & Readonly<{}>, {}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
- export default _default;
-diff --git a/dist/app/composables/fetch.d.ts b/dist/app/composables/fetch.d.ts
-index 3d8d0220999e1c0d6e293c8c08b39398ee37f33f..1f63744c237e519e53ad0e2a02767b3f299ac6d9 100644
---- a/dist/app/composables/fetch.d.ts
-+++ b/dist/app/composables/fetch.d.ts
-@@ -1,4 +1,4 @@
--import type { FetchError, FetchOptions } from 'ofetch';
-+import type { FetchError, FetchOptions, ResponseType as _ResponseType } from 'ofetch';
- import type { NitroFetchRequest, TypedInternalResponse, AvailableRouterMethod as _AvailableRouterMethod } from 'nitropack/types';
- import type { MaybeRefOrGetter, Ref } from 'vue';
- import type { AsyncData, AsyncDataOptions, KeysOf, MultiWatchSources, PickFrom } from './asyncData.js';
-@@ -7,11 +7,11 @@ export type FetchResult<ReqT extends NitroFetchRequest, M extends AvailableRoute
- type ComputedOptions<T extends Record<string, any>> = {
-     [K in keyof T]: T[K] extends Function ? T[K] : ComputedOptions<T[K]> | Ref<T[K]> | T[K];
+diff --git a/dist/app/composables/cookie.js b/dist/app/composables/cookie.js
+index f6e68574ec71b468458aab2c7b5f345b48f4366b..d94d8bc5f487f29f1427b80904db9085b15dda1b 100644
+--- a/dist/app/composables/cookie.js
++++ b/dist/app/composables/cookie.js
+@@ -13,7 +13,7 @@ const CookieDefaults = {
+   decode: (val) => destr(decodeURIComponent(val)),
+   encode: (val) => encodeURIComponent(typeof val === "string" ? val : JSON.stringify(val))
  };
--interface NitroFetchOptions<R extends NitroFetchRequest, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>> extends FetchOptions {
-+interface NitroFetchOptions<R extends NitroFetchRequest, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>, DataT = any> extends FetchOptions<_ResponseType, DataT> {
-     method?: M;
+-const store = import.meta.client && cookieStore ? window.cookieStore : void 0;
++const store = import.meta.client && cookieStore ? globalThis.cookieStore : void 0;
+ export function useCookie(name, _opts) {
+   const opts = { ...CookieDefaults, ..._opts };
+   opts.filter ??= (key) => key === name;
+diff --git a/dist/app/composables/url.js b/dist/app/composables/url.js
+index d0365905a038de1e9c97560b8863d9e3a998b80a..5c52f2de96aad974caf4ee0076cde87ce6e127e7 100644
+--- a/dist/app/composables/url.js
++++ b/dist/app/composables/url.js
+@@ -4,5 +4,5 @@ export function useRequestURL(opts) {
+   if (import.meta.server) {
+     return getRequestURL(useRequestEvent(), opts);
+   }
+-  return new URL(window.location.href);
++  return new URL(globalThis.location.href);
  }
--type ComputedFetchOptions<R extends NitroFetchRequest, M extends AvailableRouterMethod<R>> = ComputedOptions<NitroFetchOptions<R, M>>;
--export interface UseFetchOptions<ResT, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined, R extends NitroFetchRequest = string & {}, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>> extends Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'watch'>, ComputedFetchOptions<R, M> {
-+type ComputedFetchOptions<R extends NitroFetchRequest, M extends AvailableRouterMethod<R>, DataT = any> = ComputedOptions<NitroFetchOptions<R, M, DataT>>;
-+export interface UseFetchOptions<ResT, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined, R extends NitroFetchRequest = string & {}, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>> extends Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'watch'>, ComputedFetchOptions<R, M, DataT> {
-     key?: MaybeRefOrGetter<string>;
-     $fetch?: typeof globalThis.$fetch;
-     watch?: MultiWatchSources | false;
 diff --git a/dist/app/deserialize.d.ts b/dist/app/deserialize.d.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..2f07a2fdeb3e30b09fb39572fda159387059cdad
@@ -746,10 +626,15 @@ index 0000000000000000000000000000000000000000..4cdf208b89739d33cf180de20c10f9a9
 +  }
 +}
 diff --git a/dist/app/entry.js b/dist/app/entry.js
-index e6821aaa297411937119f71de6d86c3c2b8b2343..fcb30f22c04cf66d994f86943377065a5f617bbc 100644
+index e6821aaa297411937119f71de6d86c3c2b8b2343..56b21e1c7f11806575dd2e732595f4416dc309bf 100644
 --- a/dist/app/entry.js
 +++ b/dist/app/entry.js
-@@ -10,7 +10,7 @@ import { appId, appSpaLoaderAttrs, multiApp, spaLoadingTemplateOutside, vueAppRo
+@@ -7,10 +7,12 @@ import "#build/css";
+ import plugins from "#build/plugins";
+ import RootComponent from "#build/root-component.mjs";
+ import { appId, appSpaLoaderAttrs, multiApp, spaLoadingTemplateOutside, vueAppRootContainer } from "#build/nuxt.config.mjs";
++
++export { islandComponents } from '#build/components.islands.mjs'
  let entry;
  if (import.meta.server) {
    entry = async function createNuxtAppServer(ssrContext) {
@@ -813,44 +698,21 @@ index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..b89d2c7ae40580987459bb556276fd27
  }
  export interface NuxtPayload {
      path?: string;
-diff --git a/dist/app/plugins/check-outdated-build.client.js b/dist/app/plugins/check-outdated-build.client.js
-index 04c750ba963475305b4e32131f4875e3560e50da..3b64901911e4ebd9b95687b79d9b6488a7022135 100644
---- a/dist/app/plugins/check-outdated-build.client.js
-+++ b/dist/app/plugins/check-outdated-build.client.js
-@@ -9,15 +9,26 @@ export default defineNuxtPlugin((nuxtApp) => {
-   }
-   let timeout;
-   async function getLatestManifest() {
--    const currentManifest = await getAppManifest();
-+    let currentManifest;
-+    try {
-+      currentManifest = await getAppManifest();
-+    } catch (e) {
-+      const err = e;
-+      if (!("status" in err && (err.status === 404 || err.status === 403))) {
-+        throw err;
-+      }
-+    }
-     if (timeout) {
-       clearTimeout(timeout);
-     }
-     timeout = setTimeout(getLatestManifest, outdatedBuildInterval);
-     try {
-       const meta = await $fetch(buildAssetsURL("builds/latest.json") + `?${Date.now()}`);
--      if (meta.id !== currentManifest.id) {
-+      if (meta.id !== currentManifest?.id) {
-         nuxtApp.hooks.callHook("app:manifest:update", meta);
-+        if (timeout) {
-+          clearTimeout(timeout);
-+        }
-       }
-     } catch {
-     }
+diff --git a/dist/core/runtime/nitro/handlers/island.d.ts b/dist/core/runtime/nitro/handlers/island.d.ts
+index ea7b2201536514931228ea584d1707a694853fb9..f85583688484b69c5c0051c7cb0563db853520c6 100644
+--- a/dist/core/runtime/nitro/handlers/island.d.ts
++++ b/dist/core/runtime/nitro/handlers/island.d.ts
+@@ -1,4 +1,4 @@
+ import type { RenderResponse } from 'nitropack/types';
+ import type { NuxtIslandResponse } from '../utils/renderer/islands.js';
+-declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<NuxtIslandResponse | Partial<RenderResponse>>>;
++declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<Partial<RenderResponse> | NuxtIslandResponse>>;
+ export default _default;
 diff --git a/dist/core/runtime/nitro/handlers/island.js b/dist/core/runtime/nitro/handlers/island.js
-index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5e67c43ae 100644
+index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e9bced1b3 100644
 --- a/dist/core/runtime/nitro/handlers/island.js
 +++ b/dist/core/runtime/nitro/handlers/island.js
-@@ -4,11 +4,13 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
+@@ -4,11 +4,11 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
  import { resolveUnrefHeadInput } from "@unhead/vue";
  import { getRequestDependencies } from "vue-bundle-renderer/runtime";
  import { getQuery as getURLQuery } from "ufo";
@@ -861,12 +723,19 @@ index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5
 +import { getComponentsIslands, getSSRRenderer, getServerEntry } from "../utils/renderer/build-files.js";
  import { renderInlineStyles } from "../utils/renderer/inline-styles.js";
 -import { getClientIslandResponse, getServerComponentHTML, getSlotIslandResponse } from "../utils/renderer/islands.js";
-+import { renderToString } from "vue/server-renderer";
-+const components = (await getComponentsIslands()).islandComponents;
- const ISLAND_SUFFIX_RE = /\.json(\?.*)?$/;
+ const ISLAND_SUFFIX_RE = /\.json(?:\?.*)?$/;
  export default defineEventHandler(async (event) => {
    const nitroApp = useNitroApp();
-@@ -27,12 +29,13 @@ export default defineEventHandler(async (event) => {
+@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
+     return islandCache.getItem(event.path);
+   }
+   const islandContext = await getIslandContext(event);
++  
++const components = (await getComponentsIslands());
+   const ssrContext = {
+     ...createSSRContext(event),
+     islandContext,
+@@ -27,12 +29,12 @@ export default defineEventHandler(async (event) => {
      url: islandContext.url
    };
    const renderer = await getSSRRenderer();
@@ -877,7 +746,6 @@ index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5
 +  const createSSRApp = await getServerEntry();
 +  ssrContext.rootComponent = components[islandContext.name];
 +  const app = await createSSRApp(ssrContext, renderer.rendererContext);
-+  await renderToString(app, ssrContext);
 +  const ast = await app.runWithContext(() => serializeApp(app, ssrContext));
    const inlinedStyles = await renderInlineStyles(ssrContext.modules ?? []);
 -  await ssrContext.nuxt?.hooks.callHook("app:rendered", { ssrContext, renderResult });
@@ -885,7 +753,7 @@ index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5
    if (inlinedStyles.length) {
      ssrContext.head.push({ style: inlinedStyles });
    }
-@@ -44,7 +47,7 @@ export default defineEventHandler(async (event) => {
+@@ -44,7 +46,7 @@ export default defineEventHandler(async (event) => {
          continue;
        }
        if (resource.file.includes("scoped") && !resource.file.includes("pages/")) {
@@ -894,7 +762,7 @@ index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5
        }
      }
      if (link.length) {
-@@ -64,9 +67,7 @@ export default defineEventHandler(async (event) => {
+@@ -64,9 +66,7 @@ export default defineEventHandler(async (event) => {
    const islandResponse = {
      id: islandContext.id,
      head: islandHead,
@@ -906,7 +774,7 @@ index b1adecd57fc165ea6d18773570ecabb8a4754138..1d46f39def0969efe5549b0497bfd6a5
    await nitroApp.hooks.callHook("render:island", islandResponse, { event, islandContext });
    if (import.meta.prerender) {
 diff --git a/dist/core/runtime/nitro/handlers/renderer.js b/dist/core/runtime/nitro/handlers/renderer.js
-index 8514fff71c815598a425dd17dcd45530fa514971..608353da99bca0a41378cbd2655763fedb825732 100644
+index 7046c97992c550e1af5e28acc258aad332ba8ebe..b27478685ca359f843db98608d61ac2a12dea274 100644
 --- a/dist/core/runtime/nitro/handlers/renderer.js
 +++ b/dist/core/runtime/nitro/handlers/renderer.js
 @@ -15,9 +15,8 @@ import { payloadCache } from "../utils/cache.js";
@@ -917,10 +785,10 @@ index 8514fff71c815598a425dd17dcd45530fa514971..608353da99bca0a41378cbd2655763fe
  import { renderSSRHeadOptions } from "#internal/unhead.config.mjs";
 -import { appHead, appTeleportAttrs, appTeleportTag, componentIslands, appManifest as isAppManifestEnabled } from "#internal/nuxt.config.mjs";
 +import { appHead, appTeleportAttrs, appTeleportTag, appManifest as isAppManifestEnabled } from "#internal/nuxt.config.mjs";
+ import { entryFileName } from "#internal/entry-chunk.mjs";
  import { buildAssetsURL, publicAssetsURL } from "#internal/nuxt/paths";
  globalThis.__buildAssetsURL = buildAssetsURL;
- globalThis.__publicAssetsURL = publicAssetsURL;
-@@ -125,7 +124,7 @@ export default defineRenderHandler(async (event) => {
+@@ -136,7 +135,7 @@ export default defineRenderHandler(async (event) => {
      ssrContext.head.push({ style: inlinedStyles });
    }
    const link = [];
@@ -929,7 +797,7 @@ index 8514fff71c815598a425dd17dcd45530fa514971..608353da99bca0a41378cbd2655763fe
      if (import.meta.dev && "inline" in getURLQuery(resource.file)) {
        continue;
      }
-@@ -136,10 +135,10 @@ export default defineRenderHandler(async (event) => {
+@@ -147,10 +146,10 @@ export default defineRenderHandler(async (event) => {
    }
    if (!NO_SCRIPTS) {
      ssrContext.head.push({
@@ -942,7 +810,7 @@ index 8514fff71c815598a425dd17dcd45530fa514971..608353da99bca0a41378cbd2655763fe
      }, headEntryOptions);
      ssrContext.head.push({
        script: _PAYLOAD_EXTRACTION ? process.env.NUXT_JSON_PAYLOADS ? renderPayloadJsonScript({ ssrContext, data: splitPayload(ssrContext).initial, src: payloadURL }) : renderPayloadScript({ ssrContext, data: splitPayload(ssrContext).initial, src: payloadURL }) : process.env.NUXT_JSON_PAYLOADS ? renderPayloadJsonScript({ ssrContext, data: ssrContext.payload }) : renderPayloadScript({ ssrContext, data: ssrContext.payload })
-@@ -171,7 +170,7 @@ export default defineRenderHandler(async (event) => {
+@@ -182,7 +181,7 @@ export default defineRenderHandler(async (event) => {
      bodyAttrs: bodyAttrs ? [bodyAttrs] : [],
      bodyPrepend: normalizeChunks([bodyTagsOpen, ssrContext.teleports?.body]),
      body: [
@@ -985,16 +853,18 @@ index 53ccf5705763b46fde817535789b2712b1d7853c..db27b7563f32275c4ad297bfa8e4b827
      rendererContext: import("vue-bundle-renderer/runtime").RendererContext;
      renderToString(ssrContext: import("vue-bundle-renderer/runtime").SSRContext): Promise<{
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.js b/dist/core/runtime/nitro/utils/renderer/build-files.js
-index c1f27b5c0fa710386d83f5bb44162f9176b260c2..4e43547c2583aa917564a814ce5ea1030b0dff0e 100644
+index c1f27b5c0fa710386d83f5bb44162f9176b260c2..e386097e20ac9535ad6858f8ccc7edd360d1711c 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.js
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.js
-@@ -8,7 +8,8 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
+@@ -8,7 +8,10 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
  import { buildAssetsURL } from "#internal/nuxt/paths";
  const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
  const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
 -const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
 +export const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
-+export const getComponentsIslands = () => import("#build/dist/server/components.islands.mjs").then((r) => import.meta.dev ? r.default() : r);
++export const getComponentsIslands = () => import("#build/dist/server/server.mjs").then((r) => {
++   return r.islandComponents
++});
  const getClientManifest = () => import("#build/dist/server/client.manifest.mjs").then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
  export const getSSRRenderer = lazyCachedFunction(async () => {
    const manifest = await getClientManifest();
@@ -1117,238 +987,29 @@ index 9d3a049702291c09150ca9c187a3b6a1aef5988e..e69de29bb2d1d6434b8b29ae775ad8c2
 -  return html;
 -}
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93d1069260 100644
+index 11965d7262242d1981705e895515c6b15a93e8f5..e21a9086dec9f956b39a61a784ed320ceaf71453 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -5,7 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
  import { dirname, resolve, normalize, basename, extname, relative, isAbsolute, join } from 'pathe';
  import { createHooks, createDebugger } from 'hookable';
  import ignore from 'ignore';
--import { useLogger, tryUseNuxt, useNuxt, directoryToURL, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias, addPluginTemplate, addImportsSources, addVitePlugin, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addWebpackPlugin, addServerPlugin, installModule, addServerTemplate, addServerHandler, addRouteMiddleware, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
-+import { useLogger, tryUseNuxt, useNuxt, directoryToURL, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias, addPluginTemplate, addImportsSources, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addVitePlugin, addWebpackPlugin, addServerPlugin, installModule, addServerTemplate, addServerHandler, addRouteMiddleware, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
+-import { useLogger, tryUseNuxt, useNuxt, directoryToURL, getLayerDirectories, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias as resolveAlias$1, addPluginTemplate, addImportsSources, addVitePlugin, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addWebpackPlugin, addServerPlugin, installModules, addServerTemplate, addServerHandler, addRouteMiddleware, resolveModuleWithOptions, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
++import { useLogger, tryUseNuxt, useNuxt, directoryToURL, getLayerDirectories, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias as resolveAlias$1, addPluginTemplate, addImportsSources, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addVitePlugin, addWebpackPlugin, addServerPlugin, installModules, addServerTemplate, addServerHandler, addRouteMiddleware, resolveModuleWithOptions, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
  import { resolvePackageJSON, readPackageJSON } from 'pkg-types';
- import { hash, serialize } from 'ohash';
+ import { hash, isEqual, serialize } from 'ohash';
  import consola, { consola as consola$1 } from 'consola';
-@@ -35,10 +35,10 @@ import { findStaticImports, findExports, parseStaticImport, parseNodeModulePath,
- import MagicString from 'magic-string';
- import { stripLiteral } from 'strip-literal';
+@@ -39,8 +39,8 @@ import { stripLiteral } from 'strip-literal';
  import { unheadVueComposablesImports } from '@unhead/vue';
--import { defineUnimportPreset, createUnimport, toExports, scanDirExports } from 'unimport';
+ import { defineUnimportPreset, createUnimport, toExports, scanDirExports } from 'unimport';
  import { glob } from 'tinyglobby';
 -import { parse, walk as walk$1, ELEMENT_NODE } from 'ultrahtml';
-+import { createUnimport, defineUnimportPreset, toExports, scanDirExports } from 'unimport';
  import { parseQuery as parseQuery$1 } from 'vue-router';
 +import { parse, walk as walk$1 } from 'ultrahtml';
  import { createTransformer } from 'unctx/transform';
  import { cpus } from 'node:os';
  import { createNitro, scanHandlers, writeTypes, copyPublicAssets, prepare, build as build$1, prerender, createDevServer } from 'nitropack';
-@@ -242,6 +242,17 @@ const QUOTE_RE = /["']/g;
- const EXTENSION_RE = /\b\.\w+$/g;
- const SX_RE = /\.[tj]sx$/;
- 
-+const SegmentTokenType = {
-+  static: "static",
-+  dynamic: "dynamic",
-+  optional: "optional",
-+  catchall: "catchall",
-+  group: "group"
-+};
-+const SegmentParserState = {
-+  initial: "initial",
-+  ...SegmentTokenType
-+};
- const enUSComparator = new Intl.Collator("en-US");
- async function resolvePagesRoutes(pattern, nuxt = useNuxt()) {
-   const pagesDirs = nuxt.options._layers.map(
-@@ -311,10 +322,10 @@ function generateRoutesFromFiles(files, options = {}) {
-     for (let i = 0; i < segments.length; i++) {
-       const segment = segments[i];
-       const tokens = parseSegment(segment, file.absolutePath);
--      if (tokens.every((token) => token.type === 4 /* group */)) {
-+      if (tokens.every((token) => token.type === SegmentTokenType.group)) {
-         continue;
-       }
--      const segmentName = tokens.map(({ value, type }) => type === 4 /* group */ ? "" : value).join("");
-+      const segmentName = tokens.map(({ value, type }) => type === SegmentTokenType.group ? "" : value).join("");
-       route.name += (route.name && "/") + segmentName;
-       const routePath = getRoutePath(tokens, segments[i + 1] !== void 0 && segments[i + 1] !== "index");
-       const path = withLeadingSlash(joinURL(route.path, routePath.replace(INDEX_PAGE_RE, "/")));
-@@ -339,7 +350,7 @@ async function augmentPages(routes, vfs, ctx = {}) {
-       const fileContent = route.file in vfs ? vfs[route.file] : fs.readFileSync(ctx.fullyResolvedPaths?.has(route.file) ? route.file : await resolvePath(route.file), "utf-8");
-       const routeMeta = getRouteMeta(fileContent, route.file, ctx.extraExtractionKeys);
-       if (route.meta) {
--        routeMeta.meta = { ...routeMeta.meta, ...route.meta };
-+        routeMeta.meta = defu({}, routeMeta.meta, route.meta);
-       }
-       Object.assign(route, routeMeta);
-       ctx.augmentedPages.add(route.file);
-@@ -447,12 +458,24 @@ function getRouteMeta(contents, absolutePath, extraExtractionKeys = /* @__PURE__
- const COLON_RE = /:/g;
- function getRoutePath(tokens, hasSucceedingSegment = false) {
-   return tokens.reduce((path, token) => {
--    return path + (token.type === 2 /* optional */ ? `:${token.value}?` : token.type === 1 /* dynamic */ ? `:${token.value}()` : token.type === 3 /* catchall */ ? hasSucceedingSegment ? `:${token.value}([^/]*)*` : `:${token.value}(.*)*` : token.type === 4 /* group */ ? "" : encodePath(token.value).replace(COLON_RE, "\\:"));
-+    switch (token.type) {
-+      case SegmentTokenType.optional:
-+        return path + `:${token.value}?`;
-+      case SegmentTokenType.dynamic:
-+        return path + `:${token.value}()`;
-+      case SegmentTokenType.catchall:
-+        return path + (hasSucceedingSegment ? `:${token.value}([^/]*)*` : `:${token.value}(.*)*`);
-+      case SegmentTokenType.group:
-+        return path;
-+      case SegmentTokenType.static:
-+      default:
-+        return path + encodePath(token.value).replace(COLON_RE, "\\:");
-+    }
-   }, "/");
- }
- const PARAM_CHAR_RE = /[\w.]/;
- function parseSegment(segment, absolutePath) {
--  let state = 0 /* initial */;
-+  let state = SegmentParserState.initial;
-   let i = 0;
-   let buffer = "";
-   const tokens = [];
-@@ -460,68 +483,65 @@ function parseSegment(segment, absolutePath) {
-     if (!buffer) {
-       return;
-     }
--    if (state === 0 /* initial */) {
-+    if (state === SegmentParserState.initial) {
-       throw new Error("wrong state");
-     }
--    tokens.push({
--      type: state === 1 /* static */ ? 0 /* static */ : state === 2 /* dynamic */ ? 1 /* dynamic */ : state === 3 /* optional */ ? 2 /* optional */ : state === 4 /* catchall */ ? 3 /* catchall */ : 4 /* group */,
--      value: buffer
--    });
-+    tokens.push({ type: state, value: buffer });
-     buffer = "";
-   }
-   while (i < segment.length) {
-     const c = segment[i];
-     switch (state) {
--      case 0 /* initial */:
-+      case SegmentParserState.initial:
-         buffer = "";
-         if (c === "[") {
--          state = 2 /* dynamic */;
-+          state = SegmentParserState.dynamic;
-         } else if (c === "(") {
--          state = 5 /* group */;
-+          state = SegmentParserState.group;
-         } else {
-           i--;
--          state = 1 /* static */;
-+          state = SegmentParserState.static;
-         }
-         break;
--      case 1 /* static */:
-+      case SegmentParserState.static:
-         if (c === "[") {
-           consumeBuffer();
--          state = 2 /* dynamic */;
-+          state = SegmentParserState.dynamic;
-         } else if (c === "(") {
-           consumeBuffer();
--          state = 5 /* group */;
-+          state = SegmentParserState.group;
-         } else {
-           buffer += c;
-         }
-         break;
--      case 4 /* catchall */:
--      case 2 /* dynamic */:
--      case 3 /* optional */:
--      case 5 /* group */:
-+      case SegmentParserState.catchall:
-+      case SegmentParserState.dynamic:
-+      case SegmentParserState.optional:
-+      case SegmentParserState.group:
-         if (buffer === "...") {
-           buffer = "";
--          state = 4 /* catchall */;
-+          state = SegmentParserState.catchall;
-         }
--        if (c === "[" && state === 2 /* dynamic */) {
--          state = 3 /* optional */;
-+        if (c === "[" && state === SegmentParserState.dynamic) {
-+          state = SegmentParserState.optional;
-         }
--        if (c === "]" && (state !== 3 /* optional */ || segment[i - 1] === "]")) {
-+        if (c === "]" && (state !== SegmentParserState.optional || segment[i - 1] === "]")) {
-           if (!buffer) {
-             throw new Error("Empty param");
-           } else {
-             consumeBuffer();
-           }
--          state = 0 /* initial */;
--        } else if (c === ")" && state === 5 /* group */) {
-+          state = SegmentParserState.initial;
-+        } else if (c === ")" && state === SegmentParserState.group) {
-           if (!buffer) {
-             throw new Error("Empty group");
-           } else {
-             consumeBuffer();
-           }
--          state = 0 /* initial */;
-+          state = SegmentParserState.initial;
-         } else if (c && PARAM_CHAR_RE.test(c)) {
-           buffer += c;
--        } else if (state === 2 /* dynamic */ || state === 3 /* optional */) {
-+        } else if (state === SegmentParserState.dynamic || state === SegmentParserState.optional) {
-           if (c !== "[" && c !== "]") {
-             logger.warn(`'\`${c}\`' is not allowed in a dynamic route parameter and has been ignored. Consider renaming \`${absolutePath}\`.`);
-           }
-@@ -530,7 +550,7 @@ function parseSegment(segment, absolutePath) {
-     }
-     i++;
-   }
--  if (state === 2 /* dynamic */) {
-+  if (state === SegmentParserState.dynamic) {
-     throw new Error(`Unfinished param "${buffer}"`);
-   }
-   consumeBuffer();
-@@ -731,6 +751,9 @@ function isSerializable(code, node) {
-       serializable: true
-     };
-   }
-+  if (node.type === "TSSatisfiesExpression" || node.type === "TSAsExpression" || node.type === "ParenthesizedExpression") {
-+    return isSerializable(code, node.expression);
-+  }
-   return {
-     serializable: false
-   };
-@@ -748,13 +771,18 @@ function toRou3Patterns(pages, prefix = "/") {
- }
- 
- const ROUTE_RULE_RE = /\bdefineRouteRules\(/;
-+const pageCodeCache = {};
- const ruleCache = {};
- function extractRouteRules(code, path) {
-   if (!ROUTE_RULE_RE.test(code)) {
-     return null;
-   }
--  if (code in ruleCache) {
--    return ruleCache[code] || null;
-+  if (!(path in pageCodeCache) || pageCodeCache[path] !== code) {
-+    pageCodeCache[path] = code;
-+    delete ruleCache[path];
-+  }
-+  if (path in ruleCache) {
-+    return ruleCache[path] || null;
-   }
-   const loader = getLoader(path);
-   if (!loader) {
-@@ -781,7 +809,7 @@ function extractRouteRules(code, path) {
-       }
-     });
-   }
--  ruleCache[code] = rule;
-+  ruleCache[path] = rule;
-   return rule;
- }
- function getMappedPages(pages, paths = {}, prefix = "") {
-@@ -1816,326 +1844,60 @@ export default {
+@@ -1816,6 +1816,7 @@ export default {
      nuxt.hooks.hook("nitro:config", (config) => {
        config.virtual["#internal/unhead-options.mjs"] = () => nuxt.vfs["#build/unhead-options.mjs"] || "";
        config.virtual["#internal/unhead.config.mjs"] = () => nuxt.vfs["#build/unhead.config.mjs"] || "";
@@ -1356,375 +1017,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
      });
      addPlugin({ src: resolve(runtimeDir, "plugins/unhead") });
    }
- });
- 
--const commonPresets = [
--  // vue-demi (mocked)
--  defineUnimportPreset({
--    from: "vue-demi",
--    imports: [
--      "isVue2",
--      "isVue3"
--    ]
--  })
--];
--const granularAppPresets = [
--  {
--    from: "#app/components/nuxt-link",
--    imports: ["defineNuxtLink"]
--  },
--  {
--    imports: ["useNuxtApp", "tryUseNuxtApp", "defineNuxtPlugin", "definePayloadPlugin", "useRuntimeConfig", "defineAppConfig"],
--    from: "#app/nuxt"
--  },
--  {
--    imports: ["useAppConfig", "updateAppConfig"],
--    from: "#app/config"
--  },
--  {
--    imports: ["defineNuxtComponent"],
--    from: "#app/composables/component"
--  },
--  {
--    imports: ["useAsyncData", "useLazyAsyncData", "useNuxtData", "refreshNuxtData", "clearNuxtData"],
--    from: "#app/composables/asyncData"
--  },
--  {
--    imports: ["useHydration"],
--    from: "#app/composables/hydrate"
--  },
--  {
--    imports: ["callOnce"],
--    from: "#app/composables/once"
--  },
--  {
--    imports: ["useState", "clearNuxtState"],
--    from: "#app/composables/state"
--  },
--  {
--    imports: ["clearError", "createError", "isNuxtError", "showError", "useError"],
--    from: "#app/composables/error"
--  },
--  {
--    imports: ["useFetch", "useLazyFetch"],
--    from: "#app/composables/fetch"
--  },
--  {
--    imports: ["useCookie", "refreshCookie"],
--    from: "#app/composables/cookie"
--  },
--  {
--    imports: ["onPrehydrate", "prerenderRoutes", "useRequestHeader", "useRequestHeaders", "useResponseHeader", "useRequestEvent", "useRequestFetch", "setResponseStatus"],
--    from: "#app/composables/ssr"
--  },
--  {
--    imports: ["onNuxtReady"],
--    from: "#app/composables/ready"
--  },
--  {
--    imports: ["preloadComponents", "prefetchComponents", "preloadRouteComponents"],
--    from: "#app/composables/preload"
--  },
--  {
--    imports: ["abortNavigation", "addRouteMiddleware", "defineNuxtRouteMiddleware", "setPageLayout", "navigateTo", "useRoute", "useRouter"],
--    from: "#app/composables/router"
--  },
--  {
--    imports: ["isPrerendered", "loadPayload", "preloadPayload", "definePayloadReducer", "definePayloadReviver"],
--    from: "#app/composables/payload"
--  },
--  {
--    imports: ["useLoadingIndicator"],
--    from: "#app/composables/loading-indicator"
--  },
--  {
--    imports: ["getAppManifest", "getRouteRules"],
--    from: "#app/composables/manifest"
--  },
--  {
--    imports: ["reloadNuxtApp"],
--    from: "#app/composables/chunk"
--  },
--  {
--    imports: ["useRequestURL"],
--    from: "#app/composables/url"
--  },
--  {
--    imports: ["usePreviewMode"],
--    from: "#app/composables/preview"
--  },
--  {
--    imports: ["useRouteAnnouncer"],
--    from: "#app/composables/route-announcer"
--  },
--  {
--    imports: ["useRuntimeHook"],
--    from: "#app/composables/runtime-hook"
--  },
--  {
--    imports: ["useHead", "useHeadSafe", "useServerHeadSafe", "useServerHead", "useSeoMeta", "useServerSeoMeta", "injectHead"],
--    from: "#app/composables/head"
--  }
--];
--const scriptsStubsPreset = {
--  imports: [
--    "useScriptTriggerConsent",
--    "useScriptEventPage",
--    "useScriptTriggerElement",
--    "useScript",
--    "useScriptGoogleAnalytics",
--    "useScriptPlausibleAnalytics",
--    "useScriptCrisp",
--    "useScriptClarity",
--    "useScriptCloudflareWebAnalytics",
--    "useScriptFathomAnalytics",
--    "useScriptMatomoAnalytics",
--    "useScriptGoogleTagManager",
--    "useScriptGoogleAdsense",
--    "useScriptSegment",
--    "useScriptMetaPixel",
--    "useScriptXPixel",
--    "useScriptIntercom",
--    "useScriptHotjar",
--    "useScriptStripe",
--    "useScriptLemonSqueezy",
--    "useScriptVimeoPlayer",
--    "useScriptYouTubePlayer",
--    "useScriptGoogleMaps",
--    "useScriptNpm",
--    "useScriptUmamiAnalytics",
--    "useScriptSnapchatPixel",
--    "useScriptRybbitAnalytics"
--  ],
--  priority: -1,
--  from: "#app/composables/script-stubs"
--};
--const routerPreset = defineUnimportPreset({
--  imports: ["onBeforeRouteLeave", "onBeforeRouteUpdate"],
--  from: "#app/composables/router"
--});
--const vuePreset = defineUnimportPreset({
--  from: "vue",
--  imports: [
--    // <script setup>
--    "withCtx",
--    "withDirectives",
--    "withKeys",
--    "withMemo",
--    "withModifiers",
--    "withScopeId",
--    // Lifecycle
--    "onActivated",
--    "onBeforeMount",
--    "onBeforeUnmount",
--    "onBeforeUpdate",
--    "onDeactivated",
--    "onErrorCaptured",
--    "onMounted",
--    "onRenderTracked",
--    "onRenderTriggered",
--    "onServerPrefetch",
--    "onUnmounted",
--    "onUpdated",
--    // Reactivity
--    "computed",
--    "customRef",
--    "isProxy",
--    "isReactive",
--    "isReadonly",
--    "isRef",
--    "markRaw",
--    "proxyRefs",
--    "reactive",
--    "readonly",
--    "ref",
--    "shallowReactive",
--    "shallowReadonly",
--    "shallowRef",
--    "toRaw",
--    "toRef",
--    "toRefs",
--    "triggerRef",
--    "unref",
--    "watch",
--    "watchEffect",
--    "watchPostEffect",
--    "watchSyncEffect",
--    "onWatcherCleanup",
--    "isShallow",
--    // effect
--    "effect",
--    "effectScope",
--    "getCurrentScope",
--    "onScopeDispose",
--    // Component
--    "defineComponent",
--    "defineAsyncComponent",
--    "resolveComponent",
--    "getCurrentInstance",
--    "h",
--    "inject",
--    "hasInjectionContext",
--    "nextTick",
--    "provide",
--    "mergeModels",
--    "toValue",
--    "useModel",
--    "useAttrs",
--    "useCssModule",
--    "useCssVars",
--    "useSlots",
--    "useTransitionState",
--    "useId",
--    "useTemplateRef",
--    "useShadowRoot",
--    "useCssVars"
--  ]
--});
--const vueTypesPreset = defineUnimportPreset({
--  from: "vue",
--  type: true,
--  imports: [
--    "Component",
--    "ComponentPublicInstance",
--    "ComputedRef",
--    "DirectiveBinding",
--    "ExtractDefaultPropTypes",
--    "ExtractPropTypes",
--    "ExtractPublicPropTypes",
--    "InjectionKey",
--    "PropType",
--    "Ref",
--    "MaybeRef",
--    "MaybeRefOrGetter",
--    "VNode",
--    "WritableComputedRef"
--  ]
--});
--const appCompatPresets = [
--  {
--    imports: ["requestIdleCallback", "cancelIdleCallback"],
--    from: "#app/compat/idle-callback"
--  },
--  {
--    imports: ["setInterval"],
--    from: "#app/compat/interval"
--  }
--];
--const lazyHydrationMacroPreset = [
--  {
--    imports: ["defineLazyHydrationComponent"],
--    from: "#app/composables/lazy-hydration"
--  }
--];
--const defaultPresets = [
--  ...commonPresets,
--  ...granularAppPresets,
--  routerPreset,
--  vuePreset,
--  vueTypesPreset
--];
--
--const createImportMagicComments = (options) => {
--  const { chunkName, prefetch, preload } = options;
--  return [
--    `webpackChunkName: "${chunkName}"`,
--    prefetch === true || typeof prefetch === "number" ? `webpackPrefetch: ${prefetch}` : false,
--    preload === true || typeof preload === "number" ? `webpackPreload: ${preload}` : false
--  ].filter(Boolean).join(", ");
--};
--const emptyComponentsPlugin = `
--import { defineNuxtPlugin } from '#app/nuxt'
--export default defineNuxtPlugin({
--  name: 'nuxt:global-components',
--})
--`;
--const componentsPluginTemplate = {
--  filename: "components.plugin.mjs",
--  getContents({ app }) {
--    const lazyGlobalComponents = /* @__PURE__ */ new Set();
--    const syncGlobalComponents = /* @__PURE__ */ new Set();
--    for (const component of app.components) {
--      if (component.global === "sync") {
--        syncGlobalComponents.add(component.pascalName);
--      } else if (component.global) {
--        lazyGlobalComponents.add(component.pascalName);
--      }
--    }
--    if (!lazyGlobalComponents.size && !syncGlobalComponents.size) {
--      return emptyComponentsPlugin;
--    }
--    const lazyComponents = [...lazyGlobalComponents];
--    const syncComponents = [...syncGlobalComponents];
--    return `import { defineNuxtPlugin } from '#app/nuxt'
--import { ${[...lazyComponents.map((c) => "Lazy" + c), ...syncComponents].join(", ")} } from '#components'
--const lazyGlobalComponents = [
--  ${lazyComponents.map((c) => `["${c}", Lazy${c}]`).join(",\n")},
--  ${syncComponents.map((c) => `["${c}", ${c}]`).join(",\n")}
--]
--
--export default defineNuxtPlugin({
--  name: 'nuxt:global-components',
--  setup (nuxtApp) {
--    for (const [name, component] of lazyGlobalComponents) {
--      nuxtApp.vueApp.component(name, component)
--      nuxtApp.vueApp.component('Lazy' + name, component)
--    }
--  }
--})
--`;
-+const createImportMagicComments = (options) => {
-+  const { chunkName, prefetch, preload } = options;
-+  return [
-+    `webpackChunkName: "${chunkName}"`,
-+    prefetch === true || typeof prefetch === "number" ? `webpackPrefetch: ${prefetch}` : false,
-+    preload === true || typeof preload === "number" ? `webpackPreload: ${preload}` : false
-+  ].filter(Boolean).join(", ");
-+};
-+const emptyComponentsPlugin = `
-+import { defineNuxtPlugin } from '#app/nuxt'
-+export default defineNuxtPlugin({
-+  name: 'nuxt:global-components',
-+})
-+`;
-+const componentsPluginTemplate = {
-+  filename: "components.plugin.mjs",
-+  getContents({ app }) {
-+    const lazyGlobalComponents = /* @__PURE__ */ new Set();
-+    const syncGlobalComponents = /* @__PURE__ */ new Set();
-+    for (const component of app.components) {
-+      if (component.global === "sync") {
-+        syncGlobalComponents.add(component.pascalName);
-+      } else if (component.global) {
-+        lazyGlobalComponents.add(component.pascalName);
-+      }
-+    }
-+    if (!lazyGlobalComponents.size && !syncGlobalComponents.size) {
-+      return emptyComponentsPlugin;
-+    }
-+    const lazyComponents = [...lazyGlobalComponents];
-+    const syncComponents = [...syncGlobalComponents];
-+    return `import { defineNuxtPlugin } from '#app/nuxt'
-+import { ${[...lazyComponents.map((c) => "Lazy" + c), ...syncComponents].join(", ")} } from '#components'
-+const lazyGlobalComponents = [
-+  ${lazyComponents.map((c) => `["${c}", Lazy${c}]`).join(",\n")},
-+  ${syncComponents.map((c) => `["${c}", ${c}]`).join(",\n")}
-+]
-+
-+export default defineNuxtPlugin({
-+  name: 'nuxt:global-components',
-+  setup (nuxtApp) {
-+    for (const [name, component] of lazyGlobalComponents) {
-+      nuxtApp.vueApp.component(name, component)
-+      nuxtApp.vueApp.component('Lazy' + name, component)
-+    }
-+  }
-+})
-+`;
-   }
- };
- const componentNamesTemplate = {
-@@ -2157,7 +1919,7 @@ const componentsIslandsTemplate = {
+@@ -2157,7 +2158,7 @@ const componentsIslandsTemplate = {
        component.mode === "server" && !components.some((c) => c.pascalName === component.pascalName && c.mode === "client")
      );
      const pageExports = pages?.filter((p) => p.mode === "server" && p.file && p.name).map((p) => {
@@ -1733,7 +1026,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
      }) || [];
      return [
        "import { defineAsyncComponent } from 'vue'",
-@@ -2166,12 +1928,13 @@ const componentsIslandsTemplate = {
+@@ -2166,19 +2167,19 @@ const componentsIslandsTemplate = {
          (c) => {
            const exp = c.export === "default" ? "c.default || c" : `c['${c.export}']`;
            const comment = createImportMagicComments(c);
@@ -1748,17 +1041,45 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
 +  write: true
  };
  const NON_VUE_RE = /\b\.(?!vue)\w+$/g;
+-function resolveComponentTypes(nuxt, app) {
+-  const buildDir = nuxt.options.buildDir;
++function resolveComponentTypes(app, baseDir) {
+   const serverPlaceholderPath = resolve(distDir, "app/components/server-placeholder");
+   const componentTypes = app.components.filter((c) => !c.island).map((c) => {
+-    const type = `typeof ${genDynamicImport(isAbsolute(c.filePath) ? relative(buildDir, c.filePath).replace(NON_VUE_RE, "") : c.filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
++    const type = `typeof ${genDynamicImport(isAbsolute(c.filePath) ? relative(baseDir, c.filePath).replace(NON_VUE_RE, "") : c.filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
+     const isServerOnly = c.mode === "server" && c.filePath !== serverPlaceholderPath && !app.components.some((other) => other.pascalName === c.pascalName && other.mode === "client");
+     return [
+       c.pascalName,
+@@ -2204,7 +2205,7 @@ const componentsDeclarationTemplate = {
+   filename: "components.d.ts",
+   write: true,
+   getContents: ({ app, nuxt }) => {
+-    const componentTypes = resolveComponentTypes(nuxt, app);
++    const componentTypes = resolveComponentTypes(app, nuxt.options.buildDir);
+     return `
+ import type { DefineComponent, SlotsType } from 'vue'
+ ${nuxt.options.experimental.componentIslands ? islandType : ""}
+@@ -2220,7 +2221,7 @@ export const componentNames: string[]
  const componentsTypeTemplate = {
-@@ -2485,215 +2248,6 @@ function findComponent$1(components, name, mode) {
+   filename: "types/components.d.ts",
+   getContents: ({ app, nuxt }) => {
+-    const componentTypes = resolveComponentTypes(nuxt, app);
++    const componentTypes = resolveComponentTypes(app, join(nuxt.options.buildDir, "types"));
+     return `
+ import type { DefineComponent, SlotsType } from 'vue'
+ ${nuxt.options.experimental.componentIslands ? islandType : ""}
+@@ -2506,216 +2507,6 @@ function findComponent(components, name, mode) {
    return otherModeComponent;
  }
  
--const SCRIPT_RE$2 = /<script[^>]*>/gi;
+-const SCRIPT_RE$2 = /<script[^>]*>/i;
+-const SCRIPT_RE_GLOBAL = /<script[^>]*>/gi;
 -const HAS_SLOT_OR_CLIENT_RE = /<slot[^>]*>|nuxt-client/;
--const TEMPLATE_RE$1 = /<template>([\s\S]*)<\/template>/;
--const NUXTCLIENT_ATTR_RE = /\s:?nuxt-client(="[^"]*")?/g;
+-const TEMPLATE_RE$1 = /<template>[\s\S]*<\/template>/;
+-const NUXTCLIENT_ATTR_RE = /\s:?nuxt-client(?:="[^"]*")?/g;
 -const IMPORT_CODE = "\nimport { mergeProps as __mergeProps } from 'vue'\nimport { vforToArray as __vforToArray } from '#app/components/utils'\nimport NuxtTeleportIslandComponent from '#app/components/nuxt-teleport-island-component'\nimport NuxtTeleportSsrSlot from '#app/components/nuxt-teleport-island-slot'";
--const EXTRACTED_ATTRS_RE = /v-(?:if|else-if|else)(="[^"]*")?/g;
+-const EXTRACTED_ATTRS_RE = /v-(?:if|else-if|else)(?:="[^"]*")?/g;
 -const KEY_RE = /:?key="[^"]"/g;
 -function wrapWithVForDiv(code, vfor) {
 -  return `<div v-for="${vfor}" style="display: contents;">${code}</div>`;
@@ -1795,10 +1116,10 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
 -        }
 -        const startingIndex = template.index || 0;
 -        const s = new MagicString(code);
--        if (!code.match(SCRIPT_RE$2)) {
+-        if (!SCRIPT_RE$2.test(code)) {
 -          s.prepend("<script setup>" + IMPORT_CODE + "<\/script>");
 -        } else {
--          s.replace(SCRIPT_RE$2, (full) => {
+-          s.replace(SCRIPT_RE_GLOBAL, (full) => {
 -            return full + IMPORT_CODE;
 -          });
 -        }
@@ -1965,438 +1286,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
  const COMPONENT_QUERY_RE = /[?&]nuxt_component=/;
  function TransformPlugin$1(nuxt, options) {
    const componentUnimport = createUnimport({
-@@ -3177,85 +2731,352 @@ Rename it to \`<Lazy${pascalCase(node.name)} />\` or remove the lazy-hydration p
-     }
-   };
- });
--
--const LAZY_HYDRATION_MACRO_RE = /(?:\b(?:const|let|var)\s+(\w+)\s*=\s*)?defineLazyHydrationComponent\(\s*['"]([^'"]+)['"]\s*,\s*\(\s*\)\s*=>\s*import\s*\(\s*['"]([^'"]+)['"]\s*\)\s*\)/g;
--const COMPONENT_NAME = /import\(["'].*\/([^\\/]+?)\.\w+["']\)/;
--const HYDRATION_STRATEGY = ["visible", "idle", "interaction", "mediaQuery", "if", "time", "never"];
--const LazyHydrationMacroTransformPlugin = (options) => createUnplugin(() => {
--  const exclude = options.transform?.exclude || [];
--  const include = options.transform?.include || [];
--  return {
--    name: "nuxt:lazy-hydration-macro",
--    enforce: "post",
--    transformInclude(id) {
--      if (exclude.some((pattern) => pattern.test(id))) {
--        return false;
--      }
--      if (include.some((pattern) => pattern.test(id))) {
--        return true;
--      }
--      return isVue(id, { type: ["template", "script"] }) || isJS(id);
--    },
--    transform: {
--      filter: {
--        code: { include: LAZY_HYDRATION_MACRO_RE }
--      },
--      handler(code) {
--        const matches = Array.from(code.matchAll(LAZY_HYDRATION_MACRO_RE));
--        if (!matches.length) {
--          return;
--        }
--        const s = new MagicString(code);
--        const names = /* @__PURE__ */ new Set();
--        const components = options.getComponents();
--        for (const match of matches) {
--          const [matchedString, variableName, hydrationStrategy] = match;
--          const startIndex = match.index;
--          const endIndex = startIndex + matchedString.length;
--          if (!variableName) {
--            s.remove(startIndex, endIndex);
--            continue;
--          }
--          if (!hydrationStrategy || !HYDRATION_STRATEGY.includes(hydrationStrategy)) {
--            s.remove(startIndex, endIndex);
--            continue;
--          }
--          const componentNameMatch = matchedString.match(COMPONENT_NAME);
--          if (!componentNameMatch || !componentNameMatch[1]) {
--            s.remove(startIndex, endIndex);
--            continue;
--          }
--          const name = componentNameMatch[1];
--          const component = findComponent(components, name);
--          if (!component) {
--            s.remove(startIndex, endIndex);
--            continue;
--          }
--          const relativePath = relative(options.srcDir, component.filePath);
--          const dynamicImport = `${genDynamicImport(component.filePath, { interopDefault: false })}.then(c => c.${component.export ?? "default"} || c)`;
--          const replaceFunctionName = `createLazy${upperFirst(hydrationStrategy)}Component`;
--          const replacement = `const ${variableName} = __${replaceFunctionName}(${JSON.stringify(relativePath)}, ${dynamicImport})`;
--          s.overwrite(startIndex, endIndex, replacement);
--          names.add(replaceFunctionName);
--        }
--        if (names.size) {
--          const imports = genImport(options.clientDelayedComponentRuntime, [...names].map((name) => ({ name, as: `__${name}` })));
--          s.prepend(imports);
--        }
--        if (s.hasChanged()) {
--          return {
--            code: s.toString(),
--            map: options.sourcemap ? s.generateMap({ hires: true }) : void 0
--          };
--        }
--      }
--    }
--  };
-+
-+const LAZY_HYDRATION_MACRO_RE = /(?:\b(?:const|let|var)\s+(\w+)\s*=\s*)?defineLazyHydrationComponent\(\s*['"]([^'"]+)['"]\s*,\s*\(\s*\)\s*=>\s*import\s*\(\s*['"]([^'"]+)['"]\s*\)\s*\)/g;
-+const COMPONENT_NAME = /import\(["'].*\/([^\\/]+?)\.\w+["']\)/;
-+const HYDRATION_STRATEGY = ["visible", "idle", "interaction", "mediaQuery", "if", "time", "never"];
-+const LazyHydrationMacroTransformPlugin = (options) => createUnplugin(() => {
-+  const exclude = options.transform?.exclude || [];
-+  const include = options.transform?.include || [];
-+  return {
-+    name: "nuxt:lazy-hydration-macro",
-+    enforce: "post",
-+    transformInclude(id) {
-+      if (exclude.some((pattern) => pattern.test(id))) {
-+        return false;
-+      }
-+      if (include.some((pattern) => pattern.test(id))) {
-+        return true;
-+      }
-+      return isVue(id, { type: ["template", "script"] }) || isJS(id);
-+    },
-+    transform: {
-+      filter: {
-+        code: { include: LAZY_HYDRATION_MACRO_RE }
-+      },
-+      handler(code) {
-+        const matches = Array.from(code.matchAll(LAZY_HYDRATION_MACRO_RE));
-+        if (!matches.length) {
-+          return;
-+        }
-+        const s = new MagicString(code);
-+        const names = /* @__PURE__ */ new Set();
-+        const components = options.getComponents();
-+        for (const match of matches) {
-+          const [matchedString, variableName, hydrationStrategy] = match;
-+          const startIndex = match.index;
-+          const endIndex = startIndex + matchedString.length;
-+          if (!variableName) {
-+            s.remove(startIndex, endIndex);
-+            continue;
-+          }
-+          if (!hydrationStrategy || !HYDRATION_STRATEGY.includes(hydrationStrategy)) {
-+            s.remove(startIndex, endIndex);
-+            continue;
-+          }
-+          const componentNameMatch = matchedString.match(COMPONENT_NAME);
-+          if (!componentNameMatch || !componentNameMatch[1]) {
-+            s.remove(startIndex, endIndex);
-+            continue;
-+          }
-+          const name = componentNameMatch[1];
-+          const component = findComponent(components, name);
-+          if (!component) {
-+            s.remove(startIndex, endIndex);
-+            continue;
-+          }
-+          const relativePath = relative(options.srcDir, component.filePath);
-+          const dynamicImport = `${genDynamicImport(component.filePath, { interopDefault: false })}.then(c => c.${component.export ?? "default"} || c)`;
-+          const replaceFunctionName = `createLazy${upperFirst(hydrationStrategy)}Component`;
-+          const replacement = `const ${variableName} = __${replaceFunctionName}(${JSON.stringify(relativePath)}, ${dynamicImport})`;
-+          s.overwrite(startIndex, endIndex, replacement);
-+          names.add(replaceFunctionName);
-+        }
-+        if (names.size) {
-+          const imports = genImport(options.clientDelayedComponentRuntime, [...names].map((name) => ({ name, as: `__${name}` })));
-+          s.prepend(imports);
-+        }
-+        if (s.hasChanged()) {
-+          return {
-+            code: s.toString(),
-+            map: options.sourcemap ? s.generateMap({ hires: true }) : void 0
-+          };
-+        }
-+      }
-+    }
-+  };
-+});
-+function findComponent(components, name) {
-+  const id = pascalCase(name);
-+  return components.find((c) => c.pascalName === id);
-+}
-+
-+const commonPresets = [
-+  // vue-demi (mocked)
-+  defineUnimportPreset({
-+    from: "vue-demi",
-+    imports: [
-+      "isVue2",
-+      "isVue3"
-+    ]
-+  })
-+];
-+const granularAppPresets = [
-+  {
-+    from: "#app/components/nuxt-link",
-+    imports: ["defineNuxtLink"]
-+  },
-+  {
-+    imports: ["useNuxtApp", "tryUseNuxtApp", "defineNuxtPlugin", "definePayloadPlugin", "useRuntimeConfig", "defineAppConfig"],
-+    from: "#app/nuxt"
-+  },
-+  {
-+    imports: ["useAppConfig", "updateAppConfig"],
-+    from: "#app/config"
-+  },
-+  {
-+    imports: ["defineNuxtComponent"],
-+    from: "#app/composables/component"
-+  },
-+  {
-+    imports: ["useAsyncData", "useLazyAsyncData", "useNuxtData", "refreshNuxtData", "clearNuxtData"],
-+    from: "#app/composables/asyncData"
-+  },
-+  {
-+    imports: ["useHydration"],
-+    from: "#app/composables/hydrate"
-+  },
-+  {
-+    imports: ["callOnce"],
-+    from: "#app/composables/once"
-+  },
-+  {
-+    imports: ["useState", "clearNuxtState"],
-+    from: "#app/composables/state"
-+  },
-+  {
-+    imports: ["clearError", "createError", "isNuxtError", "showError", "useError"],
-+    from: "#app/composables/error"
-+  },
-+  {
-+    imports: ["useFetch", "useLazyFetch"],
-+    from: "#app/composables/fetch"
-+  },
-+  {
-+    imports: ["useCookie", "refreshCookie"],
-+    from: "#app/composables/cookie"
-+  },
-+  {
-+    imports: ["onPrehydrate", "prerenderRoutes", "useRequestHeader", "useRequestHeaders", "useResponseHeader", "useRequestEvent", "useRequestFetch", "setResponseStatus"],
-+    from: "#app/composables/ssr"
-+  },
-+  {
-+    imports: ["onNuxtReady"],
-+    from: "#app/composables/ready"
-+  },
-+  {
-+    imports: ["preloadComponents", "prefetchComponents", "preloadRouteComponents"],
-+    from: "#app/composables/preload"
-+  },
-+  {
-+    imports: ["abortNavigation", "addRouteMiddleware", "defineNuxtRouteMiddleware", "setPageLayout", "navigateTo", "useRoute", "useRouter"],
-+    from: "#app/composables/router"
-+  },
-+  {
-+    imports: ["isPrerendered", "loadPayload", "preloadPayload", "definePayloadReducer", "definePayloadReviver"],
-+    from: "#app/composables/payload"
-+  },
-+  {
-+    imports: ["useLoadingIndicator"],
-+    from: "#app/composables/loading-indicator"
-+  },
-+  {
-+    imports: ["getAppManifest", "getRouteRules"],
-+    from: "#app/composables/manifest"
-+  },
-+  {
-+    imports: ["reloadNuxtApp"],
-+    from: "#app/composables/chunk"
-+  },
-+  {
-+    imports: ["useRequestURL"],
-+    from: "#app/composables/url"
-+  },
-+  {
-+    imports: ["usePreviewMode"],
-+    from: "#app/composables/preview"
-+  },
-+  {
-+    imports: ["useRouteAnnouncer"],
-+    from: "#app/composables/route-announcer"
-+  },
-+  {
-+    imports: ["useRuntimeHook"],
-+    from: "#app/composables/runtime-hook"
-+  },
-+  {
-+    imports: ["useHead", "useHeadSafe", "useServerHeadSafe", "useServerHead", "useSeoMeta", "useServerSeoMeta", "injectHead"],
-+    from: "#app/composables/head"
-+  }
-+];
-+const scriptsStubsPreset = {
-+  imports: [
-+    "useScriptTriggerConsent",
-+    "useScriptEventPage",
-+    "useScriptTriggerElement",
-+    "useScript",
-+    "useScriptGoogleAnalytics",
-+    "useScriptPlausibleAnalytics",
-+    "useScriptCrisp",
-+    "useScriptClarity",
-+    "useScriptCloudflareWebAnalytics",
-+    "useScriptFathomAnalytics",
-+    "useScriptMatomoAnalytics",
-+    "useScriptGoogleTagManager",
-+    "useScriptGoogleAdsense",
-+    "useScriptSegment",
-+    "useScriptMetaPixel",
-+    "useScriptXPixel",
-+    "useScriptIntercom",
-+    "useScriptHotjar",
-+    "useScriptStripe",
-+    "useScriptLemonSqueezy",
-+    "useScriptVimeoPlayer",
-+    "useScriptYouTubePlayer",
-+    "useScriptGoogleMaps",
-+    "useScriptNpm",
-+    "useScriptUmamiAnalytics",
-+    "useScriptSnapchatPixel",
-+    "useScriptRybbitAnalytics"
-+  ],
-+  priority: -1,
-+  from: "#app/composables/script-stubs"
-+};
-+const routerPreset = defineUnimportPreset({
-+  imports: ["onBeforeRouteLeave", "onBeforeRouteUpdate"],
-+  from: "#app/composables/router"
-+});
-+const vuePreset = defineUnimportPreset({
-+  from: "vue",
-+  imports: [
-+    // <script setup>
-+    "withCtx",
-+    "withDirectives",
-+    "withKeys",
-+    "withMemo",
-+    "withModifiers",
-+    "withScopeId",
-+    // Lifecycle
-+    "onActivated",
-+    "onBeforeMount",
-+    "onBeforeUnmount",
-+    "onBeforeUpdate",
-+    "onDeactivated",
-+    "onErrorCaptured",
-+    "onMounted",
-+    "onRenderTracked",
-+    "onRenderTriggered",
-+    "onServerPrefetch",
-+    "onUnmounted",
-+    "onUpdated",
-+    // Reactivity
-+    "computed",
-+    "customRef",
-+    "isProxy",
-+    "isReactive",
-+    "isReadonly",
-+    "isRef",
-+    "markRaw",
-+    "proxyRefs",
-+    "reactive",
-+    "readonly",
-+    "ref",
-+    "shallowReactive",
-+    "shallowReadonly",
-+    "shallowRef",
-+    "toRaw",
-+    "toRef",
-+    "toRefs",
-+    "triggerRef",
-+    "unref",
-+    "watch",
-+    "watchEffect",
-+    "watchPostEffect",
-+    "watchSyncEffect",
-+    "onWatcherCleanup",
-+    "isShallow",
-+    // effect
-+    "effect",
-+    "effectScope",
-+    "getCurrentScope",
-+    "onScopeDispose",
-+    // Component
-+    "defineComponent",
-+    "defineAsyncComponent",
-+    "resolveComponent",
-+    "getCurrentInstance",
-+    "h",
-+    "inject",
-+    "hasInjectionContext",
-+    "nextTick",
-+    "provide",
-+    "mergeModels",
-+    "toValue",
-+    "useModel",
-+    "useAttrs",
-+    "useCssModule",
-+    "useCssVars",
-+    "useSlots",
-+    "useTransitionState",
-+    "useId",
-+    "useTemplateRef",
-+    "useShadowRoot",
-+    "useCssVars"
-+  ]
- });
--function findComponent(components, name) {
--  const id = pascalCase(name);
--  return components.find((c) => c.pascalName === id);
--}
-+const vueTypesPreset = defineUnimportPreset({
-+  from: "vue",
-+  type: true,
-+  imports: [
-+    "Component",
-+    "ComponentPublicInstance",
-+    "ComputedRef",
-+    "DirectiveBinding",
-+    "ExtractDefaultPropTypes",
-+    "ExtractPropTypes",
-+    "ExtractPublicPropTypes",
-+    "InjectionKey",
-+    "PropType",
-+    "Ref",
-+    "MaybeRef",
-+    "MaybeRefOrGetter",
-+    "VNode",
-+    "WritableComputedRef"
-+  ]
-+});
-+const appCompatPresets = [
-+  {
-+    imports: ["requestIdleCallback", "cancelIdleCallback"],
-+    from: "#app/compat/idle-callback"
-+  },
-+  {
-+    imports: ["setInterval"],
-+    from: "#app/compat/interval"
-+  }
-+];
-+const lazyHydrationMacroPreset = [
-+  {
-+    imports: ["defineLazyHydrationComponent"],
-+    from: "#app/composables/lazy-hydration"
-+  }
-+];
-+const defaultPresets = [
-+  ...commonPresets,
-+  ...granularAppPresets,
-+  routerPreset,
-+  vuePreset,
-+  vueTypesPreset
-+];
- 
- const isPureObjectOrString = (val) => !Array.isArray(val) && typeof val === "object" || typeof val === "string";
- const isDirectory = (p) => {
-@@ -3437,32 +3258,7 @@ const componentsModule = defineNuxtModule({
+@@ -3509,32 +3300,7 @@ const componentsModule = defineNuxtModule({
        }));
        addImportsSources(lazyHydrationMacroPreset);
      }
@@ -2430,19 +1320,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
    }
  });
  
-@@ -4009,6 +3805,11 @@ async function initNitro(nuxt) {
-       "#internal/nuxt.config.mjs": () => nuxt.vfs["#build/nuxt.config.mjs"] || "",
-       "#internal/nuxt/app-config": () => nuxt.vfs["#build/app.config.mjs"]?.replace(/\/\*\* client \*\*\/[\s\S]*\/\*\* client-end \*\*\//, "") || "",
-       "#spa-template": async () => `export const template = ${JSON.stringify(await spaLoadingTemplate(nuxt))}`
-+      // 'virtual:vue-onigiri-client-to-server-chunks': () => {
-+      //   console.log(nuxt.vfs['virtual:vue-onigiri-client-to-server-chunks']  )
-+      //   console.log('?????')
-+      //   return nuxt.vfs['virtual:vue-onigiri-client-to-server-chunks'] || ''
-+      // },
-     },
-     routeRules: {
-       "/__nuxt_error": { cache: false }
-@@ -4089,7 +3890,21 @@ async function initNitro(nuxt) {
+@@ -4157,7 +3923,21 @@ async function initNitro(nuxt) {
              }
              return targets;
            }, [])
@@ -2465,7 +1343,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
        ]
      },
      alias: {
-@@ -4126,7 +3941,10 @@ async function initNitro(nuxt) {
+@@ -4194,7 +3974,10 @@ async function initNitro(nuxt) {
            // temporary fix for https://github.com/vuejs/core/issues/8351
          }
        },
@@ -2477,7 +1355,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
      },
      logLevel: logLevelMapReverse[nuxt.options.logLevel]
    });
-@@ -4502,6 +4320,7 @@ async function initNitro(nuxt) {
+@@ -4570,6 +4353,7 @@ async function initNitro(nuxt) {
          if (name === "server") {
            const memfs = compiler.outputFileSystem;
            nitro.options.virtual["#build/dist/server/server.mjs"] = () => memfs.readFileSync(join(nuxt.options.buildDir, "dist/server/server.mjs"), "utf-8");
@@ -2485,7 +1363,7 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
          }
        });
        nuxt.hook(`${builder}:compiled`, () => {
-@@ -6016,7 +5835,7 @@ const rootComponentTemplate = {
+@@ -6073,7 +5857,7 @@ const rootComponentTemplate = {
    filename: "root-component.mjs",
    // TODO: fix upstream in vite - this ensures that vite generates a module graph for islands
    // but should not be necessary (and has a warmup performance cost). See https://github.com/nuxt/nuxt/pull/24584.
@@ -2494,69 +1372,3 @@ index 7fa92a5cd8f111907c6d991a367d1442eb5c920f..f6853ca8b035d58a8a85da34d277ee93
  };
  const errorComponentTemplate = {
    filename: "error-component.mjs",
-@@ -6689,7 +6508,7 @@ async function resolveApp(nuxt, app) {
-   const extensionGlob = nuxt.options.extensions.join(",");
-   const layerConfigs = nuxt.options._layers.map((layer) => layer.config);
-   const reversedConfigs = layerConfigs.slice().reverse();
--  app.layouts = {};
-+  const layouts = {};
-   for (const config of layerConfigs) {
-     const layoutDir = (config.rootDir === nuxt.options.rootDir ? nuxt.options.dir : config.dir)?.layouts || "layouts";
-     const layoutFiles = await resolveFiles(config.srcDir, `${layoutDir}/**/*{${extensionGlob}}`);
-@@ -6699,10 +6518,10 @@ async function resolveApp(nuxt, app) {
-         logger.warn(`No layout name could be resolved for \`${resolveToAlias(file, nuxt)}\`. Bear in mind that \`index\` is ignored for the purpose of creating a layout name.`);
-         continue;
-       }
--      app.layouts[name] ||= { name, file };
-+      layouts[name] ||= { name, file };
-     }
-   }
--  app.middleware = [];
-+  let middleware = [];
-   for (const config of reversedConfigs) {
-     const middlewareDir = (config.rootDir === nuxt.options.rootDir ? nuxt.options.dir : config.dir)?.middleware || "middleware";
-     const middlewareFiles = await resolveFiles(config.srcDir, [
-@@ -6715,13 +6534,13 @@ async function resolveApp(nuxt, app) {
-         logger.warn(`No middleware name could be resolved for \`${resolveToAlias(file, nuxt)}\`. Bear in mind that \`index\` is ignored for the purpose of creating a middleware name.`);
-         continue;
-       }
--      app.middleware.push({ name, path: file, global: hasSuffix(file, ".global") });
-+      middleware.push({ name, path: file, global: hasSuffix(file, ".global") });
-     }
-   }
--  app.plugins = [];
-+  let plugins = [];
-   for (const config of reversedConfigs) {
-     const pluginDir = (config.rootDir === nuxt.options.rootDir ? nuxt.options.dir : config.dir)?.plugins || "plugins";
--    app.plugins.push(...[
-+    plugins.push(...[
-       ...config.plugins || [],
-       ...config.srcDir ? await resolveFiles(config.srcDir, [
-         `${pluginDir}/*{${extensionGlob}}`,
-@@ -6731,19 +6550,20 @@ async function resolveApp(nuxt, app) {
-   }
-   for (const p of [...nuxt.options.plugins].reverse()) {
-     const plugin = normalizePlugin(p);
--    if (!app.plugins.some((p2) => p2.src === plugin.src)) {
--      app.plugins.unshift(plugin);
-+    if (!plugins.some((p2) => p2.src === plugin.src)) {
-+      plugins.unshift(plugin);
-     }
-   }
--  app.middleware = uniqueBy(await resolvePaths(nuxt, [...app.middleware].reverse(), "path"), "name").reverse();
--  app.plugins = uniqueBy(await resolvePaths(nuxt, app.plugins, "src"), "src");
--  app.configs = [];
-+  middleware = uniqueBy(await resolvePaths(nuxt, [...middleware].reverse(), "path"), "name").reverse();
-+  plugins = uniqueBy(await resolvePaths(nuxt, plugins, "src"), "src");
-+  const configs = [];
-   for (const config of layerConfigs) {
-     const appConfigPath = await findPath(resolve(config.srcDir, "app.config"));
-     if (appConfigPath) {
--      app.configs.push(appConfigPath);
-+      configs.push(appConfigPath);
-     }
-   }
-+  Object.assign(app, { middleware, plugins, configs, layouts });
-   await nuxt.callHook("app:resolve", app);
-   app.middleware = uniqueBy(await resolvePaths(nuxt, app.middleware, "path"), "name");
-   app.plugins = uniqueBy(await resolvePaths(nuxt, app.plugins, "src"), "src");

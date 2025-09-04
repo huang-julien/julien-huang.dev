@@ -1,5 +1,5 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c5b9682b6 100644
+index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..a9a8d53827a1f1e3454ba1fffeca737b1a377ed2 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
@@ -11,18 +11,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
  import viteJsxPlugin from '@vitejs/plugin-vue-jsx';
  import { getPort } from 'get-port-please';
  import defu$1, { defu } from 'defu';
-@@ -314,6 +314,10 @@ function ViteNodePlugin(nuxt) {
-           root: nuxt.options.srcDir,
-           entryPath: resolveServerEntry(ssrServer.config),
-           base: ssrServer.config.base || "/_nuxt/",
-+          maxRetryAttempts: nuxt.options.vite.viteNode?.maxRetryAttempts,
-+          baseRetryDelay: nuxt.options.vite.viteNode?.baseRetryDelay,
-+          maxRetryDelay: nuxt.options.vite.viteNode?.maxRetryDelay,
-+          requestTimeout: nuxt.options.vite.viteNode?.requestTimeout,
-           // TODO: remove baseURL in future
-           baseURL: nuxt.options.devServer.url
-         };
-@@ -553,14 +557,19 @@ async function writeDevServer(nuxt) {
+@@ -560,14 +560,19 @@ async function writeDevServer(nuxt) {
    const serverResolvedPath = resolve(distDir, "runtime/vite-node.mjs");
    const manifestResolvedPath = resolve(distDir, "runtime/client.manifest.mjs");
    await mkdir(join(nuxt.options.buildDir, "dist/server"), { recursive: true });
@@ -43,8 +32,8 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
      )
    ]);
  }
-@@ -774,7 +783,7 @@ function createViteLogger(config, ctx = {}) {
-   return viteLogger;
+@@ -850,7 +855,7 @@ function isSupported(target) {
+   return Number.isNaN(version) || Number(version) >= constraint;
  }
  
 -async function buildClient(nuxt, ctx) {
@@ -52,7 +41,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
    const nodeCompat = nuxt.options.experimental.clientNodeCompat ? {
      alias: defineEnv({ nodeCompat: true, resolve: true }).env.alias,
      define: { global: "globalThis" }
-@@ -932,7 +941,7 @@ async function buildClient(nuxt, ctx) {
+@@ -1010,7 +1015,7 @@ async function buildClient(nuxt, ctx) {
    }
    await nuxt.callHook("vite:extendConfig", clientConfig, { isClient: true, isServer: false });
    clientConfig.plugins.unshift(
@@ -61,7 +50,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
      viteJsxPlugin(clientConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", clientConfig, { isClient: true, isServer: false });
-@@ -1161,7 +1170,7 @@ function VueFeatureFlagsPlugin(nuxt) {
+@@ -1239,7 +1244,7 @@ function VueFeatureFlagsPlugin(nuxt) {
    };
  }
  
@@ -70,7 +59,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
    const serverEntry = nuxt.options.ssr ? ctx.entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
    const serverConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
      configFile: false,
-@@ -1198,7 +1207,8 @@ async function buildServer(nuxt, ctx) {
+@@ -1276,7 +1281,8 @@ async function buildServer(nuxt, ctx) {
          "nitro/runtime",
          // TODO: remove in v5
          "#internal/nitro",
@@ -80,16 +69,16 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
        ],
        noExternal: [
          ...transpile({ isServer: true, isDev: nuxt.options.dev }),
-@@ -1216,7 +1226,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1294,7 +1300,7 @@ async function buildServer(nuxt, ctx) {
        outDir: resolve(nuxt.options.buildDir, "dist/server"),
        ssr: true,
        rollupOptions: {
 -        input: { server: serverEntry },
-+        input: { "server": serverEntry, "components.islands": resolve(ctx.nuxt.options.buildDir, "components.islands") },
++        input: { "server": serverEntry, },
          external: [
            "nitro/runtime",
            // TODO: remove in v5
-@@ -1262,7 +1272,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1346,7 +1352,7 @@ async function buildServer(nuxt, ctx) {
    serverConfig.customLogger = createViteLogger(serverConfig, { hideOutput: !nuxt.options.dev });
    await nuxt.callHook("vite:extendConfig", serverConfig, { isClient: false, isServer: true });
    serverConfig.plugins.unshift(
@@ -98,7 +87,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
      viteJsxPlugin(serverConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", serverConfig, { isClient: false, isServer: true });
-@@ -1682,6 +1692,84 @@ const bundle = async (nuxt) => {
+@@ -1775,6 +1781,84 @@ const bundle = async (nuxt) => {
        viteConfig
      )
    };
@@ -183,7 +172,7 @@ index fae2bb70e39098484f67c550904d8d1acf03f7f7..67ef7d7e150af212304f139ef3e6739c
    if (!nuxt.options.dev) {
      ctx.config.server.watch = void 0;
      ctx.config.build.watch = void 0;
-@@ -1765,24 +1853,24 @@ const bundle = async (nuxt) => {
+@@ -1860,24 +1944,24 @@ const bundle = async (nuxt) => {
        }
      });
    }
@@ -341,25 +330,6 @@ index 0000000000000000000000000000000000000000..d5c8870def937f83d901e9d0ef58ba0a
 +    stack,
 +  }
 +}
-diff --git a/dist/runtime/vite-node-shared.mjs b/dist/runtime/vite-node-shared.mjs
-index 76598e5173571399edc31d8855ed1c0b4a5d17cd..60755e57bea274cb9167541d264b587697ca645d 100644
---- a/dist/runtime/vite-node-shared.mjs
-+++ b/dist/runtime/vite-node-shared.mjs
-@@ -16,10 +16,10 @@ let requestIdCounter = 0
- let clientSocket
- /** @type {Promise<Socket> | undefined} */
- let currentConnectPromise
--const MAX_RETRY_ATTEMPTS = 5
--const BASE_RETRY_DELAY_MS = 100
--const MAX_RETRY_DELAY_MS = 2000
--const REQUEST_TIMEOUT_MS = 10000
-+const MAX_RETRY_ATTEMPTS = viteNodeOptions.maxRetryAttempts ?? 5
-+const BASE_RETRY_DELAY_MS = viteNodeOptions.baseRetryDelay ?? 100
-+const MAX_RETRY_DELAY_MS = viteNodeOptions.maxRetryDelay ?? 2000
-+const REQUEST_TIMEOUT_MS = viteNodeOptions.requestTimeout ?? 60000
- 
- /**
-  * Calculates exponential backoff delay with jitter.
 diff --git a/dist/runtime/vite-node.d.mts b/dist/runtime/vite-node.d.mts
 index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdbbe715f98 100644
 --- a/dist/runtime/vite-node.d.mts
@@ -369,7 +339,7 @@ index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdb
  declare function _default(ssrContext: any): Promise<any>;
  export default _default;
 diff --git a/dist/runtime/vite-node.mjs b/dist/runtime/vite-node.mjs
-index 609242a7f14c3389d6e7bd95cbb3ef17c086f9ef..1ba62cd381202e4cbca1e728a4917712880b5292 100644
+index e497e8e0aab6eed45d47862a8e79f9245d72ac78..2f8c77174c113d37fa3324b8e48564e35cbc0228 100644
 --- a/dist/runtime/vite-node.mjs
 +++ b/dist/runtime/vite-node.mjs
 @@ -11,6 +11,11 @@ const runner = createRunner()

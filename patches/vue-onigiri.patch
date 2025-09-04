@@ -40,3 +40,54 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
    const { dirs, props } = child;
    if (dirs) {
      child.props = applySSRDirectives(child, props, dirs);
+diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
+index bbf89c47dba800aef026ca58b56de6bc40eef382..e1c2a842762d457555e851513fbb838ac2f7576b 100644
+--- a/dist/vite/chunk.js
++++ b/dist/vite/chunk.js
+@@ -146,6 +146,14 @@ export function vueOnigiriPluginFactory(options = {}) {
+             data.filename = this.getFileName(data.id);
+           }
+         }
++      },
++      {
++        name: "vue-onigiri:resolve",
++        resolveId(id, importer) {
++          if( VSC_PREFIX_RE.test(id) ) {
++            return this.resolve(id.replace(VSC_PREFIX, ""), importer?.replace(VSC_PREFIX_RE, ""));
++          }
++        }
+       }
+     ],
+     server: (opts) => [
+@@ -285,16 +293,21 @@ export function vueOnigiriPluginFactory(options = {}) {
+                   return node.type === "ExportNamedDeclaration" && node.specifiers.some((specifier) => specifier.exported.type === "Identifier" && specifier.exported.name === exportName);
+                 });
+                 if (exportNode) {
+-                  const { start, end } = exportNode.declaration;
+-                  s.overwrite(
+-                    start,
+-                    end,
+-                    `Object.assign( ${code.slice(start, end)},
+-                                    { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
+-                                    
+-                                )`
+-                  );
+-                }
++                                  if (exportNode.declaration) {
++                
++                                  const { start, end } = exportNode.declaration; 
++                                    s.overwrite(
++                                      start,
++                                      end,
++                                      `Object.assign( ${code.slice(start, end)},
++                                                      { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
++                                                      
++                                                  )`,
++                                    );
++                                  } else { 
++                                    // todo
++                                  }
++                                }
+               }
+               if (s.hasChanged()) {
+                 return {
