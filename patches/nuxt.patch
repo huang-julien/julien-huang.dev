@@ -987,7 +987,7 @@ index 9d3a049702291c09150ca9c187a3b6a1aef5988e..e69de29bb2d1d6434b8b29ae775ad8c2
 -  return html;
 -}
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 11965d7262242d1981705e895515c6b15a93e8f5..e21a9086dec9f956b39a61a784ed320ceaf71453 100644
+index 11965d7262242d1981705e895515c6b15a93e8f5..451bd1b08897172bd6b9c93f606daaee49adf3a6 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -5,7 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
@@ -1320,11 +1320,12 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..e21a9086dec9f956b39a61a784ed320c
    }
  });
  
-@@ -4157,7 +3923,21 @@ async function initNitro(nuxt) {
+@@ -4157,8 +3923,18 @@ async function initNitro(nuxt) {
              }
              return targets;
            }, [])
 -        ] : []
+-      ]
 +        ] : [],
 +        // todo fix 
 +        ...[
@@ -1337,25 +1338,19 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..e21a9086dec9f956b39a61a784ed320c
 +          }, [])
 +        ]
 +      ],
-+      // todo this too...
-+      external: [
-+        "vue"
-       ]
      },
      alias: {
-@@ -4194,7 +3974,10 @@ async function initNitro(nuxt) {
+       // Vue 3 mocks
+@@ -4194,7 +3970,7 @@ async function initNitro(nuxt) {
            // temporary fix for https://github.com/vuejs/core/issues/8351
          }
        },
 -      plugins: []
 +      plugins: [],
-+      external: [
-+        "vue"
-+      ]
      },
      logLevel: logLevelMapReverse[nuxt.options.logLevel]
    });
-@@ -4570,6 +4353,7 @@ async function initNitro(nuxt) {
+@@ -4570,6 +4346,7 @@ async function initNitro(nuxt) {
          if (name === "server") {
            const memfs = compiler.outputFileSystem;
            nitro.options.virtual["#build/dist/server/server.mjs"] = () => memfs.readFileSync(join(nuxt.options.buildDir, "dist/server/server.mjs"), "utf-8");
@@ -1363,7 +1358,7 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..e21a9086dec9f956b39a61a784ed320c
          }
        });
        nuxt.hook(`${builder}:compiled`, () => {
-@@ -6073,7 +5857,7 @@ const rootComponentTemplate = {
+@@ -6073,7 +5850,7 @@ const rootComponentTemplate = {
    filename: "root-component.mjs",
    // TODO: fix upstream in vite - this ensures that vite generates a module graph for islands
    // but should not be necessary (and has a warmup performance cost). See https://github.com/nuxt/nuxt/pull/24584.
