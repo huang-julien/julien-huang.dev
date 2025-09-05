@@ -147,10 +147,10 @@ index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2
          type: StringConstructor;
          required: true;
 diff --git a/dist/app/components/nuxt-island.js b/dist/app/components/nuxt-island.js
-index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc629d6c12 100644
+index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da359033272 100644
 --- a/dist/app/components/nuxt-island.js
 +++ b/dist/app/components/nuxt-island.js
-@@ -1,42 +1,30 @@
+@@ -1,42 +1,31 @@
 -import { Fragment, Teleport, computed, createStaticVNode, createVNode, defineComponent, getCurrentInstance, h, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch, withMemo } from "vue";
 +import { computed, defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, ref, shallowRef, useId, watch } from "vue";
  import { debounce } from "perfect-debounce";
@@ -166,18 +166,19 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
 -import { getFragmentHTML, isEndFragment, isStartFragment } from "./utils.js";
 -import { appBaseURL, remoteComponentIslands, selectiveClient } from "#build/nuxt.config.mjs";
 +import { remoteComponentIslands } from "#build/nuxt.config.mjs";
-+const viteFetch = import.meta.server ? import.meta.dev ? (src, exportName) => import("#build/dist/server/server.mjs").then((r) => r.executeFile(src)).then((r) => {
-+  return r[exportName];
-+}) : (
-+  // todo path association between server and client chunks
-+  ((src, exportName) => import("virtual:vue-onigiri").then((r) => {
-+    console.log(src, exportName);
-+    return r.default.get(src + "__" + exportName);
-+  }))
-+) : (src) => import(
-+  /* @vite-ignore */
-+  join(src.replace("/app", ""))
-+).then((r) => r.default || r);
++const viteFetch = import.meta.server 
++  ? import.meta.dev 
++    ? (src, exportName) => import("#build/dist/server/server.mjs").then((r) => r.executeFile(src)).then((r) => {
++      return r[exportName];
++    }) 
++    : (
++      // todo path association between server and client chunks
++      ((src, exportName) => import("virtual:vue-onigiri").then((r) => {
++        console.log(src, exportName);
++        return r.default.get(src + "__" + exportName);
++      }))
++    ) 
++  : (src) => import("virtual:vue-onigiri").then(mod => (mod.default ?? mod)[`${src}#${exportName}`]);
  const pKey = "_islandPromises";
 -const SSR_UID_RE = /data-island-uid="([^"]*)"/;
 -const DATA_ISLAND_UID_RE = /data-island-uid(="")?(?!="[^"])/g;
@@ -209,7 +210,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
  export default defineComponent({
    name: "NuxtIsland",
    inheritAttrs: false,
-@@ -68,18 +56,16 @@ export default defineComponent({
+@@ -68,18 +57,16 @@ export default defineComponent({
      }
    },
    emits: ["error"],
@@ -232,7 +233,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
      let activeHead;
      const eventFetch = import.meta.server ? event.fetch : import.meta.dev ? $fetch.raw : globalThis.fetch;
      const mounted = shallowRef(false);
-@@ -92,100 +78,31 @@ export default defineComponent({
+@@ -92,100 +79,31 @@ export default defineComponent({
          activeHead.dispose();
        }
      });
@@ -344,7 +345,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
        if (import.meta.server && import.meta.prerender) {
          nuxtApp.runWithContext(() => prerenderRoutes(url));
        }
-@@ -201,7 +118,7 @@ export default defineComponent({
+@@ -201,7 +119,7 @@ export default defineComponent({
              appendResponseHeader(event, "x-nitro-prerender", hints);
            }
          }
@@ -353,7 +354,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
          return result;
        } catch (e) {
          if (r.status !== 200) {
-@@ -217,16 +134,10 @@ export default defineComponent({
+@@ -217,16 +135,10 @@ export default defineComponent({
        });
        try {
          const res = await nuxtApp[pKey][uid.value];
@@ -373,7 +374,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
          if (res?.head) {
            if (activeHead) {
              activeHead.patch(res.head);
-@@ -234,12 +145,6 @@ export default defineComponent({
+@@ -234,12 +146,6 @@ export default defineComponent({
              activeHead = head.push(res.head);
            }
          }
@@ -386,7 +387,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
        } catch (e) {
          error.value = e;
          emit("error", e);
-@@ -260,68 +165,12 @@ export default defineComponent({
+@@ -260,68 +166,12 @@ export default defineComponent({
        fetchComponent();
      } else if (import.meta.server || !instance.vnode.el || !nuxtApp.payload.serverRendered) {
        await fetchComponent();
@@ -461,7 +462,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..307e9f54e7e97cecd3311eb615ab9bcc
    }
  });
 diff --git a/dist/app/components/nuxt-root.vue b/dist/app/components/nuxt-root.vue
-index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..017c67866082f15c45f2b0110aed0955d670c59c 100644
+index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..a5894dc18d2906055a7b12e06a7d85ca85876b2d 100644
 --- a/dist/app/components/nuxt-root.vue
 +++ b/dist/app/components/nuxt-root.vue
 @@ -4,11 +4,7 @@
@@ -626,15 +627,14 @@ index 0000000000000000000000000000000000000000..4cdf208b89739d33cf180de20c10f9a9
 +  }
 +}
 diff --git a/dist/app/entry.js b/dist/app/entry.js
-index e6821aaa297411937119f71de6d86c3c2b8b2343..56b21e1c7f11806575dd2e732595f4416dc309bf 100644
+index e6821aaa297411937119f71de6d86c3c2b8b2343..d5b1262991913736771a8768360b5c911e754c49 100644
 --- a/dist/app/entry.js
 +++ b/dist/app/entry.js
-@@ -7,10 +7,12 @@ import "#build/css";
+@@ -7,10 +7,11 @@ import "#build/css";
  import plugins from "#build/plugins";
  import RootComponent from "#build/root-component.mjs";
  import { appId, appSpaLoaderAttrs, multiApp, spaLoadingTemplateOutside, vueAppRootContainer } from "#build/nuxt.config.mjs";
 +
-+export { islandComponents } from '#build/components.islands.mjs'
  let entry;
  if (import.meta.server) {
    entry = async function createNuxtAppServer(ssrContext) {
@@ -709,7 +709,7 @@ index ea7b2201536514931228ea584d1707a694853fb9..f85583688484b69c5c0051c7cb0563db
 +declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<Partial<RenderResponse> | NuxtIslandResponse>>;
  export default _default;
 diff --git a/dist/core/runtime/nitro/handlers/island.js b/dist/core/runtime/nitro/handlers/island.js
-index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e9bced1b3 100644
+index 5d35c092874880bf098414df7f9d3410e12d7516..adc4af21cdc3778c67d872b9e631d4d64c5a763d 100644
 --- a/dist/core/runtime/nitro/handlers/island.js
 +++ b/dist/core/runtime/nitro/handlers/island.js
 @@ -4,11 +4,11 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
@@ -735,7 +735,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e
    const ssrContext = {
      ...createSSRContext(event),
      islandContext,
-@@ -27,12 +29,12 @@ export default defineEventHandler(async (event) => {
+@@ -27,12 +29,13 @@ export default defineEventHandler(async (event) => {
      url: islandContext.url
    };
    const renderer = await getSSRRenderer();
@@ -744,6 +744,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e
 -    throw error;
 -  });
 +  const createSSRApp = await getServerEntry();
++  console.log(components)
 +  ssrContext.rootComponent = components[islandContext.name];
 +  const app = await createSSRApp(ssrContext, renderer.rendererContext);
 +  const ast = await app.runWithContext(() => serializeApp(app, ssrContext));
@@ -753,7 +754,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e
    if (inlinedStyles.length) {
      ssrContext.head.push({ style: inlinedStyles });
    }
-@@ -44,7 +46,7 @@ export default defineEventHandler(async (event) => {
+@@ -44,7 +47,7 @@ export default defineEventHandler(async (event) => {
          continue;
        }
        if (resource.file.includes("scoped") && !resource.file.includes("pages/")) {
@@ -762,7 +763,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..69f5207fb3c2827227d930e1264cc66e
        }
      }
      if (link.length) {
-@@ -64,9 +66,7 @@ export default defineEventHandler(async (event) => {
+@@ -64,9 +67,7 @@ export default defineEventHandler(async (event) => {
    const islandResponse = {
      id: islandContext.id,
      head: islandHead,
@@ -853,18 +854,22 @@ index 53ccf5705763b46fde817535789b2712b1d7853c..db27b7563f32275c4ad297bfa8e4b827
      rendererContext: import("vue-bundle-renderer/runtime").RendererContext;
      renderToString(ssrContext: import("vue-bundle-renderer/runtime").SSRContext): Promise<{
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.js b/dist/core/runtime/nitro/utils/renderer/build-files.js
-index c1f27b5c0fa710386d83f5bb44162f9176b260c2..e386097e20ac9535ad6858f8ccc7edd360d1711c 100644
+index c1f27b5c0fa710386d83f5bb44162f9176b260c2..48be82c245967a9f2ef7c9d3530f8ee6e26e6b55 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.js
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.js
-@@ -8,7 +8,10 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
+@@ -8,7 +8,14 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
  import { buildAssetsURL } from "#internal/nuxt/paths";
  const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
  const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
 -const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
 +export const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
-+export const getComponentsIslands = () => import("#build/dist/server/server.mjs").then((r) => {
++export const getComponentsIslands = () => import("#build/dist/server/components.islands.mjs").then((r) => {
++  if(import.meta.dev) { 
++    return r.default().then(r => r.islandComponents)
++  }
 +   return r.islandComponents
 +});
++
  const getClientManifest = () => import("#build/dist/server/client.manifest.mjs").then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
  export const getSSRRenderer = lazyCachedFunction(async () => {
    const manifest = await getClientManifest();

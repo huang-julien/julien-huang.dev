@@ -1,5 +1,5 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..a9a8d53827a1f1e3454ba1fffeca737b1a377ed2 100644
+index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..69f96e00bd87764c1dd686e9aa15dfbf5ecb373c 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
@@ -74,7 +74,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..a9a8d53827a1f1e3454ba1fffeca737b
        ssr: true,
        rollupOptions: {
 -        input: { server: serverEntry },
-+        input: { "server": serverEntry, },
++        input: { "server": serverEntry, 'components.islands': resolve(ctx.nuxt.options.buildDir, 'components.islands') },
          external: [
            "nitro/runtime",
            // TODO: remove in v5
@@ -339,7 +339,7 @@ index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdb
  declare function _default(ssrContext: any): Promise<any>;
  export default _default;
 diff --git a/dist/runtime/vite-node.mjs b/dist/runtime/vite-node.mjs
-index e497e8e0aab6eed45d47862a8e79f9245d72ac78..2f8c77174c113d37fa3324b8e48564e35cbc0228 100644
+index e497e8e0aab6eed45d47862a8e79f9245d72ac78..de739a4aac743fdae824d59aeeba318c530b91bf 100644
 --- a/dist/runtime/vite-node.mjs
 +++ b/dist/runtime/vite-node.mjs
 @@ -11,6 +11,11 @@ const runner = createRunner()
