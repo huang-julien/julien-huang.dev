@@ -147,10 +147,10 @@ index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2
          type: StringConstructor;
          required: true;
 diff --git a/dist/app/components/nuxt-island.js b/dist/app/components/nuxt-island.js
-index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da359033272 100644
+index 71ace1b1242a03419444f5fee57f676a3d7332a7..1ce2fb206b374f723803c35d242849a3fed147a7 100644
 --- a/dist/app/components/nuxt-island.js
 +++ b/dist/app/components/nuxt-island.js
-@@ -1,42 +1,31 @@
+@@ -1,42 +1,39 @@
 -import { Fragment, Teleport, computed, createStaticVNode, createVNode, defineComponent, getCurrentInstance, h, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch, withMemo } from "vue";
 +import { computed, defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, ref, shallowRef, useId, watch } from "vue";
  import { debounce } from "perfect-debounce";
@@ -165,20 +165,28 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
  import { injectHead } from "../composables/head.js";
 -import { getFragmentHTML, isEndFragment, isStartFragment } from "./utils.js";
 -import { appBaseURL, remoteComponentIslands, selectiveClient } from "#build/nuxt.config.mjs";
-+import { remoteComponentIslands } from "#build/nuxt.config.mjs";
++import { remoteComponentIslands, devRootDir } from "#build/nuxt.config.mjs";
++
++
 +const viteFetch = import.meta.server 
 +  ? import.meta.dev 
 +    ? (src, exportName) => import("#build/dist/server/server.mjs").then((r) => r.executeFile(src)).then((r) => {
++      debugger
 +      return r[exportName];
 +    }) 
 +    : (
 +      // todo path association between server and client chunks
-+      ((src, exportName) => import("virtual:vue-onigiri").then((r) => {
-+        console.log(src, exportName);
-+        return r.default.get(src + "__" + exportName);
-+      }))
++      ((src, exportName) =>import("virtual:vue-onigiri").then(mod => (mod.default ?? mod)[`${src}#${exportName}`]))
 +    ) 
-+  : (src) => import("virtual:vue-onigiri").then(mod => (mod.default ?? mod)[`${src}#${exportName}`]);
++  : (src, exportName) => import("virtual:vue-onigiri").then(mod => {
++      if(import.meta.dev) {
++        return import(/* @vite-ignore */ `/_nuxt/@fs/${devRootDir}/${src}`).then(m => {
++          return m[exportName]
++        })
++      }
++
++    return mod.default[`${src}#${exportName}`]
++  });
  const pKey = "_islandPromises";
 -const SSR_UID_RE = /data-island-uid="([^"]*)"/;
 -const DATA_ISLAND_UID_RE = /data-island-uid(="")?(?!="[^"])/g;
@@ -210,7 +218,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
  export default defineComponent({
    name: "NuxtIsland",
    inheritAttrs: false,
-@@ -68,18 +57,16 @@ export default defineComponent({
+@@ -68,18 +65,16 @@ export default defineComponent({
      }
    },
    emits: ["error"],
@@ -233,7 +241,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
      let activeHead;
      const eventFetch = import.meta.server ? event.fetch : import.meta.dev ? $fetch.raw : globalThis.fetch;
      const mounted = shallowRef(false);
-@@ -92,100 +79,31 @@ export default defineComponent({
+@@ -92,100 +87,31 @@ export default defineComponent({
          activeHead.dispose();
        }
      });
@@ -345,7 +353,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
        if (import.meta.server && import.meta.prerender) {
          nuxtApp.runWithContext(() => prerenderRoutes(url));
        }
-@@ -201,7 +119,7 @@ export default defineComponent({
+@@ -201,7 +127,7 @@ export default defineComponent({
              appendResponseHeader(event, "x-nitro-prerender", hints);
            }
          }
@@ -354,7 +362,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
          return result;
        } catch (e) {
          if (r.status !== 200) {
-@@ -217,16 +135,10 @@ export default defineComponent({
+@@ -217,16 +143,10 @@ export default defineComponent({
        });
        try {
          const res = await nuxtApp[pKey][uid.value];
@@ -374,7 +382,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
          if (res?.head) {
            if (activeHead) {
              activeHead.patch(res.head);
-@@ -234,12 +146,6 @@ export default defineComponent({
+@@ -234,12 +154,6 @@ export default defineComponent({
              activeHead = head.push(res.head);
            }
          }
@@ -387,7 +395,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..bebd86618c04a8beede94b79649e1da3
        } catch (e) {
          error.value = e;
          emit("error", e);
-@@ -260,68 +166,12 @@ export default defineComponent({
+@@ -260,68 +174,12 @@ export default defineComponent({
        fetchComponent();
      } else if (import.meta.server || !instance.vnode.el || !nuxtApp.payload.serverRendered) {
        await fetchComponent();

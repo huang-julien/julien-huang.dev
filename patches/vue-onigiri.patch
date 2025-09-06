@@ -1,5 +1,5 @@
 diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
-index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326e6b08130 100644
+index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491dfd8ea3e 100644
 --- a/dist/runtime/serialize.js
 +++ b/dist/runtime/serialize.js
 @@ -28,6 +28,7 @@ export function serializeApp(app, context = {}) {
@@ -10,7 +10,35 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
    return app.runWithContext(async () => {
      const res = await setupComponent(instance, true);
      return await app.runWithContext(async () => {
-@@ -120,6 +121,9 @@ export async function serializeVNode(vnode, parentInstance) {
+@@ -108,18 +109,36 @@ export async function serializeVNode(vnode, parentInstance) {
+         (child) => {
+           if (child._onigiriLoadClient) {
+             if (vnode.type.__chunk && vnode.type.__export) {
+-              return [
++              if(child.children.length) {
++                return Promise.resolve(serializeChildren(child.children, parentInstance)).then(serializedChildren => {
++                  return  [
+                 VServerComponentType.Component,
+                 filterProps(vnode.props),
+                 // @ts-expect-error
+                 vnode.type.__chunk,
+                 // @ts-expect-error
+                 vnode.type.__export,
++                {
++                  default: serializedChildren
++                }
++              ];
++                })
++              }
++              return [
++                VServerComponentType.Component,
++                filterProps(vnode.props),
++                // @ts-expect-error
++                vnode.type.__chunk,
++                // @ts-expect-error
++                vnode.type.__export, 
+                 serializeSlots(child.__slotsResult)
+               ];
              }
              console.warn("Component is missing chunk information");
            }
@@ -20,7 +48,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
            return [
              VServerComponentType.Fragment,
              serializeChildren(child.children, parentInstance)
-@@ -225,6 +229,9 @@ function renderComponent(_vnode, parentInstance) {
+@@ -225,6 +244,9 @@ function renderComponent(_vnode, parentInstance) {
      });
      return p.then(() => {
        const vnode = renderComponentRoot(instance);
@@ -30,7 +58,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
        const { dirs: dirs2, props: props2 } = vnode;
        if (dirs2) {
          vnode.props = applySSRDirectives(vnode, props2, dirs2);
-@@ -234,6 +241,9 @@ function renderComponent(_vnode, parentInstance) {
+@@ -234,6 +256,9 @@ function renderComponent(_vnode, parentInstance) {
      });
    }
    const child = renderComponentRoot(instance);
@@ -41,7 +69,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..b29a801b375bb6e668ebeccf8d6d8326
    if (dirs) {
      child.props = applySSRDirectives(child, props, dirs);
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
-index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f517444485a0cc 100644
+index bbf89c47dba800aef026ca58b56de6bc40eef382..1fa2112a65e918f7b536d9239eca00c904a1aea4 100644
 --- a/dist/vite/chunk.js
 +++ b/dist/vite/chunk.js
 @@ -3,6 +3,7 @@ import { join, normalize, relative } from "node:path";
@@ -52,7 +80,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
  import { glob } from "node:fs/promises";
  function normalizePath(path) {
    return normalize(path).replaceAll("\\", "/");
-@@ -52,6 +53,23 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -52,7 +53,26 @@ export function vueOnigiriPluginFactory(options = {}) {
              options.rootDir = config.root;
            }
          },
@@ -60,7 +88,8 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
 +        load(id) {
 +
 +          
-+            if(id === 'virtual:vue-onigiri') {
++            if(id === 'virtual:vue-onigiri') { 
++              debugger
 +              return `
 +              import { defineAsyncComponent } from "vue";
 +              export default {
@@ -74,9 +103,17 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
 +            }
 +        },
          async buildStart() {
++          console.log('biold start')
            const chunksToInclude = Array.isArray(options.includeClientChunks) ? options.includeClientChunks : [options.includeClientChunks || "**/*.vue"];
            await Promise.all(chunksToInclude.map(async (file) => {
-@@ -66,24 +84,29 @@ export function vueOnigiriPluginFactory(options = {}) {
+             const path = typeof file === "string" ? file : file.path;
+@@ -61,29 +81,35 @@ export function vueOnigiriPluginFactory(options = {}) {
+               cwd: rootDir
+             });
+             for await (const file2 of files) {
++              console.log(file2)
+               const id = join(rootDir, file2);
+               const info = clientChunks.find((chunk) => chunk.originalPath === normalizePath(id));
                if (info) {
                  info.exports.push(exportName);
                } else {
@@ -107,14 +144,14 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
 +                    //   id: VSC_PREFIX + id,
 +                    //   preserveSignature: "strict",
 +                    // });
-+                    serverChunks.push({
++                    clientChunks.push({
 +                      originalPath: normalizePath(id),
 +                      id: hash(id),
 +                      exports: [exportName],
 +                      clientSideChunk: clientSideChunk?.filename
 +                    });
 +                  } else   {
-+                    serverChunks.push({
++                    clientChunks.push({
 +                      originalPath: normalizePath(id),
 +                      id: normalizePath(join(clientAssetsDir, relative(rootDir, id))),
 +                      exports: [exportName],
@@ -124,7 +161,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
                }
              }
            }));
-@@ -119,7 +142,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -119,7 +145,7 @@ export function vueOnigiriPluginFactory(options = {}) {
                    start,
                    end,
                    `Object.assign(${code.slice(start, end)},
@@ -133,24 +170,26 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
                                       
                                  )`
                  );
-@@ -146,6 +169,17 @@ export function vueOnigiriPluginFactory(options = {}) {
-             data.filename = this.getFileName(data.id);
-           }
-         }
+@@ -141,9 +167,17 @@ export function vueOnigiriPluginFactory(options = {}) {
+                 chunk.isEntry = false;
+               }
+             }
++          } 
++        }
 +      },
 +      {
 +        name: "vue-onigiri:resolve",
 +        resolveId(id, importer, opts) {
 +          if( VSC_PREFIX_RE.test(id) ) {
 +            return this.resolve(id.replace(VSC_PREFIX, ""), importer?.replace(VSC_PREFIX_RE, ""), opts);
-+          }
+           }
+-          for (const [id, data] of clientChunks.entries()) {
+-            data.filename = this.getFileName(data.id);
 +          if(id === 'virtual:vue-onigiri') {
 +            return id;
-+          }
-+        }
+           }
+         }
        }
-     ],
-     server: (opts) => [
 @@ -205,7 +239,7 @@ export function vueOnigiriPluginFactory(options = {}) {
          },
          resolveId: {
@@ -191,7 +230,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
                  );
                  if (resolved) {
                    return VSC_PREFIX + resolved?.id;
-@@ -261,14 +295,11 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -261,20 +295,18 @@ export function vueOnigiriPluginFactory(options = {}) {
                const list = serverChunks.values().map((ref) => ref.id).toArray();
                if (list.includes(chunk.fileName)) {
                  chunk.isEntry = false;
@@ -209,7 +248,15 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
          },
          transform: {
            order: "post",
-@@ -285,16 +316,21 @@ export function vueOnigiriPluginFactory(options = {}) {
+           handler(code, id) {
+             const ref = clientChunks.find((chunk) => chunk.originalPath === id.replace(VSC_PREFIX_RE, ""));
+-            if (id && ref && VSC_PREFIX_RE.test(id)) {
++
++            if (id && ref) {
+               const s = new MagicString(code);
+               const ast = this.parse(code);
+               for (const exportName of ref.exports) {
+@@ -285,16 +317,21 @@ export function vueOnigiriPluginFactory(options = {}) {
                    return node.type === "ExportNamedDeclaration" && node.specifiers.some((specifier) => specifier.exported.type === "Identifier" && specifier.exported.name === exportName);
                  });
                  if (exportNode) {
@@ -230,7 +277,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..9e583d44651d75455af0cef943f51744
 +                                      start,
 +                                      end,
 +                                      `Object.assign( ${code.slice(start, end)},
-+                                                      { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
++                                                      { __chunk: "${normalizePath(join("/", isProduction ? ref.id : relative(rootDir, normalize(id))))}", __export: ${JSON.stringify(exportName)} },
 +                                                      
 +                                                  )`,
 +                                    );
