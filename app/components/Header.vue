@@ -18,6 +18,9 @@
                 <li class="my-5">
                     <NuxtLink to="/work">Work</NuxtLink>
                 </li>
+                <li class="my-5">
+                    <NuxtLink to="/cv" :prefetch="false">CV</NuxtLink>
+                </li>
             </ul>
         </nav>
 
