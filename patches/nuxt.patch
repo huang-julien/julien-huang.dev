@@ -1,12 +1,12 @@
 diff --git a/dist/app/compat/interval.d.ts b/dist/app/compat/interval.d.ts
-index 9c88d28c5ee24c46b4b23354106a16c2764b2c13..b9909ed310e782fb871a58845d12f7b291b15b2c 100644
+index 9c88d28c5ee24c46b4b23354106a16c2764b2c13..65b5e9c05287c242b15899c84a5dfeab0c99a94a 100644
 --- a/dist/app/compat/interval.d.ts
 +++ b/dist/app/compat/interval.d.ts
 @@ -1 +1 @@
 -export declare const setInterval: (((handler: TimerHandler, timeout?: number, ...arguments: any[]) => number) & typeof globalThis.setInterval) | (() => void);
 +export declare const setInterval: typeof globalThis.setInterval | (() => void);
 diff --git a/dist/app/compat/interval.js b/dist/app/compat/interval.js
-index 484356f26e0df2a4a55dddc9e9a3873b80b36837..93d0da41f95a97b4d5456a010e4c0dc2a991416f 100644
+index 484356f26e0df2a4a55dddc9e9a3873b80b36837..86e4f2b1932223340acf1849a2da23670cb83884 100644
 --- a/dist/app/compat/interval.js
 +++ b/dist/app/compat/interval.js
 @@ -1,6 +1,6 @@
@@ -18,7 +18,7 @@ index 484356f26e0df2a4a55dddc9e9a3873b80b36837..93d0da41f95a97b4d5456a010e4c0dc2
      throw createError({
        statusCode: 500,
 diff --git a/dist/app/components/client-only.d.ts b/dist/app/components/client-only.d.ts
-index 57cc2c294e911310f97b73ee4a788d692653890a..67897283994572f9335730fd359c60a0bd353a88 100644
+index 57cc2c294e911310f97b73ee4a788d692653890a..af0f733a51114c63c1b4fbafbcf08aef02d46fa3 100644
 --- a/dist/app/components/client-only.d.ts
 +++ b/dist/app/components/client-only.d.ts
 @@ -1,13 +1,13 @@
@@ -45,7 +45,7 @@ index 57cc2c294e911310f97b73ee4a788d692653890a..67897283994572f9335730fd359c60a0
 +export declare function isStartFragment(element: RendererNode): boolean;
 +export declare function isEndFragment(element: RendererNode): boolean;
 diff --git a/dist/app/components/client-only.js b/dist/app/components/client-only.js
-index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..54a2141a77d02017ba8b8a562e2abcc4fb154bf0 100644
+index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..a3d850d42d832080ed0a3aa74a97b398875af43f 100644
 --- a/dist/app/components/client-only.js
 +++ b/dist/app/components/client-only.js
 @@ -1,8 +1,8 @@
@@ -77,7 +77,7 @@ index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..54a2141a77d02017ba8b8a562e2abcc4
 +  return element.nodeName === "#comment" && element.nodeValue === "]";
 +}
 diff --git a/dist/app/components/error-404.vue b/dist/app/components/error-404.vue
-index f7de60ee125295a395374c1ec9e022d7a33d4943..4ec8838deaebc9fad570b1ccef7c87cee9f4ea17 100644
+index f7de60ee125295a395374c1ec9e022d7a33d4943..86fcfc385a2c528d3afc14eb05b537ecdfdb3ef7 100644
 --- a/dist/app/components/error-404.vue
 +++ b/dist/app/components/error-404.vue
 @@ -26,7 +26,7 @@ useHead({
@@ -90,7 +90,7 @@ index f7de60ee125295a395374c1ec9e022d7a33d4943..4ec8838deaebc9fad570b1ccef7c87ce
    ],
    style: [
 diff --git a/dist/app/components/error-500.vue b/dist/app/components/error-500.vue
-index 701b21ad7c0310825552d62a0e81dfca0bb7411a..4f0463028c2edba813f30707acfa8c75b90aa19a 100644
+index 701b21ad7c0310825552d62a0e81dfca0bb7411a..26642be6680a252972ef41a7b7d3aeccc66d0f2a 100644
 --- a/dist/app/components/error-500.vue
 +++ b/dist/app/components/error-500.vue
 @@ -26,7 +26,7 @@ useHead({
@@ -103,7 +103,7 @@ index 701b21ad7c0310825552d62a0e81dfca0bb7411a..4f0463028c2edba813f30707acfa8c75
    ],
    style: [
 diff --git a/dist/app/components/error-dev.vue b/dist/app/components/error-dev.vue
-index 77833df60927cdf86f5abb19db1afd879e7e2454..8e0243ec92e2285ede7516f28fd464e0bfff723e 100644
+index 77833df60927cdf86f5abb19db1afd879e7e2454..496c5c7f57ad284c06d6a30c42c8aef7501136d2 100644
 --- a/dist/app/components/error-dev.vue
 +++ b/dist/app/components/error-dev.vue
 @@ -26,7 +26,7 @@ useHead({
@@ -122,7 +122,7 @@ diff --git a/dist/app/components/island-renderer.js b/dist/app/components/island
 deleted file mode 100644
 index 29d6a08a9f611f63a14a420ff1445b70a45379d4..0000000000000000000000000000000000000000
 diff --git a/dist/app/components/nuxt-island.d.ts b/dist/app/components/nuxt-island.d.ts
-index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2e038962a 100644
+index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..2196cbcea97c2d0c43a85a49913d0d1078b7be4e 100644
 --- a/dist/app/components/nuxt-island.d.ts
 +++ b/dist/app/components/nuxt-island.d.ts
 @@ -1,4 +1,4 @@
@@ -147,7 +147,7 @@ index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2
          type: StringConstructor;
          required: true;
 diff --git a/dist/app/components/nuxt-island.js b/dist/app/components/nuxt-island.js
-index 71ace1b1242a03419444f5fee57f676a3d7332a7..1ce2fb206b374f723803c35d242849a3fed147a7 100644
+index 71ace1b1242a03419444f5fee57f676a3d7332a7..25ca1ce9c4e949d3174b1d2505ffa3d3fe1bffb2 100644
 --- a/dist/app/components/nuxt-island.js
 +++ b/dist/app/components/nuxt-island.js
 @@ -1,42 +1,39 @@
@@ -176,7 +176,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..1ce2fb206b374f723803c35d242849a3
 +    }) 
 +    : (
 +      // todo path association between server and client chunks
-+      ((src, exportName) =>import("virtual:vue-onigiri").then(mod => (mod.default ?? mod)[`${src}#${exportName}`]))
++      ((src, exportName) =>import("virtual:vue-onigiri").then(mod => (mod.default ?? mod).get(`${src}#${exportName}`)))
 +    ) 
 +  : (src, exportName) => import("virtual:vue-onigiri").then(mod => {
 +      if(import.meta.dev) {
@@ -502,7 +502,7 @@ index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..a5894dc18d2906055a7b12e06a7d85ca
 -const islandContext = import.meta.server && nuxtApp.ssrContext.islandContext;
  </script>
 diff --git a/dist/app/components/utils.d.ts b/dist/app/components/utils.d.ts
-index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..1ad5b2d50159dad5c007df0258063c695ff4388d 100644
+index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..efd5350b60ade5e3efb52a3c5cf93aefc3227c70 100644
 --- a/dist/app/components/utils.d.ts
 +++ b/dist/app/components/utils.d.ts
 @@ -1,4 +1,4 @@
@@ -525,7 +525,7 @@ index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..1ad5b2d50159dad5c007df0258063c69
 -export declare function isStartFragment(element: RendererNode): boolean;
 -export declare function isEndFragment(element: RendererNode): boolean;
 diff --git a/dist/app/components/utils.js b/dist/app/components/utils.js
-index a1404a6721fb288b4a85697eb0133f39c7ff18ec..904ed639017596b5e3315d9bc90d7d3218fa5083 100644
+index a1404a6721fb288b4a85697eb0133f39c7ff18ec..4522b79754de0097be3ec58e7f9d6ee6149383e5 100644
 --- a/dist/app/components/utils.js
 +++ b/dist/app/components/utils.js
 @@ -1,4 +1,4 @@
@@ -552,7 +552,7 @@ index a1404a6721fb288b4a85697eb0133f39c7ff18ec..904ed639017596b5e3315d9bc90d7d32
 -  return element.nodeName === "#comment" && element.nodeValue === "]";
 -}
 diff --git a/dist/app/components/welcome.vue b/dist/app/components/welcome.vue
-index f96b90bef3a874ad226308160b4343bc83184812..d5f863f620ef7a31a4dc629531d2db5bffcdf87b 100644
+index f96b90bef3a874ad226308160b4343bc83184812..b51b94b45a1d5e2ad2b6173f7d25ba8008bda9f3 100644
 --- a/dist/app/components/welcome.vue
 +++ b/dist/app/components/welcome.vue
 @@ -14,7 +14,7 @@ useHead({
@@ -565,7 +565,7 @@ index f96b90bef3a874ad226308160b4343bc83184812..d5f863f620ef7a31a4dc629531d2db5b
    ],
    style: [
 diff --git a/dist/app/composables/cookie.js b/dist/app/composables/cookie.js
-index f6e68574ec71b468458aab2c7b5f345b48f4366b..d94d8bc5f487f29f1427b80904db9085b15dda1b 100644
+index f6e68574ec71b468458aab2c7b5f345b48f4366b..fc1b1d7028169c8ab377f4bc5ff54da8b01f4ed8 100644
 --- a/dist/app/composables/cookie.js
 +++ b/dist/app/composables/cookie.js
 @@ -13,7 +13,7 @@ const CookieDefaults = {
@@ -578,7 +578,7 @@ index f6e68574ec71b468458aab2c7b5f345b48f4366b..d94d8bc5f487f29f1427b80904db9085
    const opts = { ...CookieDefaults, ..._opts };
    opts.filter ??= (key) => key === name;
 diff --git a/dist/app/composables/url.js b/dist/app/composables/url.js
-index d0365905a038de1e9c97560b8863d9e3a998b80a..5c52f2de96aad974caf4ee0076cde87ce6e127e7 100644
+index d0365905a038de1e9c97560b8863d9e3a998b80a..bcdb8094cd0291905eae2933de7934c7958febcc 100644
 --- a/dist/app/composables/url.js
 +++ b/dist/app/composables/url.js
 @@ -4,5 +4,5 @@ export function useRequestURL(opts) {
@@ -590,7 +590,7 @@ index d0365905a038de1e9c97560b8863d9e3a998b80a..5c52f2de96aad974caf4ee0076cde87c
  }
 diff --git a/dist/app/deserialize.d.ts b/dist/app/deserialize.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..2f07a2fdeb3e30b09fb39572fda159387059cdad
+index 0000000000000000000000000000000000000000..0927a40f456d437fdf9abf2a0ac7df1592d6327b
 --- /dev/null
 +++ b/dist/app/deserialize.d.ts
 @@ -0,0 +1,4 @@
@@ -600,7 +600,7 @@ index 0000000000000000000000000000000000000000..2f07a2fdeb3e30b09fb39572fda15938
 +export declare function renderChildren(data: VServerComponent | VServerComponent[] | undefined): VNode | undefined;
 diff --git a/dist/app/deserialize.js b/dist/app/deserialize.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..4cdf208b89739d33cf180de20c10f9a916fd630e
+index 0000000000000000000000000000000000000000..2bd08546c069ddc6724f77cc450e8fd77c45fb4d
 --- /dev/null
 +++ b/dist/app/deserialize.js
 @@ -0,0 +1,30 @@
@@ -635,7 +635,7 @@ index 0000000000000000000000000000000000000000..4cdf208b89739d33cf180de20c10f9a9
 +  }
 +}
 diff --git a/dist/app/entry.js b/dist/app/entry.js
-index e6821aaa297411937119f71de6d86c3c2b8b2343..d5b1262991913736771a8768360b5c911e754c49 100644
+index e6821aaa297411937119f71de6d86c3c2b8b2343..5fef2577f1e2089f580e85f0548dbbad9c0c5563 100644
 --- a/dist/app/entry.js
 +++ b/dist/app/entry.js
 @@ -7,10 +7,11 @@ import "#build/css";
@@ -653,7 +653,7 @@ index e6821aaa297411937119f71de6d86c3c2b8b2343..d5b1262991913736771a8768360b5c91
        await applyPlugins(nuxt, plugins);
 diff --git a/dist/app/island.d.ts b/dist/app/island.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..df62284ee8906db0ac4abab8abbd0064753a0ae0
+index 0000000000000000000000000000000000000000..23e4ac4570acc8c9b7df76ce10492a8d7e2f3b4c
 --- /dev/null
 +++ b/dist/app/island.d.ts
 @@ -0,0 +1,7 @@
@@ -666,7 +666,7 @@ index 0000000000000000000000000000000000000000..df62284ee8906db0ac4abab8abbd0064
 +}>;
 diff --git a/dist/app/island.js b/dist/app/island.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..83f3a64b2f8c15845c4c2f9a4a9f40814d62d56f
+index 0000000000000000000000000000000000000000..44021736fc31507dfa923e0431dbb2b1acfac3bb
 --- /dev/null
 +++ b/dist/app/island.js
 @@ -0,0 +1,24 @@
@@ -695,7 +695,7 @@ index 0000000000000000000000000000000000000000..83f3a64b2f8c15845c4c2f9a4a9f4081
 +  };
 +}
 diff --git a/dist/app/nuxt.d.ts b/dist/app/nuxt.d.ts
-index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..b89d2c7ae40580987459bb556276fd2798bee337 100644
+index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..f4d5032f273910f836833fde03ad545982770c2d 100644
 --- a/dist/app/nuxt.d.ts
 +++ b/dist/app/nuxt.d.ts
 @@ -73,6 +73,7 @@ export interface NuxtSSRContext extends SSRContext {
@@ -707,7 +707,7 @@ index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..b89d2c7ae40580987459bb556276fd27
  export interface NuxtPayload {
      path?: string;
 diff --git a/dist/core/runtime/nitro/handlers/island.d.ts b/dist/core/runtime/nitro/handlers/island.d.ts
-index ea7b2201536514931228ea584d1707a694853fb9..f85583688484b69c5c0051c7cb0563db853520c6 100644
+index ea7b2201536514931228ea584d1707a694853fb9..a91d25b07072f74135ee00b8db15a8feb0c0acc3 100644
 --- a/dist/core/runtime/nitro/handlers/island.d.ts
 +++ b/dist/core/runtime/nitro/handlers/island.d.ts
 @@ -1,4 +1,4 @@
@@ -717,7 +717,7 @@ index ea7b2201536514931228ea584d1707a694853fb9..f85583688484b69c5c0051c7cb0563db
 +declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<Partial<RenderResponse> | NuxtIslandResponse>>;
  export default _default;
 diff --git a/dist/core/runtime/nitro/handlers/island.js b/dist/core/runtime/nitro/handlers/island.js
-index 5d35c092874880bf098414df7f9d3410e12d7516..adc4af21cdc3778c67d872b9e631d4d64c5a763d 100644
+index 5d35c092874880bf098414df7f9d3410e12d7516..e4ee87727de09199e2af57d0b50c7843f60d3567 100644
 --- a/dist/core/runtime/nitro/handlers/island.js
 +++ b/dist/core/runtime/nitro/handlers/island.js
 @@ -4,11 +4,11 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
@@ -783,7 +783,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..adc4af21cdc3778c67d872b9e631d4d6
    await nitroApp.hooks.callHook("render:island", islandResponse, { event, islandContext });
    if (import.meta.prerender) {
 diff --git a/dist/core/runtime/nitro/handlers/renderer.js b/dist/core/runtime/nitro/handlers/renderer.js
-index 7046c97992c550e1af5e28acc258aad332ba8ebe..b27478685ca359f843db98608d61ac2a12dea274 100644
+index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3639dcc1f 100644
 --- a/dist/core/runtime/nitro/handlers/renderer.js
 +++ b/dist/core/runtime/nitro/handlers/renderer.js
 @@ -15,9 +15,8 @@ import { payloadCache } from "../utils/cache.js";
@@ -829,7 +829,7 @@ index 7046c97992c550e1af5e28acc258aad332ba8ebe..b27478685ca359f843db98608d61ac2a
      ],
      bodyAppend: [bodyTags]
 diff --git a/dist/core/runtime/nitro/templates/error-500.js b/dist/core/runtime/nitro/templates/error-500.js
-index ae62858380d6ad65d8193c809b294b3112210266..e2db2f5cb08e3a8fc164251f8268dc9247f47dca 100644
+index ae62858380d6ad65d8193c809b294b3112210266..224ae7db11c59ceb463664c4e7a47a07b2c0ff53 100644
 --- a/dist/core/runtime/nitro/templates/error-500.js
 +++ b/dist/core/runtime/nitro/templates/error-500.js
 @@ -2,5 +2,5 @@ import { escapeHtml } from "@vue/shared";
@@ -840,7 +840,7 @@ index ae62858380d6ad65d8193c809b294b3112210266..e2db2f5cb08e3a8fc164251f8268dc92
 +  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage) + " | " + escapeHtml(messages.appName) + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1,h2{font-size:inherit;font-weight:inherit}h1,h2,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.grid{display:grid}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.max-w-520px{max-width:520px}.min-h-screen{min-height:100vh}.place-content-center{place-content:center}.overflow-hidden{overflow:hidden}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.px-2{padding-left:.5rem;padding-right:.5rem}.text-center{text-align:center}.text-\\[80px\\]{font-size:80px}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\\[\\#020420\\]{--un-text-opacity:1;color:rgb(2 4 32/var(--un-text-opacity))}.text-\\[\\#64748B\\]{--un-text-opacity:1;color:rgb(100 116 139/var(--un-text-opacity))}.font-semibold{font-weight:600}.leading-none{line-height:1}.tracking-wide{letter-spacing:.025em}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.tabular-nums{--un-numeric-spacing:tabular-nums;font-variant-numeric:var(--un-ordinal) var(--un-slashed-zero) var(--un-numeric-figure) var(--un-numeric-spacing) var(--un-numeric-fraction)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:text-\\[110px\\]{font-size:110px}.sm\\:text-3xl{font-size:1.875rem;line-height:2.25rem}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white font-sans grid min-h-screen overflow-hidden place-content-center text-[#020420] tracking-wide"><div class="max-w-520px text-center"><h1 class="font-semibold leading-none mb-4 sm:text-[110px] tabular-nums text-[80px]">` + escapeHtml(messages.statusCode) + '</h1><h2 class="font-semibold mb-2 sm:text-3xl text-2xl">' + escapeHtml(messages.statusMessage) + '</h2><p class="mb-4 px-2 text-[#64748B] text-md">' + escapeHtml(messages.description) + "</p></div></body></html>";
  };
 diff --git a/dist/core/runtime/nitro/templates/error-dev.js b/dist/core/runtime/nitro/templates/error-dev.js
-index 20087a8abcee6700b182fd521f39a5aba63969f9..d2b0c22d188cdcb0025c0b97ec28a437e41b7f37 100644
+index 20087a8abcee6700b182fd521f39a5aba63969f9..4594533c87de48633591e64c86816ab06973b1c7 100644
 --- a/dist/core/runtime/nitro/templates/error-dev.js
 +++ b/dist/core/runtime/nitro/templates/error-dev.js
 @@ -2,5 +2,5 @@ import { escapeHtml } from "@vue/shared";
@@ -851,7 +851,7 @@ index 20087a8abcee6700b182fd521f39a5aba63969f9..d2b0c22d188cdcb0025c0b97ec28a437
 +  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage || "Internal Server Error") + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}h1,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.absolute{position:absolute}.top-6{top:1.5rem}.z-10{z-index:10}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.inline-block{display:inline-block}.h-auto{height:auto}.min-h-screen{min-height:100vh}.flex{display:flex}.flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.overflow-y-auto{overflow-y:auto}.border{border-width:1px}.border-b-0{border-bottom-width:0}.border-black\\/5{border-color:#0000000d}.rounded-t-md{border-top-left-radius:.375rem;border-top-right-radius:.375rem}.bg-gray-50\\/50{background-color:#f5f5f580}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.pt-12{padding-top:3rem}.text-6xl{font-size:3.75rem;line-height:1}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-black{--un-text-opacity:1;color:rgb(0 0 0/var(--un-text-opacity))}.hover\\:text-\\[\\#00DC82\\]:hover{--un-text-opacity:1;color:rgb(0 220 130/var(--un-text-opacity))}.font-light{font-weight:300}.font-medium{font-weight:500}.leading-tight{line-height:1.25}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.hover\\:underline:hover{text-decoration-line:underline}.underline-offset-3{text-underline-offset:3px}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:border-white\\/10{border-color:#ffffff1a}.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:bg-white\\/5{background-color:#ffffff0d}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:right-6{right:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\\:text-8xl{font-size:6rem;line-height:1}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white flex flex-col font-sans min-h-screen pt-12 px-10 text-black"><h1 class="font-medium mb-4 sm:text-8xl text-6xl">` + escapeHtml(messages.statusCode) + '</h1><p class="font-light leading-tight mb-8 sm:text-2xl text-xl">' + escapeHtml(messages.description) + '</p><a href="https://nuxt.com/docs/getting-started/error-handling?utm_source=nuxt-error-dev-page" target="_blank" class="absolute font-medium hover:text-[#00DC82] hover:underline inline-block mx-auto sm:right-6 text-sm top-6 underline-offset-3">Customize this page</a><div class="bg-gray-50/50 border border-b-0 border-black/5 dark:bg-white/5 dark:border-white/10 flex-1 h-auto overflow-y-auto rounded-t-md"><div class="font-light leading-tight p-8 text-xl z-10">' + escapeHtml(messages.stack) + "</div></div></body></html>";
  };
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.d.ts b/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
-index 53ccf5705763b46fde817535789b2712b1d7853c..db27b7563f32275c4ad297bfa8e4b8271114bd1a 100644
+index 53ccf5705763b46fde817535789b2712b1d7853c..a4b20118456845141876e1d20ff7e83073bdb7bc 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
 @@ -1,4 +1,6 @@
@@ -862,7 +862,7 @@ index 53ccf5705763b46fde817535789b2712b1d7853c..db27b7563f32275c4ad297bfa8e4b827
      rendererContext: import("vue-bundle-renderer/runtime").RendererContext;
      renderToString(ssrContext: import("vue-bundle-renderer/runtime").SSRContext): Promise<{
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.js b/dist/core/runtime/nitro/utils/renderer/build-files.js
-index c1f27b5c0fa710386d83f5bb44162f9176b260c2..48be82c245967a9f2ef7c9d3530f8ee6e26e6b55 100644
+index c1f27b5c0fa710386d83f5bb44162f9176b260c2..121b155bf2b6824fda4e582fd7647eca2e0a7078 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.js
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.js
 @@ -8,7 +8,14 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
@@ -882,7 +882,7 @@ index c1f27b5c0fa710386d83f5bb44162f9176b260c2..48be82c245967a9f2ef7c9d3530f8ee6
  export const getSSRRenderer = lazyCachedFunction(async () => {
    const manifest = await getClientManifest();
 diff --git a/dist/core/runtime/nitro/utils/renderer/islands.d.ts b/dist/core/runtime/nitro/utils/renderer/islands.d.ts
-index bd881c1d4120c2555cc7c07178e7dc0328647138..2dece41cd51f289983bd22a57a3817c1b19e359e 100644
+index bd881c1d4120c2555cc7c07178e7dc0328647138..448c1765372db61fcb20edcc2eb9d79d7578ffd5 100644
 --- a/dist/core/runtime/nitro/utils/renderer/islands.d.ts
 +++ b/dist/core/runtime/nitro/utils/renderer/islands.d.ts
 @@ -1,13 +1,4 @@
@@ -1000,7 +1000,7 @@ index 9d3a049702291c09150ca9c187a3b6a1aef5988e..e69de29bb2d1d6434b8b29ae775ad8c2
 -  return html;
 -}
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 11965d7262242d1981705e895515c6b15a93e8f5..451bd1b08897172bd6b9c93f606daaee49adf3a6 100644
+index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a665d731d46 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -5,7 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';

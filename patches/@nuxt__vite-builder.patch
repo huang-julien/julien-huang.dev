@@ -1,5 +1,5 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..69f96e00bd87764c1dd686e9aa15dfbf5ecb373c 100644
+index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..adb0e1f5c330491be55b23fa5575737b21098f2e 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
@@ -119,7 +119,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..69f96e00bd87764c1dd686e9aa15dfbf
 +                    continue;
 +                  }
 +                  imports.add(`import { ${component.export} as ${component.pascalName} } from 'virtual:vsc:${serverSideCounterPart.filePath}'`);
-+                  mapValues.set(`/${chunk.filename}__${component.export}`, component.pascalName);
++                  mapValues.set(`/${chunk.id}#${component.export}`, component.pascalName);
 +                }
 +              }
 +              return {
@@ -206,7 +206,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..69f96e00bd87764c1dd686e9aa15dfbf
    if (!enabled) {
 diff --git a/dist/runtime/island.d.mts b/dist/runtime/island.d.mts
 new file mode 100644
-index 0000000000000000000000000000000000000000..d604bdd8dc5fe041b5a64f62d17c3517dc8cff1c
+index 0000000000000000000000000000000000000000..ce4051125830aa99da2848623d3d4765eea129d7
 --- /dev/null
 +++ b/dist/runtime/island.d.mts
 @@ -0,0 +1,2 @@
@@ -331,7 +331,7 @@ index 0000000000000000000000000000000000000000..d5c8870def937f83d901e9d0ef58ba0a
 +  }
 +}
 diff --git a/dist/runtime/vite-node.d.mts b/dist/runtime/vite-node.d.mts
-index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdbbe715f98 100644
+index 1cced675d75a6add3a63b7c474ea268999d6f654..b2983bfc3ad6ad76a2c6bf0c8933be741635a9da 100644
 --- a/dist/runtime/vite-node.d.mts
 +++ b/dist/runtime/vite-node.d.mts
 @@ -1,2 +1,3 @@
