@@ -1,5 +1,5 @@
 diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
-index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491dfd8ea3e 100644
+index ee4dc49168846a9f070b8271ec8655edd03386ff..9ec36736298254f4f4a120c79642ab8376ad8542 100644
 --- a/dist/runtime/serialize.js
 +++ b/dist/runtime/serialize.js
 @@ -28,6 +28,7 @@ export function serializeApp(app, context = {}) {
@@ -10,35 +10,36 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491
    return app.runWithContext(async () => {
      const res = await setupComponent(instance, true);
      return await app.runWithContext(async () => {
-@@ -108,18 +109,36 @@ export async function serializeVNode(vnode, parentInstance) {
+@@ -108,18 +109,37 @@ export async function serializeVNode(vnode, parentInstance) {
          (child) => {
            if (child._onigiriLoadClient) {
              if (vnode.type.__chunk && vnode.type.__export) {
--              return [
-+              if(child.children.length) {
-+                return Promise.resolve(serializeChildren(child.children, parentInstance)).then(serializedChildren => {
-+                  return  [
++              if(child.__slotsResult) {
+               return [
                  VServerComponentType.Component,
                  filterProps(vnode.props),
                  // @ts-expect-error
                  vnode.type.__chunk,
                  // @ts-expect-error
-                 vnode.type.__export,
-+                {
-+                  default: serializedChildren
-+                }
-+              ];
-+                })
+-                vnode.type.__export,
++                vnode.type.__export, 
+                 serializeSlots(child.__slotsResult)
+               ];
++                
 +              }
-+              return [
++              return Promise.resolve(serializeChildren(child.children, parentInstance)).then(serializedChildren => {
++                  return  [
 +                VServerComponentType.Component,
 +                filterProps(vnode.props),
 +                // @ts-expect-error
 +                vnode.type.__chunk,
 +                // @ts-expect-error
-+                vnode.type.__export, 
-                 serializeSlots(child.__slotsResult)
-               ];
++                vnode.type.__export,
++                {
++                  default: serializedChildren
++                }
++              ];
++                })
              }
              console.warn("Component is missing chunk information");
            }
@@ -48,7 +49,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491
            return [
              VServerComponentType.Fragment,
              serializeChildren(child.children, parentInstance)
-@@ -225,6 +244,9 @@ function renderComponent(_vnode, parentInstance) {
+@@ -225,6 +245,9 @@ function renderComponent(_vnode, parentInstance) {
      });
      return p.then(() => {
        const vnode = renderComponentRoot(instance);
@@ -58,7 +59,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491
        const { dirs: dirs2, props: props2 } = vnode;
        if (dirs2) {
          vnode.props = applySSRDirectives(vnode, props2, dirs2);
-@@ -234,6 +256,9 @@ function renderComponent(_vnode, parentInstance) {
+@@ -234,6 +257,9 @@ function renderComponent(_vnode, parentInstance) {
      });
    }
    const child = renderComponentRoot(instance);
@@ -69,7 +70,7 @@ index ee4dc49168846a9f070b8271ec8655edd03386ff..3177617684b2d46ae4cc01e706b2b491
    if (dirs) {
      child.props = applySSRDirectives(child, props, dirs);
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
-index bbf89c47dba800aef026ca58b56de6bc40eef382..1fa2112a65e918f7b536d9239eca00c904a1aea4 100644
+index bbf89c47dba800aef026ca58b56de6bc40eef382..e56a6e47ce0f8cc369d1dbb4aad530382632004e 100644
 --- a/dist/vite/chunk.js
 +++ b/dist/vite/chunk.js
 @@ -3,6 +3,7 @@ import { join, normalize, relative } from "node:path";
