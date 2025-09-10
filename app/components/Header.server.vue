@@ -1,6 +1,6 @@
 <template>
     <header class="flex items-center p-4 gap-10 backdrop-blur-sm fixed top-0 left-0 right-0 h-20">
-        <NuxtLink to="/">
+        <NuxtLink v-load-client to="/">
             <NuxtPicture src="/profile.jpg" sizes="64px" alt="Julien Huang profile picture" class="rounded-full aspect-square" :img-attrs="{
                 class: 'rounded-full aspect-square',
                 loading: 'lazy',
@@ -13,13 +13,13 @@
         <nav class="ml-auto">
             <ul class="flex gap-3">
                 <li class="my-5">
-                    <NuxtLink to="/sponsors">Sponsors</NuxtLink>
+                    <NuxtLink v-load-client to="/sponsors">Sponsors</NuxtLink>
                 </li>
                 <li class="my-5">
-                    <NuxtLink to="/work">Work</NuxtLink>
+                    <NuxtLink v-load-client to="/work">Work</NuxtLink>
                 </li>
                 <li class="my-5">
-                    <NuxtLink to="/cv" :prefetch="false">CV</NuxtLink>
+                    <NuxtLink v-load-client to="/cv" :prefetch="false">CV</NuxtLink>
                 </li>
             </ul>
         </nav>
