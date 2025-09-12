@@ -1,291 +1,234 @@
 diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
-index ee4dc49168846a9f070b8271ec8655edd03386ff..9ec36736298254f4f4a120c79642ab8376ad8542 100644
+index ee4dc49168846a9f070b8271ec8655edd03386ff..73cbcffcadb58e4eb092c196f4577370171755b5 100644
 --- a/dist/runtime/serialize.js
 +++ b/dist/runtime/serialize.js
 @@ -28,6 +28,7 @@ export function serializeApp(app, context = {}) {
    const vnode = createVNode(input._component, input._props);
    const instance = createComponentInstance(vnode, input._instance, null);
    instance.appContext = input._context;
-+  instance.provides = (input._context.provides);
++  instance.provides = /* @__PURE__ */ Object.create(input._context.provides);
    return app.runWithContext(async () => {
      const res = await setupComponent(instance, true);
      return await app.runWithContext(async () => {
-@@ -108,18 +109,37 @@ export async function serializeVNode(vnode, parentInstance) {
+@@ -56,6 +57,7 @@ export function serializeApp(app, context = {}) {
+           })
+         );
+       }
++      debugger;
+       return serializeVNode(child, instance).then((result) => {
+         if (result) {
+           return unrollServerComponentBufferPromises(result);
+@@ -106,7 +108,10 @@ export async function serializeVNode(vnode, parentInstance) {
+     } else if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
+       return Promise.resolve(renderComponent(vnode, parentInstance)).then(
          (child) => {
++          console.log("child is component, ", child);
++          debugger;
            if (child._onigiriLoadClient) {
++            console.log("child, ", child);
              if (vnode.type.__chunk && vnode.type.__export) {
-+              if(child.__slotsResult) {
                return [
                  VServerComponentType.Component,
-                 filterProps(vnode.props),
-                 // @ts-expect-error
-                 vnode.type.__chunk,
-                 // @ts-expect-error
--                vnode.type.__export,
-+                vnode.type.__export, 
-                 serializeSlots(child.__slotsResult)
-               ];
-+                
-+              }
-+              return Promise.resolve(serializeChildren(child.children, parentInstance)).then(serializedChildren => {
-+                  return  [
-+                VServerComponentType.Component,
-+                filterProps(vnode.props),
-+                // @ts-expect-error
-+                vnode.type.__chunk,
-+                // @ts-expect-error
-+                vnode.type.__export,
-+                {
-+                  default: serializedChildren
-+                }
-+              ];
-+                })
-             }
-             console.warn("Component is missing chunk information");
+@@ -122,7 +127,7 @@ export async function serializeVNode(vnode, parentInstance) {
            }
-+          if(child.shapeFlag & ShapeFlags.ELEMENT) {
-+            return serializeVNode(child, parentInstance);
-+          }
            return [
              VServerComponentType.Fragment,
-             serializeChildren(child.children, parentInstance)
-@@ -225,6 +245,9 @@ function renderComponent(_vnode, parentInstance) {
-     });
-     return p.then(() => {
-       const vnode = renderComponentRoot(instance);
-+      if(vnode.shapeFlag & ShapeFlags.COMPONENT) {
-+        return renderComponent(vnode, instance);
-+      }
-       const { dirs: dirs2, props: props2 } = vnode;
-       if (dirs2) {
+-            serializeChildren(child.children, parentInstance)
++            serializeChildren(child, parentInstance)
+           ];
+         }
+       );
+@@ -206,6 +211,21 @@ function renderComponent(_vnode, parentInstance) {
+     parentInstance ?? null,
+     null
+   );
++  const reconstructedSlots = {};
++  for (const key in instance.vnode.children) {
++    const fn = instance.vnode.children[key];
++    if (typeof fn !== "function") {
++      reconstructedSlots[key] = fn;
++      continue;
++    }
++    reconstructedSlots[key] = (ctx, ...args) => {
++      const result = fn(ctx, ...args);
++      instance.__slotsResult = instance.__slotsResult || {};
++      instance.__slotsResult[key] = result;
++      return result;
++    };
++  }
++  instance.vnode.children = reconstructedSlots;
+   const res = setupComponent(instance, true);
+   const hasAsyncSetup = isPromise(res);
+   let prefetches = (
+@@ -230,16 +250,23 @@ function renderComponent(_vnode, parentInstance) {
          vnode.props = applySSRDirectives(vnode, props2, dirs2);
-@@ -234,6 +257,9 @@ function renderComponent(_vnode, parentInstance) {
+       }
+       vnode.__slotsResult = instance.__slotsResult;
+-      return vnode;
++      if (child.shapeFlag & ShapeFlags.COMPONENT) {
++        return renderComponent(child, parentInstance);
++      }
++      return vnode.children;
      });
    }
    const child = renderComponentRoot(instance);
-+      if(child.shapeFlag & ShapeFlags.COMPONENT) {
-+        return renderComponent(child, instance);
-+      }
++  debugger;
    const { dirs, props } = child;
    if (dirs) {
      child.props = applySSRDirectives(child, props, dirs);
+   }
+   child.__slotsResult = instance.__slotsResult;
+-  return child;
++  if (child.shapeFlag & ShapeFlags.COMPONENT) {
++    return renderComponent(child, instance);
++  }
++  return isVNode(child.children) ? child.children : child;
+ }
+ function applySSRDirectives(vnode, rawProps, dirs) {
+   const toMerge = [];
+diff --git a/dist/runtime/utils.d.ts b/dist/runtime/utils.d.ts
+index f1fa74dc5069732fe24b3bf402deb6a02f03597c..d321453a49dd208bfd9c6111d4beeb0c9c9aafb4 100644
+--- a/dist/runtime/utils.d.ts
++++ b/dist/runtime/utils.d.ts
+@@ -1,3 +1,4 @@
+-import type { DefineComponent } from "vue";
++import type { DefineComponent, Directive } from "vue";
+ export type ImportFn = (src: string, exportName?: string) => Promise<DefineComponent>;
+ export declare const defaultImportFn: ImportFn;
++export declare const loadClientDirective: Directive;
+diff --git a/dist/runtime/utils.js b/dist/runtime/utils.js
+index 6907f81b21b9312bf8a1b6df6dc5916d7b1fc7b9..0baaa239a7e111e879983e6ba9cf4faf2eec124f 100644
+--- a/dist/runtime/utils.js
++++ b/dist/runtime/utils.js
+@@ -1 +1,16 @@
+-export const defaultImportFn = (src, exportName = "default") => import(src).then((m) => m[exportName]);
++const componentsImports = () => import("virtual:vue-onigiri");
++export const defaultImportFn = (src, exportName = "default") => componentsImports().then((mod) => (mod.default ?? mod)[`${src}#${exportName}`]);
++export const loadClientDirective = {
++  getSSRProps(binding, vnode) {
++    if (binding.value !== false) {
++      vnode._onigiriLoadClient = true;
++    }
++    return {};
++  },
++  created(_, binding, vnode) {
++    if (binding.value !== false) {
++      vnode._onigiriLoadClient = true;
++    }
++    return binding;
++  }
++};
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
-index bbf89c47dba800aef026ca58b56de6bc40eef382..e56a6e47ce0f8cc369d1dbb4aad530382632004e 100644
+index bbf89c47dba800aef026ca58b56de6bc40eef382..604802044f92a127423fc826ff26efcafd732313 100644
 --- a/dist/vite/chunk.js
 +++ b/dist/vite/chunk.js
-@@ -3,6 +3,7 @@ import { join, normalize, relative } from "node:path";
- import { readFileSync } from "node:fs";
- import vue from "@vitejs/plugin-vue";
- import { defu } from "defu";
-+import { hash} from "ohash"
- import { glob } from "node:fs/promises";
- function normalizePath(path) {
-   return normalize(path).replaceAll("\\", "/");
-@@ -52,7 +53,26 @@ export function vueOnigiriPluginFactory(options = {}) {
-             options.rootDir = config.root;
+@@ -11,7 +11,7 @@ const VSC_PREFIX = "virtual:vsc:";
+ const VSC_PREFIX_RE = /^(\/?@id\/)?virtual:vsc:/;
+ const NOVSC_PREFIX_RE = /^(\/?@id\/)?(?!virtual:vsc:)/;
+ export function vueOnigiriPluginFactory(options = {}) {
+-  const { serverAssetsDir = "", clientAssetsDir = "", rootDir = "" } = options;
++  let { serverAssetsDir = "", clientAssetsDir = "", rootDir = "" } = options;
+   const clientChunks = [];
+   const serverChunks = [];
+   let assetDir = clientAssetsDir;
+@@ -49,7 +49,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+           }
+           isProduction = config.isProduction;
+           if (!rootDir) {
+-            options.rootDir = config.root;
++            rootDir = config.root;
            }
          },
-+        
-+        load(id) {
-+
-+          
-+            if(id === 'virtual:vue-onigiri') { 
-+              debugger
-+              return `
-+              import { defineAsyncComponent } from "vue";
-+              export default {
-+                ${clientChunks.map(chunk =>
-+                  chunk.exports.map(exportName =>
-+                    `"${normalizePath(join("/", isProduction ? normalize(chunk.id) : relative(rootDir, normalize(chunk.id))))}#${exportName}": defineAsyncComponent(() => import("${chunk.originalPath}").then(m => m.${exportName}))`
-+                  ).join(",\n")
-+                ).join(",\n")}
-+              }
-+              `
-+            }
-+        },
          async buildStart() {
-+          console.log('biold start')
-           const chunksToInclude = Array.isArray(options.includeClientChunks) ? options.includeClientChunks : [options.includeClientChunks || "**/*.vue"];
-           await Promise.all(chunksToInclude.map(async (file) => {
-             const path = typeof file === "string" ? file : file.path;
-@@ -61,29 +81,35 @@ export function vueOnigiriPluginFactory(options = {}) {
-               cwd: rootDir
-             });
-             for await (const file2 of files) {
-+              console.log(file2)
-               const id = join(rootDir, file2);
-               const info = clientChunks.find((chunk) => chunk.originalPath === normalizePath(id));
-               if (info) {
-                 info.exports.push(exportName);
-               } else {
--                if (isProduction) {
--                  const emitted = this.emitFile({
--                    type: "chunk",
--                    id,
--                    preserveSignature: "strict"
--                  });
--                  clientChunks.push({
--                    originalPath: normalizePath(id),
--                    id: emitted,
--                    exports: [exportName]
--                  });
--                } else {
--                  clientChunks.push({
--                    originalPath: normalizePath(id),
--                    id: normalizePath(join(clientAssetsDir, relative(rootDir, id))),
--                    exports: [exportName]
--                  });
--                }
-+                  const clientSideChunk = clientChunks.find((chunk) => chunk.originalPath === normalizePath(id));
-+              
-+                  if (isProduction) {
-+                    
-+                    // const emitted = this.emitFile({
-+                    //   type: "chunk",
-+                    //   id: VSC_PREFIX + id,
-+                    //   preserveSignature: "strict",
-+                    // });
-+                    clientChunks.push({
-+                      originalPath: normalizePath(id),
-+                      id: hash(id),
-+                      exports: [exportName],
-+                      clientSideChunk: clientSideChunk?.filename
-+                    });
-+                  } else   {
-+                    clientChunks.push({
-+                      originalPath: normalizePath(id),
-+                      id: normalizePath(join(clientAssetsDir, relative(rootDir, id))),
-+                      exports: [exportName],
-+                      clientSideChunk: clientSideChunk?.filename,
-+                    });
-+                  }
-               }
-             }
-           }));
-@@ -119,7 +145,7 @@ export function vueOnigiriPluginFactory(options = {}) {
-                   start,
-                   end,
-                   `Object.assign(${code.slice(start, end)},
--                                    { __chunk: "${normalizePath(join("/", isProduction ? join(clientAssetsDir, normalize(ref.id)) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)}  },
-+                                    { __chunk: "${normalizePath(join("/", isProduction ? ref.id : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)}  },
-                                      
-                                 )`
-                 );
-@@ -141,9 +167,17 @@ export function vueOnigiriPluginFactory(options = {}) {
-                 chunk.isEntry = false;
-               }
-             }
-+          } 
-+        }
-+      },
-+      {
-+        name: "vue-onigiri:resolve",
-+        resolveId(id, importer, opts) {
-+          if( VSC_PREFIX_RE.test(id) ) {
-+            return this.resolve(id.replace(VSC_PREFIX, ""), importer?.replace(VSC_PREFIX_RE, ""), opts);
-           }
--          for (const [id, data] of clientChunks.entries()) {
--            data.filename = this.getFileName(data.id);
-+          if(id === 'virtual:vue-onigiri') {
-+            return id;
-           }
-         }
-       }
-@@ -205,7 +239,7 @@ export function vueOnigiriPluginFactory(options = {}) {
-         },
-         resolveId: {
-           order: "pre",
--          async handler(id, importer) {
-+          async handler(id, importer, opts) {
-             if (id === "virtual:vue-onigiri") {
-               return id;
-             }
-@@ -216,24 +250,24 @@ export function vueOnigiriPluginFactory(options = {}) {
-               if (id.endsWith(".vue")) {
-                 const resolved = await this.resolve(
-                   id,
--                  importer.replace(VSC_PREFIX_RE, "")
-+                  importer.replace(VSC_PREFIX_RE, ""),
-+                  opts
-                 );
-                 if (resolved) {
-                   return VSC_PREFIX + resolved.id;
-                 }
-               }
--              return this.resolve(id, importer.replace(VSC_PREFIX_RE, ""), {
--                skipSelf: true
--              });
-+              return this.resolve(id, importer.replace(VSC_PREFIX_RE, ""), opts);
-             }
-             if (id.endsWith(".ts") || id.endsWith(".tsx") || id.endsWith(".js") || id.endsWith(".jsx")) {
--              return this.resolve(id.replace(VSC_PREFIX_RE, ""), importer?.replace(VSC_PREFIX_RE, ""));
-+              return this.resolve(id.replace(VSC_PREFIX_RE, ""), importer?.replace(VSC_PREFIX_RE, ""), opts);
-             }
-             if (VSC_PREFIX_RE.test(id)) {
-               if (id.replace(VSC_PREFIX_RE, "").startsWith("./")) {
-                 const resolved = await this.resolve(
-                   id.replace(VSC_PREFIX_RE, ""),
--                  importer?.replace(VSC_PREFIX_RE, "")
-+                  importer?.replace(VSC_PREFIX_RE, ""),
-+                  opts
-                 );
-                 if (resolved) {
-                   return VSC_PREFIX + resolved?.id;
-@@ -261,20 +295,18 @@ export function vueOnigiriPluginFactory(options = {}) {
-               const list = serverChunks.values().map((ref) => ref.id).toArray();
-               if (list.includes(chunk.fileName)) {
-                 chunk.isEntry = false;
--                chunk.isImplicitEntry = true;
--                chunk.isDynamicEntry = true;
-+                chunk.isImplicitEntry = false;
-+                chunk.isDynamicEntry = false;
-               }
-             }
--          }
--          for (const chunk of serverChunks) {
--            chunk.serverChunkPath = this.getFileName(chunk.id);
--          }
-+          } 
-         },
+@@ -91,7 +91,7 @@ export function vueOnigiriPluginFactory(options = {}) {
          transform: {
            order: "post",
-           handler(code, id) {
-             const ref = clientChunks.find((chunk) => chunk.originalPath === id.replace(VSC_PREFIX_RE, ""));
--            if (id && ref && VSC_PREFIX_RE.test(id)) {
-+
-+            if (id && ref) {
-               const s = new MagicString(code);
-               const ast = this.parse(code);
-               for (const exportName of ref.exports) {
-@@ -285,16 +317,21 @@ export function vueOnigiriPluginFactory(options = {}) {
-                   return node.type === "ExportNamedDeclaration" && node.specifiers.some((specifier) => specifier.exported.type === "Identifier" && specifier.exported.name === exportName);
-                 });
-                 if (exportNode) {
--                  const { start, end } = exportNode.declaration;
--                  s.overwrite(
--                    start,
--                    end,
--                    `Object.assign( ${code.slice(start, end)},
--                                    { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
--                                    
--                                )`
--                  );
--                }
-+                                  if (exportNode.declaration) {
-+                
-+                                  const { start, end } = exportNode.declaration; 
-+                                    s.overwrite(
-+                                      start,
-+                                      end,
-+                                      `Object.assign( ${code.slice(start, end)},
-+                                                      { __chunk: "${normalizePath(join("/", isProduction ? ref.id : relative(rootDir, normalize(id))))}", __export: ${JSON.stringify(exportName)} },
-+                                                      
-+                                                  )`,
-+                                    );
-+                                  } else { 
-+                                    // todo
-+                                  }
-+                                }
+           async handler(code, id) {
+-            const shouldTransform = VSC_PREFIX_RE.test(id) || clientChunks.some((chunk) => chunk.id === id);
++            const shouldTransform = VSC_PREFIX_RE.test(id) || clientChunks.some((chunk) => chunk.originalPath === id);
+             if (!shouldTransform) {
+               return;
+             }
+@@ -112,15 +112,21 @@ export function vueOnigiriPluginFactory(options = {}) {
+                 })
+               ];
+             });
+-            for (const [exportName, exportNode] of exportNodes) {
++            for (const exportName of ref.exports) {
++              const exportNode = ast.body.find((node) => {
++                if (exportName === "default") {
++                  return node.type === "ExportDefaultDeclaration";
++                }
++                return node.type === "ExportNamedDeclaration" && node.specifiers.some((specifier) => specifier.exported.type === "Identifier" && specifier.exported.name === exportName);
++              });
+               if (exportNode) {
+-                const { start, end } = exportNode;
++                const { start, end } = exportNode.declaration;
+                 s.overwrite(
+                   start,
+                   end,
+-                  `Object.assign(${code.slice(start, end)},
+-                                    { __chunk: "${normalizePath(join("/", isProduction ? join(clientAssetsDir, normalize(ref.id)) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)}  },
+-                                     
++                  `Object.assign( ${code.slice(start, end)},
++                                    { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
++                                    
+                                 )`
+                 );
                }
-               if (s.hasChanged()) {
-                 return {
+@@ -146,6 +152,28 @@ export function vueOnigiriPluginFactory(options = {}) {
+             data.filename = this.getFileName(data.id);
+           }
+         }
++      },
++      {
++        name: "load:vue-onigiri",
++        resolveId(id) {
++          if (id === "virtual:vue-onigiri") {
++            return id;
++          }
++        },
++        load(id) {
++          if (id === "virtual:vue-onigiri") {
++            return `
++              import { defineAsyncComponent } from "vue";
++              export default {
++                ${clientChunks.map(
++              (chunk) => chunk.exports.map(
++                (exportName) => `"${normalizePath(join("/", isProduction ? normalize(chunk.id) : relative(rootDir, normalize(chunk.id))))}#${exportName}": defineAsyncComponent(() => import("${chunk.originalPath}").then(m => m.${exportName}))`
++              ).join(",\n")
++            ).join(",\n")}
++              }
++              `;
++          }
++        }
+       }
+     ],
+     server: (opts) => [
+@@ -306,26 +334,6 @@ export function vueOnigiriPluginFactory(options = {}) {
+           }
+         }
+       },
+-      {
+-        name: "vue-onigiri:renderSSRSlotReplace",
+-        transform: {
+-          order: "post",
+-          handler(code, id) {
+-            if (VSC_PREFIX_RE.test(id)) {
+-              const s = new MagicString(code);
+-              s.prepend(
+-                `import { renderSlot as cryoRenderSlot } from 'vue-onigiri/runtime/render-slot';
+-`
+-              );
+-              s.replace(/_renderSlot\(/g, "cryoRenderSlot(_ctx,");
+-              return {
+-                code: s.toString(),
+-                map: s.generateMap({ hires: true }).toString()
+-              };
+-            }
+-          }
+-        }
+-      },
+       {
+         name: "vue:onigiri:loadvirtual",
+         load(id) {
