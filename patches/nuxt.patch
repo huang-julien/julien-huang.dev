@@ -147,7 +147,7 @@ index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..2196cbcea97c2d0c43a85a49913d0d10
          type: StringConstructor;
          required: true;
 diff --git a/dist/app/components/nuxt-island.js b/dist/app/components/nuxt-island.js
-index 71ace1b1242a03419444f5fee57f676a3d7332a7..25ca1ce9c4e949d3174b1d2505ffa3d3fe1bffb2 100644
+index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856a9df3a42 100644
 --- a/dist/app/components/nuxt-island.js
 +++ b/dist/app/components/nuxt-island.js
 @@ -1,42 +1,39 @@
@@ -180,7 +180,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..25ca1ce9c4e949d3174b1d2505ffa3d3
 +    ) 
 +  : (src, exportName) => import("virtual:vue-onigiri").then(mod => {
 +      if(import.meta.dev) {
-+        return import(/* @vite-ignore */ `/_nuxt/@fs/${devRootDir}/${src}`).then(m => {
++        return import(/* @vite-ignore */ `/_nuxt/@fs/${devRootDir}/${src.replace('_nuxt/', '')}`).then(m => {
 +          return m[exportName]
 +        })
 +      }
