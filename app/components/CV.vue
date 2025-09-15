@@ -1,6 +1,6 @@
 <template>
-    <div class="page bg-white text-gray-900 p-4 size-[A4] h-[1131px] w-[800px] mx-auto flex flex-col gap-6">
-        <header class="grid grid-cols-12 gap-8 px-2 pb-4 items-center border-b border-p-yellow">
+    <div class="page bg-white text-gray-900 p-4 size-[A4] w-[800px] mx-auto flex flex-col gap-4">
+        <header class="grid grid-cols-12 gap-8 px-2 pb-2 items-center border-b border-p-yellow">
             <NuxtPicture :modifiers="{}" src="/amsterdam_profile.jpg" class="rounded-full col-span-2 overflow-hidden" />
 
             <h1 class="col-span-2 text-2xl font-bold text-p-blue">
@@ -36,44 +36,9 @@
             </p>
         </section>
 
-        <main class="grid gap-8 text-lg grid-cols-[30%_1fr]">
-            <div class="flex flex-col gap-4">
-                <section class="flex flex-col gap-4">
-                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
-                        <Icon name="bi:github" />
-
-                        Open-source
-                    </h2>
-                    <div class="flex flex-col gap-2 text-sm">
-                        <section class="flex flex-col gap-1">
-                            <h3 class="text-sm font-bold">Teams</h3>
-                            <ul class="list-disc pl-2">
-                                <li v-for="team in ossTeams" :key="team.title" class="text-xs flex flex-col gap-1">
-                                    <span>{{ team.title }}</span>
-                                    <span class="text-gray-500">{{ team.timeline[0] }} - {{ team.timeline[1]
-                                        }}</span>
-                                </li>
-                            </ul>
-                        </section>
-                        <section class="flex flex-col gap-1">
-                            <h3 class="text-sm font-bold">{{ t('oss.projects.title') }}</h3>
-                            <ul class="list-disc pl-2 text-xs grid gap-2">
-                                <li v-for="project in ossProjects" :key="project.name" class="flex">
-                                    <NuxtLink external :href="project.url" target="_blank" rel="noopener noreferrer"
-                                        class="flex flex-col ">
-                                        <span class="mb-1">{{ project.name }}</span>
-                                        <span class="text-2xs text-gray-500">{{ project.role.join(', ') }}</span>
-                                        <span class="text-2xs text-gray-500">{{ project.description }}</span>
-                                    </NuxtLink>
-                                </li>
-                            </ul>
-                        </section>
-                    </div>
-                </section>
-            </div>
+        <main class="grid gap-8 text-lg">
             <div class="flex flex-col gap-4">
                 <section>
-
                     <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="material-symbols:work" />
 
@@ -100,7 +65,40 @@
                         </div>
                     </div>
                 </section>
+                <div class="flex flex-col gap-4">
+                <section class="flex flex-col gap-4">
+                    <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
+                        <Icon name="bi:github" />
 
+                        Open-source
+                    </h2>
+                    <div class="flex flex-col gap-2 text-sm pl-5">
+                        <!-- <section class="flex flex-col gap-1">
+                            <h3 class="text-sm font-bold">Teams</h3>
+                            <ul class="list-disc pl-2">
+                                <li v-for="team in ossTeams" :key="team.title" class="text-xs flex flex-col gap-1">
+                                    <span>{{ team.title }}</span>
+                                    <span class="text-gray-500">{{ team.timeline[0] }} - {{ team.timeline[1]
+                                        }}</span>
+                                </li>
+                            </ul>
+                        </section> -->
+                        <section class="grid gap-1">
+                            <h3 class="text-sm font-bold">{{ t('oss.projects.title') }}</h3>
+                            <ul class="list-disc text-xs grid grid-cols-2 grid gap-2">
+                                <li v-for="project in ossProjects" :key="project.name" class="flex">
+                                    <NuxtLink external :href="project.url" target="_blank" rel="noopener noreferrer"
+                                        class="flex flex-col ">
+                                        <span class="mb-1">{{ project.name }}</span>
+                                        <span class="text-2xs text-gray-500">{{ project.role.join(', ') }}</span>
+                                        <span class="text-2xs text-gray-500">{{ project.description }}</span>
+                                    </NuxtLink>
+                                </li>
+                            </ul>
+                        </section>
+                    </div>
+                </section>
+            </div>
                 <section>
                     <h2 class="flex items-center gap-2 border-b border-p-yellow pb-1 px-4 w-fit font-bold text-lg">
                         <Icon name="carbon:skill-level" />
@@ -216,9 +214,25 @@ const skills: Skills[] = [
         level: 3
     },
     {
-        name: 'ASP.NET',
-        level: 2
+        name: '.NET/C#',
+        level: 3
     },
+    {
+        name: 'Azure DevOps',
+        level: 4
+    },
+    {
+        name: 'GitHub Actions',
+        level: 4
+    }, 
+    {
+        name: 'Microservices',
+        level: 4
+    }, 
+    {
+        name: 'OpenTelemetry',
+        level: 4
+    }, 
 ]
 
 interface Contact {
@@ -294,10 +308,24 @@ const ossProjects = computed<OssProjects[]>(() => [
         name: '@nuxt/hints',
         role: [t('oss.role.co-author'), t('oss.role.maintainer')],
         description: t('oss.projects.nuxtHints.description')
+    },
+    {
+        name: 'vue-onigiri',
+        role: [t('oss.role.author'), t('oss.role.maintainer')],
+        description: t('oss.projects.vueOnigiri.description')
     }
 ])
 
 const workExperience = computed<WorkExperience[]>(() => [
+    {
+        company: 'Nuxt',
+        country: 'Open Source',
+        title: [t('oss.role.coreTeam'), t('oss.role.maintainer')].join(' - '),
+        timeline: ['2022', t('today')],
+        subtitle: t('work.experience.nuxt.subtitle'),
+        stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
+        description: (tm('work.experience.nuxt.description') as VueMessageType[]).map((desc) => rt(desc))
+    },
     {
         company: 'Leetchi',
         country: 'France',
@@ -321,10 +349,21 @@ const workExperience = computed<WorkExperience[]>(() => [
 </script>
 
 <style scoped lang="scss">
-@page {
-    margin: 0;
-    padding: 0;
-    size: A4 portrait;
+@media print { 
+    @page {
+        margin: 0;
+        padding: 0;
+        size: A4 portrait;
+        margin-top: 25px;
+    }
+
+    @page :first {
+        margin-top: 0;
+    }
+    
+    li {
+        break-inside: avoid;
+    }
 }
 
 p {
@@ -340,7 +379,7 @@ p {
 <i18n lang="json">{
     "en": {
         "today": "today",
-        "title": "JS Developer",
+        "title": "Web Developer",
         "introduction": "Web developer passionate about open source. I love challenges and working in collaboration with product teams. \nAs a Core member of the Nuxt Team, sharing my knowledge and learning from others is what motivates me on a daily basis.",
         "education": {
             "title": "Education",
@@ -381,26 +420,39 @@ p {
                     "description": "A module created in collaboration between the (former) Aurora Team and the Nuxt WebPerf team, providing best practices for third-party scripts in Nuxt."
                 },
                 "nuxtHints": {
-                    "description": "In progress. Nuxt module to actively detect bad development and performance practices in Nuxt."
+                    "description": "To be released. Nuxt module to actively detect bad development and performance practices in Nuxt."
+                },
+                "vueOnigiri": {
+                    "description": "To be released. Low-level Vue library to provide advanced VNode serialization and deserialization which can allow Server Components."
                 }
             }
         },
         "work": {
             "title": "Work Experience",
             "experience": {
+                "nuxt": {
+                    "name": "Nuxt",
+                    "title": "Core Team Member",
+                    "subtitle": "After a few months of contributing to Nuxt, I was invited to join the Insiders Team in early 2022 then the Core Team in early 2023. As a member of the Core Team, I participate in the maintenance and development of Nuxt and its ecosystem as well as representing Nuxt at conferences, meetups and in collaborations with other teams.",
+                    "description": [
+                        "Member of the Nuxt Core Team, maintaining and developing Nuxt and its ecosystem.",
+                        "Maintainer of several open-source projects related to Nuxt and Nitro.",
+                        "Speaker at various conferences and meetups about Nuxt and web development.",
+                        "Active decision-maker on the core repository for future features."
+                    ]
+                },
                 "leetchi": {
                     "name": "Leetchi",
                     "title": "Frontend Developer - Frontend Technical Lead",
-                    "subtitle": "Joined the team as part of the complete redesign of the Leetchi platform, within an Agile environment based on microservices architecture. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery and maintenance. A project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration",
+                    "subtitle": "Joined the team as a Frontend developer in a 25 persons team, part of the complete remake of the Leetchi platform into a microservices architecture (Azure Cloud), then took the role of frontend technical lead in run phase and became more versatile as a support for Backend developers and QA. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery for upcoming features and maintenance. A project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration.",
                     "description": [
-                        "Responsible for frontend architecture decisions",
                         "Participation in technical decisions and design of features",
                         "Training and mentoring other frontend developers",
                         "Developed the complete redesign of Leetchi's front office using Nuxt 2 (bridge) with technical debt management",
                         "Nuxt 2 to Nuxt 3 migration",
                         "Feature development and maintenance of the front office and back office",
-                        "ASP.NET skill development",
-                        "QA support with Cypress E2E testing",
+                        "C# .NET feature development and maintenance",
+                        "Supporting the QA team with Cypress tests",
                         "Design Core Team - Dev reviewer"
                     ]
                 },
@@ -410,7 +462,8 @@ p {
                     "description": [
                         "Development of an internal project from scratch using Vue.js",
                         "Magento 2 integrator",
-                        "Development of Visual prospect for Stellantis using Laravel and Vue.JS"
+                        "Development of Visual prospect for Stellantis using Laravel and Vue.JS",
+                        "R&D on a future CMS based on NuxtJS to allows users to create drop-shipping websites with customizable products"
                     ]
                 }
             }
@@ -421,7 +474,7 @@ p {
     },
     "fr": {
         "today": "Aujourd'hui",
-        "title": "Développeur JS",
+        "title": "Web Développeur",
         "introduction": "Développeur web passionné par l'open source. J'adore les défis qui me sont donnés et co-construire avec les équipes produits. \nEn tant que membre de la Nuxt Core Team, partager mes connaissances et apprendre des autres est ce qui me motive au quotidien.",
         "education": {
             "title": "Formations",
@@ -463,12 +516,24 @@ p {
                 },
                 "nuxtHints": {
                     "description": "In progress. Module Nuxt pour activement détecter les mauvaises pratiques de développement et de performance dans Nuxt."
+                },
+                "vueOnigiri": {
+                    "description": "In progress. Bibliothèque Vue de bas niveau pour fournir une sérialisation et une désérialisation avancées des VNode, ce qui peut permettre les Server Components dans VueJS."
                 }
             }
         },
         "work": {
             "title": "Expérience professionnelle",
             "experience": {
+                "nuxt": {
+                    "name": "Nuxt",
+                    "title": "Core Team Member",
+                    "description": [
+                        "Member of the Nuxt Core Team, maintaining and developing Nuxt and its ecosystem.",
+                        "Maintainer of several open-source projects related to Nuxt and Nitro.",
+                        "Active contributor to the Nuxt community through forums, GitHub, and social media."
+                    ]
+                },
                 "leetchi": {
                     "title": "Développeur frontend - Référent Frontend",
                     "subtitle": "Arrivé dans le cadre de la refonte complète de la plateforme Leetchi, dans un environnement agile organisé autour de microservices. La phase build s'est étalée sur 8 mois, avant de passer en mode \"run/build\" pour assurer la continuité évolutive et corrective. Projet à fort enjeu technique et stratégique, avec des problématiques de scalabilité, dette technique et migration technologique",
