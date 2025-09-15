@@ -148,7 +148,7 @@ index 6907f81b21b9312bf8a1b6df6dc5916d7b1fc7b9..0baaa239a7e111e879983e6ba9cf4faf
 +  }
 +};
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
-index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5371b1540 100644
+index bbf89c47dba800aef026ca58b56de6bc40eef382..fa7f86fe06f4bb583e56ee47a17b566ff788c148 100644
 --- a/dist/vite/chunk.js
 +++ b/dist/vite/chunk.js
 @@ -11,7 +11,7 @@ const VSC_PREFIX = "virtual:vsc:";
@@ -160,7 +160,22 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
    const clientChunks = [];
    const serverChunks = [];
    let assetDir = clientAssetsDir;
-@@ -49,7 +49,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -41,6 +41,14 @@ export function vueOnigiriPluginFactory(options = {}) {
+           }
+         }
+       },
++      {
++        name: "vue-onigiri:resolveVSC",
++        resolveId(id, importer, opts) {
++          if (VSC_PREFIX_RE.test(id)) {
++            return this.resolve(id.replace(VSC_PREFIX_RE, ""), importer?.replace(VSC_PREFIX_RE, ""), opts)
++          }
++        }
++      },
+       {
+         name: "vite:vue-server-components-client",
+         configResolved(config) {
+@@ -49,7 +57,7 @@ export function vueOnigiriPluginFactory(options = {}) {
            }
            isProduction = config.isProduction;
            if (!rootDir) {
@@ -169,7 +184,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
            }
          },
          async buildStart() {
-@@ -91,7 +91,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -91,7 +99,7 @@ export function vueOnigiriPluginFactory(options = {}) {
          transform: {
            order: "post",
            async handler(code, id) {
@@ -178,7 +193,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
              if (!shouldTransform) {
                return;
              }
-@@ -112,15 +112,21 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -112,15 +120,21 @@ export function vueOnigiriPluginFactory(options = {}) {
                  })
                ];
              });
@@ -200,12 +215,12 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
 -                                    { __chunk: "${normalizePath(join("/", isProduction ? join(clientAssetsDir, normalize(ref.id)) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)}  },
 -                                     
 +                  `Object.assign( ${code.slice(start, end)},
-+                                    { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
++                                    { __chunk: \`/${normalizePath(join(  isProduction ? `\${import.meta.ROLLUP_FILE_URL_${ref.id}}` : relative(rootDir, normalize(ref.id))))}\`, __export: ${JSON.stringify(exportName)} },
 +                                    
                                  )`
                  );
                }
-@@ -146,6 +152,28 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -146,6 +160,28 @@ export function vueOnigiriPluginFactory(options = {}) {
              data.filename = this.getFileName(data.id);
            }
          }
@@ -234,7 +249,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
        }
      ],
      server: (opts) => [
-@@ -205,7 +233,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -205,7 +241,7 @@ export function vueOnigiriPluginFactory(options = {}) {
          },
          resolveId: {
            order: "pre",
@@ -243,7 +258,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
              if (id === "virtual:vue-onigiri") {
                return id;
              }
-@@ -216,18 +244,17 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -216,18 +252,17 @@ export function vueOnigiriPluginFactory(options = {}) {
                if (id.endsWith(".vue")) {
                  const resolved = await this.resolve(
                    id,
@@ -266,7 +281,7 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
              }
              if (VSC_PREFIX_RE.test(id)) {
                if (id.replace(VSC_PREFIX_RE, "").startsWith("./")) {
-@@ -255,26 +282,11 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -255,26 +290,11 @@ export function vueOnigiriPluginFactory(options = {}) {
              }
            }
          },
@@ -294,7 +309,16 @@ index bbf89c47dba800aef026ca58b56de6bc40eef382..f1948d854553736a77475faf825047e5
                const s = new MagicString(code);
                const ast = this.parse(code);
                for (const exportName of ref.exports) {
-@@ -306,26 +318,6 @@ export function vueOnigiriPluginFactory(options = {}) {
+@@ -290,7 +310,7 @@ export function vueOnigiriPluginFactory(options = {}) {
+                     start,
+                     end,
+                     `Object.assign( ${code.slice(start, end)},
+-                                    { __chunk: "${normalizePath(join("/", isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}", __export: ${JSON.stringify(exportName)} },
++                                    { __chunk: \`/${normalizePath(join(isProduction ? normalize(ref.filename) : relative(rootDir, normalize(ref.id))))}\`, __export: ${JSON.stringify(exportName)} },
+                                     
+                                 )`
+                   );
+@@ -306,26 +326,6 @@ export function vueOnigiriPluginFactory(options = {}) {
            }
          }
        },

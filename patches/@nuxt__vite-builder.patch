@@ -1,5 +1,5 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..adb0e1f5c330491be55b23fa5575737b21098f2e 100644
+index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382f7809b00 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
@@ -59,16 +59,14 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..adb0e1f5c330491be55b23fa5575737b
    const serverEntry = nuxt.options.ssr ? ctx.entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
    const serverConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
      configFile: false,
-@@ -1276,7 +1281,8 @@ async function buildServer(nuxt, ctx) {
-         "nitro/runtime",
-         // TODO: remove in v5
-         "#internal/nitro",
--        "#internal/nitro/utils"
-+        "#internal/nitro/utils",
-+        "vue-onigiri"
+@@ -1280,6 +1285,7 @@ async function buildServer(nuxt, ctx) {
        ],
        noExternal: [
          ...transpile({ isServer: true, isDev: nuxt.options.dev }),
++        "vue-onigiri",
+         "/__vue-jsx",
+         "#app",
+         /^nuxt(\/|$)/,
 @@ -1294,7 +1300,7 @@ async function buildServer(nuxt, ctx) {
        outDir: resolve(nuxt.options.buildDir, "dist/server"),
        ssr: true,
