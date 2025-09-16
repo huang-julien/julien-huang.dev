@@ -1,74 +1,102 @@
 diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
-index ee4dc49168846a9f070b8271ec8655edd03386ff..9ec36736298254f4f4a120c79642ab8376ad8542 100644
+index ee4dc49168846a9f070b8271ec8655edd03386ff..e74a9ff8e2a83fdc0264e4697525f17ff7770bf4 100644
 --- a/dist/runtime/serialize.js
 +++ b/dist/runtime/serialize.js
 @@ -28,6 +28,7 @@ export function serializeApp(app, context = {}) {
    const vnode = createVNode(input._component, input._props);
    const instance = createComponentInstance(vnode, input._instance, null);
    instance.appContext = input._context;
-+  instance.provides = (input._context.provides);
++  instance.provides = /* @__PURE__ */ Object.create(input._context.provides);
    return app.runWithContext(async () => {
      const res = await setupComponent(instance, true);
      return await app.runWithContext(async () => {
-@@ -108,18 +109,37 @@ export async function serializeVNode(vnode, parentInstance) {
-         (child) => {
-           if (child._onigiriLoadClient) {
-             if (vnode.type.__chunk && vnode.type.__export) {
-+              if(child.__slotsResult) {
-               return [
-                 VServerComponentType.Component,
-                 filterProps(vnode.props),
-                 // @ts-expect-error
-                 vnode.type.__chunk,
-                 // @ts-expect-error
--                vnode.type.__export,
-+                vnode.type.__export, 
-                 serializeSlots(child.__slotsResult)
-               ];
-+                
-+              }
-+              return Promise.resolve(serializeChildren(child.children, parentInstance)).then(serializedChildren => {
-+                  return  [
-+                VServerComponentType.Component,
-+                filterProps(vnode.props),
-+                // @ts-expect-error
-+                vnode.type.__chunk,
-+                // @ts-expect-error
-+                vnode.type.__export,
-+                {
-+                  default: serializedChildren
-+                }
-+              ];
-+                })
-             }
-             console.warn("Component is missing chunk information");
+@@ -122,7 +123,7 @@ export async function serializeVNode(vnode, parentInstance) {
            }
-+          if(child.shapeFlag & ShapeFlags.ELEMENT) {
-+            return serializeVNode(child, parentInstance);
-+          }
            return [
              VServerComponentType.Fragment,
-             serializeChildren(child.children, parentInstance)
-@@ -225,6 +245,9 @@ function renderComponent(_vnode, parentInstance) {
-     });
-     return p.then(() => {
-       const vnode = renderComponentRoot(instance);
-+      if(vnode.shapeFlag & ShapeFlags.COMPONENT) {
-+        return renderComponent(vnode, instance);
-+      }
-       const { dirs: dirs2, props: props2 } = vnode;
-       if (dirs2) {
+-            serializeChildren(child.children, parentInstance)
++            serializeChildren(child, parentInstance)
+           ];
+         }
+       );
+@@ -206,6 +207,21 @@ function renderComponent(_vnode, parentInstance) {
+     parentInstance ?? null,
+     null
+   );
++  const reconstructedSlots = {};
++  for (const key in instance.vnode.children) {
++    const fn = instance.vnode.children[key];
++    if (typeof fn !== "function") {
++      reconstructedSlots[key] = fn;
++      continue;
++    }
++    reconstructedSlots[key] = (...args) => {
++      const result = fn(...args);
++      instance.__slotsResult = instance.__slotsResult || {};
++      instance.__slotsResult[key] = result;
++      return result;
++    };
++  }
++  instance.vnode.children = reconstructedSlots;
+   const res = setupComponent(instance, true);
+   const hasAsyncSetup = isPromise(res);
+   let prefetches = (
+@@ -230,7 +246,10 @@ function renderComponent(_vnode, parentInstance) {
          vnode.props = applySSRDirectives(vnode, props2, dirs2);
-@@ -234,6 +257,9 @@ function renderComponent(_vnode, parentInstance) {
+       }
+       vnode.__slotsResult = instance.__slotsResult;
+-      return vnode;
++      if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
++        return renderComponent(vnode, parentInstance);
++      }
++      return vnode.children;
      });
    }
    const child = renderComponentRoot(instance);
-+      if(child.shapeFlag & ShapeFlags.COMPONENT) {
-+        return renderComponent(child, instance);
-+      }
-   const { dirs, props } = child;
-   if (dirs) {
+@@ -239,7 +258,10 @@ function renderComponent(_vnode, parentInstance) {
      child.props = applySSRDirectives(child, props, dirs);
+   }
+   child.__slotsResult = instance.__slotsResult;
+-  return child;
++  if (child.shapeFlag & ShapeFlags.COMPONENT) {
++    return renderComponent(child, instance);
++  }
++  return isVNode(child.children) ? child.children : child;
+ }
+ function applySSRDirectives(vnode, rawProps, dirs) {
+   const toMerge = [];
+diff --git a/dist/runtime/utils.d.ts b/dist/runtime/utils.d.ts
+index f1fa74dc5069732fe24b3bf402deb6a02f03597c..d321453a49dd208bfd9c6111d4beeb0c9c9aafb4 100644
+--- a/dist/runtime/utils.d.ts
++++ b/dist/runtime/utils.d.ts
+@@ -1,3 +1,4 @@
+-import type { DefineComponent } from "vue";
++import type { DefineComponent, Directive } from "vue";
+ export type ImportFn = (src: string, exportName?: string) => Promise<DefineComponent>;
+ export declare const defaultImportFn: ImportFn;
++export declare const loadClientDirective: Directive;
+diff --git a/dist/runtime/utils.js b/dist/runtime/utils.js
+index 6907f81b21b9312bf8a1b6df6dc5916d7b1fc7b9..0baaa239a7e111e879983e6ba9cf4faf2eec124f 100644
+--- a/dist/runtime/utils.js
++++ b/dist/runtime/utils.js
+@@ -1 +1,16 @@
+-export const defaultImportFn = (src, exportName = "default") => import(src).then((m) => m[exportName]);
++const componentsImports = () => import("virtual:vue-onigiri");
++export const defaultImportFn = (src, exportName = "default") => componentsImports().then((mod) => (mod.default ?? mod)[`${src}#${exportName}`]);
++export const loadClientDirective = {
++  getSSRProps(binding, vnode) {
++    if (binding.value !== false) {
++      vnode._onigiriLoadClient = true;
++    }
++    return {};
++  },
++  created(_, binding, vnode) {
++    if (binding.value !== false) {
++      vnode._onigiriLoadClient = true;
++    }
++    return binding;
++  }
++};
 diff --git a/dist/vite/chunk.js b/dist/vite/chunk.js
 index bbf89c47dba800aef026ca58b56de6bc40eef382..e56a6e47ce0f8cc369d1dbb4aad530382632004e 100644
 --- a/dist/vite/chunk.js

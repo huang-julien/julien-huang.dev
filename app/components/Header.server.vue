@@ -1,6 +1,6 @@
 <template>
     <header class="flex items-center p-4 gap-10 backdrop-blur-sm fixed top-0 left-0 right-0 h-20">
-        <NuxtLink to="/">
+        <NuxtLink v-load-client to="/">
             <NuxtPicture src="/profile.jpg" sizes="64px" alt="Julien Huang profile picture" class="rounded-full aspect-square" :img-attrs="{
                 class: 'rounded-full aspect-square',
                 loading: 'lazy',
