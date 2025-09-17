@@ -529,10 +529,11 @@ p {
                     "name": "Nuxt",
                     "title": "Core Team Member",
                     "description": [
-                        "Member of the Nuxt Core Team, maintaining and developing Nuxt and its ecosystem.",
-                        "Maintainer of several open-source projects related to Nuxt and Nitro.",
-                        "Active contributor to the Nuxt community through forums, GitHub, and social media."
-                    ]
+                        "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème.",
+                        "Mainteneur de plusieurs projets open-source liés à Nuxt et Nitro.",
+                        "Contributeur actif à la communauté Nuxt à travers les forums, GitHub et les réseaux sociaux."
+                    ],
+                    "subtitle": "Après quelques mois de contributions sur Nuxt, j'ai été invité à rejoindre l'équipe Insiders en 2022 puis la Core Team début 2023. En tant que membre de la Core Team, je participe à la maintenance et au développement de Nuxt et de son écosystème et représente Nuxt lors de conférences, meetups et sur des projets en collaboration avec d'autres équipes tels que Google ou Github."
                 },
                 "leetchi": {
                     "title": "Développeur frontend - Référent Frontend",
