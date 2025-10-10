@@ -1,74 +1,481 @@
+diff --git a/README.md b/README.md
+index f96ad2e925c3bb1faa6728f76cca975c73ae40a9..904177e9276afcd1bcf0e8fd4ce28ee7716d4a3f 100644
+--- a/README.md
++++ b/README.md
+@@ -60,7 +60,7 @@ Example of an `app.vue`:
+ <script setup lang="ts">
+ useSeoMeta({
+   title: 'Meet Nuxt',
+-  description: 'The Intuitive Vue Framework.',
++  description: 'The Intuitive Vue Framework.'
+ })
+ </script>
+ 
+@@ -93,13 +93,13 @@ Discover our [list of modules](https://nuxt.com/modules) to supercharge your Nux
+ We invite you to contribute and help improve Nuxt 💚
+ 
+ Here are a few ways you can get involved:
+-- **Reporting Bugs:** If you come across any bugs or issues, please check out the [reporting bugs guide](https://nuxt.com/docs/4.x/community/reporting-bugs) to learn how to submit a bug report.
+-- **Suggestions:** Have ideas to enhance Nuxt? We'd love to hear them! Check out the [contribution guide](https://nuxt.com/docs/4.x/community/contribution) to share your suggestions.
+-- **Questions:** If you have questions or need assistance, the [getting help guide](https://nuxt.com/docs/4.x/community/getting-help) provides resources to help you out.
++- **Reporting Bugs:** If you come across any bugs or issues, please check out the [reporting bugs guide](https://nuxt.com/docs/community/reporting-bugs) to learn how to submit a bug report.
++- **Suggestions:** Have ideas to enhance Nuxt? We'd love to hear them! Check out the [contribution guide](https://nuxt.com/docs/community/contribution) to share your suggestions.
++- **Questions:** If you have questions or need assistance, the [getting help guide](https://nuxt.com/docs/community/getting-help) provides resources to help you out.
+ 
+ ## <a name="local-development">🏠 Local Development</a>
+ 
+-Follow the docs to [Set Up Your Local Development Environment](https://nuxt.com/docs/4.x/community/framework-contribution#setup) to contribute to the framework and documentation.
++Follow the docs to [Set Up Your Local Development Environment](https://nuxt.com/docs/community/framework-contribution#setup) to contribute to the framework and documentation.
+ 
+ ## <a name="professional-support">🛟 Professional Support</a>
+ 
+diff --git a/dist/chunks/analyze.mjs b/dist/chunks/analyze.mjs
+deleted file mode 100644
+index 92e860e5ad6df18f0c7895d576e0021a3a5124a9..0000000000000000000000000000000000000000
+diff --git a/dist/index.d.mts b/dist/index.d.mts
+index 2011207fa09dff54d3f2c6fe6dab3b0396e52cc2..5d36e383a23273c318469a4a02d377e103ba2c33 100644
+--- a/dist/index.d.mts
++++ b/dist/index.d.mts
+@@ -1,14 +1,22 @@
+-import * as vite from 'vite';
+-import { NuxtBuilder, Nuxt, ViteConfig } from '@nuxt/schema';
++import { ViteConfig } from 'nuxt/schema';
++import { NuxtBuilder } from '@nuxt/schema';
+ 
+-interface ViteBuildContext {
+-    nuxt: Nuxt;
+-    config: ViteConfig;
+-    entry: string;
+-    clientServer?: vite.ViteDevServer;
+-    ssrServer?: vite.ViteDevServer;
+-}
+ declare const bundle: NuxtBuilder['bundle'];
+ 
++declare module 'nuxt/schema' {
++    interface ViteOptions extends ViteConfig {
++        $client?: ViteConfig;
++        $server?: ViteConfig;
++        viteNode?: {
++            maxRetryAttempts?: number;
++            /** in milliseconds */
++            baseRetryDelay?: number;
++            /** in milliseconds */
++            maxRetryDelay?: number;
++            /** in milliseconds */
++            requestTimeout?: number;
++        };
++    }
++}
++
+ export { bundle };
+-export type { ViteBuildContext };
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 2011207fa09dff54d3f2c6fe6dab3b0396e52cc2..5d36e383a23273c318469a4a02d377e103ba2c33 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,14 +1,22 @@
+-import * as vite from 'vite';
+-import { NuxtBuilder, Nuxt, ViteConfig } from '@nuxt/schema';
++import { ViteConfig } from 'nuxt/schema';
++import { NuxtBuilder } from '@nuxt/schema';
+ 
+-interface ViteBuildContext {
+-    nuxt: Nuxt;
+-    config: ViteConfig;
+-    entry: string;
+-    clientServer?: vite.ViteDevServer;
+-    ssrServer?: vite.ViteDevServer;
+-}
+ declare const bundle: NuxtBuilder['bundle'];
+ 
++declare module 'nuxt/schema' {
++    interface ViteOptions extends ViteConfig {
++        $client?: ViteConfig;
++        $server?: ViteConfig;
++        viteNode?: {
++            maxRetryAttempts?: number;
++            /** in milliseconds */
++            baseRetryDelay?: number;
++            /** in milliseconds */
++            maxRetryDelay?: number;
++            /** in milliseconds */
++            requestTimeout?: number;
++        };
++    }
++}
++
+ export { bundle };
+-export type { ViteBuildContext };
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986e4e0db61 100644
+index 8af438d1ee63dea31472215a20f9e53b1633709c..aa8dfee99878792df245a4eed0b607702dc4e071 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
-@@ -3,13 +3,13 @@ import * as vite from 'vite';
+@@ -2,33 +2,35 @@ import fs, { existsSync, readFileSync } from 'node:fs';
+ import * as vite from 'vite';
  import { isCSSRequest, createLogger } from 'vite';
  import { dirname, normalize, resolve, join, relative, basename, isAbsolute } from 'pathe';
- import { useNitro, logger, useNuxt, resolvePath, getLayerDirectories, createIsIgnored, addVitePlugin } from '@nuxt/kit';
--import replace from '@rollup/plugin-replace';
-+import replacePlugin from '@rollup/plugin-replace';
+-import { useNitro, logger, useNuxt, resolvePath, getLayerDirectories, createIsIgnored, addVitePlugin } from '@nuxt/kit';
+-import replacePlugin from '@rollup/plugin-replace';
++import { useNitro, logger, useNuxt, resolvePath, getLayerDirectories, createIsIgnored } from '@nuxt/kit';
  import { findStaticImports, sanitizeFilePath } from 'mlly';
  import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailingSlash, withoutLeadingSlash, withoutBase } from 'ufo';
  import { filename as filename$1 } from 'pathe/utils';
- import { resolveTSConfig, readTSConfig } from 'pkg-types';
+-import { resolveTSConfig, readTSConfig } from 'pkg-types';
  import { resolveModulePath } from 'exsolve';
 -import vuePlugin from '@vitejs/plugin-vue';
 +import { vueOnigiriPluginFactory } from 'vue-onigiri';
  import viteJsxPlugin from '@vitejs/plugin-vue-jsx';
- import { getPort } from 'get-port-please';
- import defu$1, { defu } from 'defu';
-@@ -28,7 +28,7 @@ import { colorize } from 'consola/utils';
+-import { getPort } from 'get-port-please';
+-import defu$1, { defu } from 'defu';
+ import { defineEnv } from 'unenv';
+-import { createError, defineEventHandler, handleCors, setHeader } from 'h3';
+ import { pathToFileURL, fileURLToPath } from 'node:url';
+ import MagicString from 'magic-string';
+ import { unlink, mkdir, writeFile, rm, readFile } from 'node:fs/promises';
+ import net from 'node:net';
+ import os from 'node:os';
+ import { Buffer } from 'node:buffer';
++import { createError, defineEventHandler, handleCors, setHeader } from 'h3';
+ import { ViteNodeServer } from 'vite-node/server';
+-import { normalizeViteManifest } from 'vue-bundle-renderer';
++import { normalizeViteManifest, precomputeDependencies } from 'vue-bundle-renderer';
+ import { provider, hasTTY, isCI } from 'std-env';
+ import { colorize } from 'consola/utils';
  import escapeStringRegexp from 'escape-string-regexp';
++import { transform } from 'esbuild';
++import defu from 'defu';
++import { getPort } from 'get-port-please';
++import { resolveTSConfig, readTSConfig } from 'pkg-types';
++import { serialize } from 'seroval';
  import { isBuiltin } from 'node:module';
  import { createJiti } from 'jiti';
--import { genImport, genObjectFromRawEntries } from 'knitwork';
-+import { genImport, genArrayFromRaw, genObjectFromRawEntries } from 'knitwork';
+ import { genImport, genArrayFromRaw, genObjectFromRawEntries } from 'knitwork';
++import replacePlugin from '@rollup/plugin-replace';
  
  function isVue(id, opts = {}) {
    const { search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
-@@ -357,9 +357,6 @@ function ViteNodePlugin(nuxt) {
- let _node;
- function getNode(server) {
-   return _node ||= new ViteNodeServer(server, {
--    deps: {
--      inline: [/^#/, /\?/]
--    },
-     transformMode: {
-       ssr: [/.*/],
-       web: []
-@@ -560,14 +557,19 @@ async function writeDevServer(nuxt) {
+@@ -556,15 +558,16 @@ function sendError(socket, id, error) {
+ async function writeDevServer(nuxt) {
    const serverResolvedPath = resolve(distDir, "runtime/vite-node.mjs");
    const manifestResolvedPath = resolve(distDir, "runtime/client.manifest.mjs");
-   await mkdir(join(nuxt.options.buildDir, "dist/server"), { recursive: true });
+-  await mkdir(join(nuxt.options.buildDir, "dist/server"), { recursive: true });
++  const serverDist = join(nuxt.options.buildDir, "dist/server");
++  await mkdir(serverDist, { recursive: true });
 +  const island = resolve(distDir, "runtime/island.mjs");
    await Promise.all([
++    writeFile(join(serverDist, "server.mjs"), `export { default } from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}`),
++    writeFile(join(serverDist, "client.precomputed.mjs"), `export default undefined`),
++    writeFile(join(serverDist, "client.manifest.mjs"), `export { default } from ${JSON.stringify(pathToFileURL(manifestResolvedPath).href)}`),
      writeFile(
-       resolve(nuxt.options.buildDir, "dist/server/server.mjs"),
+-      resolve(nuxt.options.buildDir, "dist/server/server.mjs"),
 -      `export { default } from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}`
-+      `export * from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}; export { default } from ${JSON.stringify(pathToFileURL(serverResolvedPath).href)}`
-     ),
-     writeFile(
-       resolve(nuxt.options.buildDir, "dist/server/client.manifest.mjs"),
-       `export { default } from ${JSON.stringify(pathToFileURL(manifestResolvedPath).href)}`
-+    ),
-+    writeFile(
+-    ),
+-    writeFile(
+-      resolve(nuxt.options.buildDir, "dist/server/client.manifest.mjs"),
+-      `export { default } from ${JSON.stringify(pathToFileURL(manifestResolvedPath).href)}`
 +      resolve(nuxt.options.buildDir, "dist/server/components.islands.mjs"),
 +      `export { default } from ${JSON.stringify(pathToFileURL(island).href)}`
      )
    ]);
  }
-@@ -850,7 +852,7 @@ function isSupported(target) {
+@@ -790,18 +793,18 @@ function StableEntryPlugin(nuxt) {
+     configResolved(config) {
+       sourcemap = !!config.build.sourcemap;
+     },
+-    applyToEnvironment: (environment) => environment.name === "client",
+-    apply(config) {
+-      if (nuxt.options.dev || !nuxt.options.experimental.entryImportMap) {
++    apply: () => !nuxt.options.dev && nuxt.options.experimental.entryImportMap,
++    applyToEnvironment(environment) {
++      if (environment.name !== "client") {
+         return false;
+       }
+-      if (config.build?.target) {
+-        const targets = toArray(config.build.target);
++      if (environment.config.build.target) {
++        const targets = toArray(environment.config.build.target);
+         if (!targets.every(isSupported)) {
+           return false;
+         }
+       }
+-      return toArray(config.build?.rollupOptions?.output).some((output) => typeof output?.entryFileNames === "string" && output?.entryFileNames.includes("[hash]"));
++      return toArray(environment.config.build.rollupOptions?.output).some((output) => typeof output?.entryFileNames === "string" && output?.entryFileNames.includes("[hash]"));
+     },
+     renderChunk(code, chunk, _options, meta) {
+       const entry = Object.values(meta.chunks).find((chunk2) => chunk2.isEntry && chunk2.name === "entry")?.fileName;
+@@ -847,11 +850,191 @@ function isSupported(target) {
    return Number.isNaN(version) || Number(version) >= constraint;
  }
  
 -async function buildClient(nuxt, ctx) {
++async function AnalyzePlugin(nuxt) {
++  if (nuxt.options.test) {
++    return;
++  }
++  const analyzeOptions = defu({}, nuxt.options.build.analyze);
++  if (!analyzeOptions.enabled) {
++    return;
++  }
++  const { visualizer } = await import('rollup-plugin-visualizer');
++  return {
++    name: "nuxt:analyze",
++    applyToEnvironment(environment) {
++      if (environment.name !== "client") {
++        return false;
++      }
++      return [
++        {
++          name: "nuxt:analyze-minify",
++          async generateBundle(_opts, outputBundle) {
++            for (const _bundleId in outputBundle) {
++              const bundle = outputBundle[_bundleId];
++              if (!bundle || bundle.type !== "chunk") {
++                continue;
++              }
++              const minifiedModuleEntryPromises = [];
++              for (const [moduleId, module] of Object.entries(bundle.modules)) {
++                minifiedModuleEntryPromises.push(
++                  transform(module.code || "", { minify: true }).then((result) => [moduleId, { ...module, code: result.code }])
++                );
++              }
++              bundle.modules = Object.fromEntries(await Promise.all(minifiedModuleEntryPromises));
++            }
++          }
++        },
++        visualizer({
++          ...analyzeOptions,
++          filename: "filename" in analyzeOptions && analyzeOptions.filename ? analyzeOptions.filename.replace("{name}", "client") : void 0,
++          title: "Client bundle stats",
++          gzipSize: true,
++          brotliSize: true
++        })
++      ];
++    }
++  };
++}
++
++function DevServerPlugin(nuxt) {
++  let useViteCors = false;
++  const nitro = useNitro();
++  return {
++    name: "nuxt:dev-server",
++    async config(config) {
++      for (const item of [config.optimizeDeps, config.environments?.client?.optimizeDeps, config.environments?.ssr?.optimizeDeps]) {
++        if (!item) {
++          continue;
++        }
++        const exclude = new Set(item.exclude ?? []);
++        item.include = item.include?.filter((dep) => !exclude.has(dep));
++      }
++      if (!nuxt.options.dev && config.server) {
++        config.server.hmr = false;
++      }
++      useViteCors = config.server?.cors !== void 0;
++      if (!useViteCors) {
++        config.server ??= {};
++        config.server.cors = false;
++      }
++      if (config.server && config.server.hmr !== false) {
++        const serverDefaults = {
++          hmr: {
++            protocol: nuxt.options.devServer.https ? "wss" : void 0
++          }
++        };
++        if (typeof config.server.hmr !== "object" || !config.server.hmr.server) {
++          serverDefaults.hmr ??= {};
++          const hmrPortDefault = 24678;
++          serverDefaults.hmr.port = await getPort({
++            port: hmrPortDefault,
++            ports: Array.from({ length: 20 }, (_, i) => hmrPortDefault + 1 + i)
++          });
++        }
++        if (nuxt.options.devServer.https) {
++          serverDefaults.https = nuxt.options.devServer.https === true ? {} : nuxt.options.devServer.https;
++        }
++        config.server = defu(config.server, serverDefaults);
++      }
++    },
++    async configureServer(viteServer) {
++      nuxt.hook("app:templatesGenerated", async (_app, changedTemplates) => {
++        await Promise.all(changedTemplates.map(async (template) => {
++          for (const mod of viteServer.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
++            viteServer.moduleGraph.invalidateModule(mod);
++            await viteServer.reloadModule(mod);
++          }
++        }));
++      });
++      const mw = {
++        route: "",
++        handle: (req, res, next) => {
++          if (req._skip_transform && req.url) {
++            req.url = joinURL("/__skip_vite", req.url.replace(/\?.*/, ""));
++          }
++          next();
++        }
++      };
++      const transformHandler = viteServer.middlewares.stack.findIndex((m) => m.handle instanceof Function && m.handle.name === "viteTransformMiddleware");
++      if (transformHandler === -1) {
++        viteServer.middlewares.stack.push(mw);
++      } else {
++        viteServer.middlewares.stack.splice(transformHandler, 0, mw);
++      }
++      const staticBases = [];
++      for (const folder of nitro.options.publicAssets) {
++        if (folder.baseURL && folder.baseURL !== "/" && folder.baseURL.startsWith(nuxt.options.app.buildAssetsDir)) {
++          staticBases.push(folder.baseURL.replace(/\/?$/, "/"));
++        }
++      }
++      const devHandlerRegexes = [];
++      for (const handler of nuxt.options.devServerHandlers) {
++        if (handler.route && handler.route !== "/" && handler.route.startsWith(nuxt.options.app.buildAssetsDir)) {
++          devHandlerRegexes.push(new RegExp(
++            `^${handler.route.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/:[^/]+/g, "[^/]+").replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*")}$`
++            // single wildcard (*) to match any segment
++          ));
++        }
++      }
++      const viteMiddleware = defineEventHandler(async (event) => {
++        const viteRoutes = [];
++        for (const viteRoute of viteServer.middlewares.stack) {
++          const m = viteRoute.route;
++          if (m.length > 1) {
++            viteRoutes.push(m);
++          }
++        }
++        if (!event.path.startsWith(viteServer.config.base) && !viteRoutes.some((route) => event.path.startsWith(route))) {
++          event.node.req._skip_transform = true;
++        } else if (!useViteCors) {
++          const isPreflight = handleCors(event, nuxt.options.devServer.cors);
++          if (isPreflight) {
++            return null;
++          }
++          setHeader(event, "Vary", "Origin");
++        }
++        const _originalPath = event.node.req.url;
++        await new Promise((resolve, reject) => {
++          viteServer.middlewares.handle(event.node.req, event.node.res, (err) => {
++            event.node.req.url = _originalPath;
++            return err ? reject(err) : resolve(null);
++          });
++        });
++        const ended = event.node.res.writableEnded || event.handled;
++        if (!ended && event.path.startsWith(nuxt.options.app.buildAssetsDir) && !staticBases.some((baseURL) => event.path.startsWith(baseURL)) && !devHandlerRegexes.some((regex) => regex.test(event.path))) {
++          throw createError({ statusCode: 404 });
++        }
++      });
++      await nuxt.callHook("server:devHandler", viteMiddleware);
++    }
++  };
++}
++
++async function VitePluginCheckerPlugin(nuxt, environment) {
++  if (!nuxt.options.test && (nuxt.options.typescript.typeCheck === true || nuxt.options.typescript.typeCheck === "build" && !nuxt.options.dev)) {
++    const [checker, tsconfigPath] = await Promise.all([
++      import('vite-plugin-checker').then((r) => r.default),
++      resolveTSConfig(nuxt.options.rootDir)
++    ]);
++    const supportsProjects = await readTSConfig(tsconfigPath).then((r) => !!r.references?.length);
++    const environments = ["client", nuxt.options.ssr ? "ssr" : void 0].filter((name) => name === environment);
++    return environments.map((envName) => ({
++      applyToEnvironment: (environment2) => environment2.name === envName,
++      ...checker({
++        vueTsc: {
++          tsconfigPath,
++          buildMode: supportsProjects
++        }
++      })
++    }));
++  }
++}
++
 +async function buildClient(nuxt, ctx, vue) {
    const nodeCompat = nuxt.options.experimental.clientNodeCompat ? {
      alias: defineEnv({ nodeCompat: true, resolve: true }).env.alias,
      define: { global: "globalThis" }
-@@ -1010,7 +1012,7 @@ async function buildClient(nuxt, ctx) {
-   }
+-  } : { alias: {}, define: {} };
++  } : { define: {} };
+   const clientConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
+     configFile: false,
+     base: nuxt.options.dev ? joinURL(nuxt.options.app.baseURL.replace(/^\.\//, "/") || "/", nuxt.options.app.buildAssetsDir) : "./",
+@@ -918,19 +1101,6 @@ async function buildClient(nuxt, ctx) {
+         "#app-manifest"
+       ]
+     },
+-    resolve: {
+-      alias: {
+-        // user aliases
+-        ...nodeCompat.alias,
+-        ...ctx.config.resolve?.alias,
+-        "nitro/runtime": join(nuxt.options.buildDir, "nitro.client.mjs"),
+-        // TODO: remove in v5
+-        "#internal/nitro": join(ctx.nuxt.options.buildDir, "nitro.client.mjs"),
+-        "nitropack/runtime": join(ctx.nuxt.options.buildDir, "nitro.client.mjs"),
+-        // work around vite optimizer bug
+-        "#app-manifest": resolveModulePath("mocked-exports/empty", { from: import.meta.url })
+-      }
+-    },
+     cacheDir: resolve(nuxt.options.rootDir, ctx.config.cacheDir ?? "node_modules/.cache/vite", "client"),
+     build: {
+       sourcemap: nuxt.options.sourcemap.client ? ctx.config.build?.sourcemap ?? nuxt.options.sourcemap.client : false,
+@@ -951,7 +1121,10 @@ async function buildClient(nuxt, ctx) {
+       TypeCheckPlugin(nuxt),
+       ModulePreloadPolyfillPlugin(),
+       // ensure changes in chunks do not invalidate whole build
+-      StableEntryPlugin(nuxt)
++      StableEntryPlugin(nuxt),
++      AnalyzePlugin(nuxt),
++      DevServerPlugin(nuxt),
++      VitePluginCheckerPlugin(nuxt, "client")
+     ],
+     appType: "custom",
+     server: {
+@@ -962,118 +1135,17 @@ async function buildClient(nuxt, ctx) {
+     }
+   }, nuxt.options.vite.$client || {}));
+   clientConfig.customLogger = createViteLogger(clientConfig);
+-  if (!nuxt.options.dev) {
+-    clientConfig.server.hmr = false;
+-  }
+-  const useViteCors = clientConfig.server?.cors !== void 0;
+-  if (!useViteCors) {
+-    clientConfig.server.cors = false;
+-  }
+-  const fileNames = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, "[hash].js"));
+-  const clientOutputDir = join(useNitro().options.output.publicDir, nuxt.options.app.buildAssetsDir);
+-  clientConfig.build.rollupOptions = defu(clientConfig.build.rollupOptions, {
+-    output: {
+-      chunkFileNames: nuxt.options.dev ? void 0 : fileNames,
+-      entryFileNames: nuxt.options.dev ? "entry.js" : fileNames,
+-      sourcemapPathTransform(relativeSourcePath, sourcemapPath) {
+-        if (!isAbsolute(relativeSourcePath)) {
+-          const absoluteSourcePath = resolve(dirname(sourcemapPath), relativeSourcePath);
+-          return relative(clientOutputDir, absoluteSourcePath);
+-        }
+-        return relativeSourcePath;
+-      }
+-    }
+-  });
+-  if (clientConfig.server && clientConfig.server.hmr !== false) {
+-    const serverDefaults = {
+-      hmr: {
+-        protocol: nuxt.options.devServer.https ? "wss" : void 0
+-      }
+-    };
+-    if (typeof clientConfig.server.hmr !== "object" || !clientConfig.server.hmr.server) {
+-      const hmrPortDefault = 24678;
+-      serverDefaults.hmr.port = await getPort({
+-        port: hmrPortDefault,
+-        ports: Array.from({ length: 20 }, (_, i) => hmrPortDefault + 1 + i)
+-      });
+-    }
+-    if (nuxt.options.devServer.https) {
+-      serverDefaults.https = nuxt.options.devServer.https === true ? {} : nuxt.options.devServer.https;
+-    }
+-    clientConfig.server = defu(clientConfig.server, serverDefaults);
+-  }
+-  if (!nuxt.options.test && nuxt.options.build.analyze && (nuxt.options.build.analyze === true || nuxt.options.build.analyze.enabled)) {
+-    clientConfig.plugins.push(...await import('./chunks/analyze.mjs').then((r) => r.AnalyzePlugin(nuxt)));
+-  }
    await nuxt.callHook("vite:extendConfig", clientConfig, { isClient: true, isServer: false });
    clientConfig.plugins.unshift(
 -    vuePlugin(clientConfig.vue),
@@ -76,7 +483,95 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
      viteJsxPlugin(clientConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", clientConfig, { isClient: true, isServer: false });
-@@ -1239,7 +1241,7 @@ function VueFeatureFlagsPlugin(nuxt) {
+-  const exclude = new Set(clientConfig.optimizeDeps.exclude);
+-  clientConfig.optimizeDeps.include = clientConfig.optimizeDeps.include.filter((dep) => !exclude.has(dep));
+   if (nuxt.options.dev) {
+     const viteServer = await vite.createServer(clientConfig);
+     ctx.clientServer = viteServer;
+     nuxt.hook("close", () => viteServer.close());
+     await nuxt.callHook("vite:serverCreated", viteServer, { isClient: true, isServer: false });
+-    const transformHandler = viteServer.middlewares.stack.findIndex((m) => m.handle instanceof Function && m.handle.name === "viteTransformMiddleware");
+-    viteServer.middlewares.stack.splice(transformHandler, 0, {
+-      route: "",
+-      handle: (req, res, next) => {
+-        if (req._skip_transform) {
+-          req.url = joinURL("/__skip_vite", req.url.replace(/\?.*/, ""));
+-        }
+-        next();
+-      }
+-    });
+-    const staticBases = [];
+-    for (const folder of useNitro().options.publicAssets) {
+-      if (folder.baseURL && folder.baseURL !== "/" && folder.baseURL.startsWith(nuxt.options.app.buildAssetsDir)) {
+-        staticBases.push(folder.baseURL.replace(/\/?$/, "/"));
+-      }
+-    }
+-    const devHandlerRegexes = [];
+-    for (const handler of nuxt.options.devServerHandlers) {
+-      if (handler.route && handler.route !== "/" && handler.route.startsWith(nuxt.options.app.buildAssetsDir)) {
+-        devHandlerRegexes.push(new RegExp(
+-          `^${handler.route.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/:[^/]+/g, "[^/]+").replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*")}$`
+-          // single wildcard (*) to match any segment
+-        ));
+-      }
+-    }
+-    const viteMiddleware = defineEventHandler(async (event) => {
+-      const viteRoutes = [];
+-      for (const viteRoute of viteServer.middlewares.stack) {
+-        const m = viteRoute.route;
+-        if (m.length > 1) {
+-          viteRoutes.push(m);
+-        }
+-      }
+-      if (!event.path.startsWith(clientConfig.base) && !viteRoutes.some((route) => event.path.startsWith(route))) {
+-        event.node.req._skip_transform = true;
+-      } else if (!useViteCors) {
+-        const isPreflight = handleCors(event, nuxt.options.devServer.cors);
+-        if (isPreflight) {
+-          return null;
+-        }
+-        setHeader(event, "Vary", "Origin");
+-      }
+-      const _originalPath = event.node.req.url;
+-      await new Promise((resolve2, reject) => {
+-        viteServer.middlewares.handle(event.node.req, event.node.res, (err) => {
+-          event.node.req.url = _originalPath;
+-          return err ? reject(err) : resolve2(null);
+-        });
+-      });
+-      if (!event.handled && event.path.startsWith(nuxt.options.app.buildAssetsDir) && !staticBases.some((baseURL) => event.path.startsWith(baseURL)) && !devHandlerRegexes.some((regex) => regex.test(event.path))) {
+-        throw createError({
+-          statusCode: 404
+-        });
+-      }
+-    });
+-    await nuxt.callHook("server:devHandler", viteMiddleware);
+   } else {
+     logger.info("Building client...");
+     const start = Date.now();
+@@ -1130,9 +1202,9 @@ async function writeManifest(ctx) {
+   }
+   const manifest = normalizeViteManifest(clientManifest);
+   await nuxt.callHook("build:manifest", manifest);
+-  const stringifiedManifest = JSON.stringify(manifest, null, 2);
+-  await writeFile(resolve(serverDist, "client.manifest.json"), stringifiedManifest, "utf8");
+-  await writeFile(resolve(serverDist, "client.manifest.mjs"), "export default " + stringifiedManifest, "utf8");
++  const precomputed = precomputeDependencies(manifest);
++  await writeFile(resolve(serverDist, "client.manifest.mjs"), "export default " + serialize(manifest), "utf8");
++  await writeFile(resolve(serverDist, "client.precomputed.mjs"), "export default " + serialize(precomputed), "utf8");
+   if (!nuxt.options.dev) {
+     await rm(manifestFile, { force: true });
+   }
+@@ -1185,7 +1257,7 @@ const SourcemapPreserverPlugin = (nuxt) => {
+     }
+   };
+   nuxt.hook("nitro:build:before", (nitro) => {
+-    nitro.options.rollupConfig = defu$1(nitro.options.rollupConfig, {
++    nitro.options.rollupConfig = defu(nitro.options.rollupConfig, {
+       plugins: [nitroPlugin]
+     });
+   });
+@@ -1236,7 +1308,7 @@ function VueFeatureFlagsPlugin(nuxt) {
    };
  }
  
@@ -85,17 +580,17 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
    const serverEntry = nuxt.options.ssr ? ctx.entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
    const serverConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
      configFile: false,
-@@ -1266,7 +1268,8 @@ async function buildServer(nuxt, ctx) {
-       "XMLHttpRequest": "undefined"
-     },
-     optimizeDeps: {
--      noDiscovery: true
-+      noDiscovery: true,
-+      include: void 0
-     },
-     resolve: {
-       conditions: nuxt._nitro?.options.exportConditions
-@@ -1276,7 +1279,8 @@ async function buildServer(nuxt, ctx) {
+@@ -1247,7 +1319,8 @@ async function buildServer(nuxt, ctx) {
+     plugins: [
+       VueFeatureFlagsPlugin(nuxt),
+       // tell rollup's nitro build about the original sources of the generated vite server build
+-      SourcemapPreserverPlugin(nuxt)
++      SourcemapPreserverPlugin(nuxt),
++      VitePluginCheckerPlugin(nuxt, "ssr")
+     ],
+     define: {
+       "process.server": true,
+@@ -1281,7 +1354,8 @@ async function buildServer(nuxt, ctx) {
          "nitro/runtime",
          // TODO: remove in v5
          "#internal/nitro",
@@ -105,7 +600,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
        ],
        noExternal: [
          ...transpile({ isServer: true, isDev: nuxt.options.dev }),
-@@ -1294,7 +1298,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1299,7 +1373,7 @@ async function buildServer(nuxt, ctx) {
        outDir: resolve(nuxt.options.buildDir, "dist/server"),
        ssr: true,
        rollupOptions: {
@@ -114,7 +609,16 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
          external: [
            "nitro/runtime",
            // TODO: remove in v5
-@@ -1346,7 +1350,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1342,16 +1416,10 @@ async function buildServer(nuxt, ctx) {
+       hmr: false
+     }
+   }, nuxt.options.vite.$server || {}));
+-  if (serverConfig.build?.rollupOptions?.output && !Array.isArray(serverConfig.build.rollupOptions.output)) {
+-    serverConfig.build.rollupOptions.output.manualChunks = void 0;
+-    if (vite.rolldownVersion) {
+-      serverConfig.build.rollupOptions.output.advancedChunks = void 0;
+-    }
+-  }
    serverConfig.customLogger = createViteLogger(serverConfig, { hideOutput: !nuxt.options.dev });
    await nuxt.callHook("vite:extendConfig", serverConfig, { isClient: false, isServer: true });
    serverConfig.plugins.unshift(
@@ -123,39 +627,647 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
      viteJsxPlugin(serverConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", serverConfig, { isClient: false, isServer: true });
-@@ -1503,12 +1507,26 @@ function SSRStylesPlugin(options) {
-           source: ""
-         });
-         const baseDir = dirname(base);
-+        const cssImports = /* @__PURE__ */ new Set();
-+        const exportNames = /* @__PURE__ */ new Set();
-+        const importStatements = /* @__PURE__ */ new Set();
-+        let i = 0;
-+        for (const css of files) {
-+          const file2 = this.getFileName(css);
-+          if (cssImports.has(file2)) {
-+            continue;
-+          }
-+          cssImports.add(file2);
-+          const name = `style_${i++}`;
-+          importStatements.add(genImport(`./${relative(baseDir, file2)}`, name));
-+          exportNames.add(name);
-+        }
-         emitted[file] = this.emitFile({
-           type: "asset",
-           name: `${fileName}-styles.mjs`,
-           source: [
--            ...files.map((css, i) => `import style_${i} from './${relative(baseDir, this.getFileName(css))}';`),
--            `export default [${files.map((_, i) => `style_${i}`).join(", ")}]`
-+            ...importStatements,
-+            `export default ${genArrayFromRaw([...exportNames])}`
-           ].join("\n")
-         });
+@@ -1375,6 +1443,14 @@ async function buildServer(nuxt, ctx) {
+   ctx.ssrServer = ssrServer;
+   nuxt.hook("close", () => ssrServer.close());
+   await nuxt.callHook("vite:serverCreated", ssrServer, { isClient: false, isServer: true });
++  nuxt.hook("app:templatesGenerated", async (_app, changedTemplates) => {
++    await Promise.all(changedTemplates.map(async (template) => {
++      for (const mod of ssrServer.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
++        ssrServer.moduleGraph.invalidateModule(mod);
++        await ssrServer.reloadModule(mod);
++      }
++    }));
++  });
+   await ssrServer.pluginContainer.buildStart({});
+   await writeDevServer(nuxt);
+ }
+@@ -1461,129 +1537,208 @@ async function resolveCSSOptions(nuxt) {
+ }
+ 
+ const SUPPORTED_FILES_RE = /\.(?:vue|(?:[cm]?j|t)sx?)$/;
+-function SSRStylesPlugin(options) {
++function SSRStylesPlugin(nuxt) {
++  if (nuxt.options.dev) {
++    return;
++  }
++  const chunksWithInlinedCSS = /* @__PURE__ */ new Set();
++  const clientCSSMap = {};
++  const nitro = useNitro();
++  nuxt.hook("build:manifest", (manifest) => {
++    const entryIds = /* @__PURE__ */ new Set();
++    for (const id of chunksWithInlinedCSS) {
++      const chunk = manifest[id];
++      if (!chunk) {
++        continue;
++      }
++      if (chunk.isEntry && chunk.src) {
++        entryIds.add(chunk.src);
++      } else {
++        chunk.css &&= [];
++      }
++    }
++    nitro.options.virtual["#internal/nuxt/entry-ids.mjs"] = () => `export default ${JSON.stringify(Array.from(entryIds))}`;
++    nitro.options._config.virtual ||= {};
++    nitro.options._config.virtual["#internal/nuxt/entry-ids.mjs"] = nitro.options.virtual["#internal/nuxt/entry-ids.mjs"];
++  });
+   const cssMap = {};
+   const idRefMap = {};
+-  const relativeToSrcDir = (path) => relative(options.srcDir, path);
++  const options = {
++    shouldInline: nuxt.options.features.inlineStyles,
++    globalCSS: nuxt.options.css
++  };
++  const relativeToSrcDir = (path) => relative(nuxt.options.srcDir, path);
+   const warnCache = /* @__PURE__ */ new Set();
+-  const islands = options.components.filter(
++  const components = nuxt.apps.default.components || [];
++  const islands = components.filter(
+     (component) => component.island || // .server components without a corresponding .client component will need to be rendered as an island
+-    component.mode === "server" && !options.components.some((c) => c.pascalName === component.pascalName && c.mode === "client")
++    component.mode === "server" && !components.some((c) => c.pascalName === component.pascalName && c.mode === "client")
+   );
++  let entry;
+   return {
+     name: "ssr-styles",
+-    resolveId: {
+-      order: "pre",
+-      async handler(id, importer, _options) {
+-        if (options.shouldInline === false || typeof options.shouldInline === "function" && !options.shouldInline(importer)) {
+-          return;
+-        }
+-        if (id === "#build/css" || id.endsWith(".vue") || isCSS(id)) {
+-          const res = await this.resolve(id, importer, { ..._options, skipSelf: true });
+-          if (res) {
+-            return {
+-              ...res,
+-              moduleSideEffects: false
+-            };
+-          }
+-        }
++    configResolved(config) {
++      if (!config.build.ssr) {
++        entry = resolveClientEntry(config);
        }
-@@ -1775,6 +1793,84 @@ const bundle = async (nuxt) => {
+     },
+-    generateBundle(outputOptions) {
+-      if (options.mode === "client") {
+-        return;
+-      }
+-      const emitted = {};
+-      for (const [file, { files, inBundle }] of Object.entries(cssMap)) {
+-        if (!files.length || !inBundle) {
+-          continue;
+-        }
+-        const fileName = filename(file);
+-        const base = typeof outputOptions.assetFileNames === "string" ? outputOptions.assetFileNames : outputOptions.assetFileNames({
+-          type: "asset",
+-          name: `${fileName}-styles.mjs`,
+-          names: [`${fileName}-styles.mjs`],
+-          originalFileName: `${fileName}-styles.mjs`,
+-          originalFileNames: [`${fileName}-styles.mjs`],
+-          source: ""
+-        });
+-        const baseDir = dirname(base);
+-        const cssImports = /* @__PURE__ */ new Set();
+-        const exportNames = /* @__PURE__ */ new Set();
+-        const importStatements = /* @__PURE__ */ new Set();
+-        let i = 0;
+-        for (const css of files) {
+-          const file2 = this.getFileName(css);
+-          if (cssImports.has(file2)) {
+-            continue;
++    applyToEnvironment(environment) {
++      return {
++        name: `nuxt:ssr-styles:${environment.name}`,
++        enforce: "pre",
++        resolveId: {
++          order: "pre",
++          async handler(id, importer, _options) {
++            if (options.shouldInline === false || typeof options.shouldInline === "function" && !options.shouldInline(importer)) {
++              return;
++            }
++            if (id === "#build/css" || id.endsWith(".vue") || isCSS(id)) {
++              const res = await this.resolve(id, importer, { ..._options, skipSelf: true });
++              if (res) {
++                return {
++                  ...res,
++                  moduleSideEffects: false
++                };
++              }
++            }
+           }
+-          cssImports.add(file2);
+-          const name = `style_${i++}`;
+-          importStatements.add(genImport(`./${relative(baseDir, file2)}`, name));
+-          exportNames.add(name);
+-        }
+-        emitted[file] = this.emitFile({
+-          type: "asset",
+-          name: `${fileName}-styles.mjs`,
+-          source: [
+-            ...importStatements,
+-            `export default ${genArrayFromRaw([...exportNames])}`
+-          ].join("\n")
+-        });
+-      }
+-      for (const key in emitted) {
+-        options.chunksWithInlinedCSS.add(key);
+-      }
+-      this.emitFile({
+-        type: "asset",
+-        fileName: "styles.mjs",
+-        originalFileName: "styles.mjs",
+-        source: [
+-          "const interopDefault = r => r.default || r || []",
+-          `export default ${genObjectFromRawEntries(
+-            Object.entries(emitted).map(([key, value]) => [key, `() => import('./${this.getFileName(value)}').then(interopDefault)`])
+-          )}`
+-        ].join("\n")
+-      });
+-    },
+-    renderChunk(_code, chunk) {
+-      const isEntry = chunk.facadeModuleId === options.entry;
+-      if (isEntry) {
+-        options.clientCSSMap[chunk.facadeModuleId] ||= /* @__PURE__ */ new Set();
+-      }
+-      for (const moduleId of [chunk.facadeModuleId, ...chunk.moduleIds].filter(Boolean)) {
+-        if (options.mode === "client") {
+-          const moduleMap = options.clientCSSMap[moduleId] ||= /* @__PURE__ */ new Set();
+-          if (isCSS(moduleId)) {
+-            if (isVue(moduleId)) {
+-              moduleMap.add(moduleId);
+-              const parent = moduleId.replace(/\?.+$/, "");
+-              const parentMap = options.clientCSSMap[parent] ||= /* @__PURE__ */ new Set();
+-              parentMap.add(moduleId);
++        },
++        generateBundle(outputOptions) {
++          if (environment.name === "client") {
++            return;
++          }
++          const emitted = {};
++          for (const [file, { files, inBundle }] of Object.entries(cssMap)) {
++            if (!files.length || !inBundle) {
++              continue;
+             }
+-            if (isEntry && chunk.facadeModuleId) {
+-              const facadeMap = options.clientCSSMap[chunk.facadeModuleId] ||= /* @__PURE__ */ new Set();
+-              facadeMap.add(moduleId);
++            const fileName = filename(file);
++            const base = typeof outputOptions.assetFileNames === "string" ? outputOptions.assetFileNames : outputOptions.assetFileNames({
++              type: "asset",
++              name: `${fileName}-styles.mjs`,
++              names: [`${fileName}-styles.mjs`],
++              originalFileName: `${fileName}-styles.mjs`,
++              originalFileNames: [`${fileName}-styles.mjs`],
++              source: ""
++            });
++            const baseDir = dirname(base);
++            const cssImports = /* @__PURE__ */ new Set();
++            const exportNames = /* @__PURE__ */ new Set();
++            const importStatements = /* @__PURE__ */ new Set();
++            let i = 0;
++            for (const css of files) {
++              const file2 = this.getFileName(css);
++              if (cssImports.has(file2)) {
++                continue;
++              }
++              cssImports.add(file2);
++              const name = `style_${i++}`;
++              importStatements.add(genImport(`./${relative(baseDir, file2)}`, name));
++              exportNames.add(name);
+             }
++            emitted[file] = this.emitFile({
++              type: "asset",
++              name: `${fileName}-styles.mjs`,
++              source: [
++                ...importStatements,
++                `export default ${genArrayFromRaw([...exportNames])}`
++              ].join("\n")
++            });
+           }
+-          continue;
+-        }
+-        const relativePath = relativeToSrcDir(moduleId);
+-        if (relativePath in cssMap) {
+-          cssMap[relativePath].inBundle = cssMap[relativePath].inBundle ?? (isVue(moduleId) && !!relativeToSrcDir(moduleId) || isEntry);
+-        }
+-      }
+-      return null;
+-    },
+-    async transform(code, id) {
+-      if (options.mode === "client") {
+-        if (id === options.entry && (options.shouldInline === true || typeof options.shouldInline === "function" && options.shouldInline(id))) {
+-          const s = new MagicString(code);
+-          const idClientCSSMap = options.clientCSSMap[id] ||= /* @__PURE__ */ new Set();
+-          if (!options.globalCSS.length) {
++          for (const key in emitted) {
++            chunksWithInlinedCSS.add(key);
++          }
++          this.emitFile({
++            type: "asset",
++            fileName: "styles.mjs",
++            originalFileName: "styles.mjs",
++            source: [
++              "const interopDefault = r => r.default || r || []",
++              `export default ${genObjectFromRawEntries(
++                Object.entries(emitted).map(([key, value]) => [key, `() => import('./${this.getFileName(value)}').then(interopDefault)`])
++              )}`
++            ].join("\n")
++          });
++        },
++        renderChunk(_code, chunk) {
++          const isEntry = chunk.facadeModuleId === entry;
++          if (isEntry) {
++            clientCSSMap[chunk.facadeModuleId] ||= /* @__PURE__ */ new Set();
++          }
++          for (const moduleId of [chunk.facadeModuleId, ...chunk.moduleIds].filter(Boolean)) {
++            if (environment.name === "client") {
++              const moduleMap = clientCSSMap[moduleId] ||= /* @__PURE__ */ new Set();
++              if (isCSS(moduleId)) {
++                if (isVue(moduleId)) {
++                  moduleMap.add(moduleId);
++                  const parent = moduleId.replace(/\?.+$/, "");
++                  const parentMap = clientCSSMap[parent] ||= /* @__PURE__ */ new Set();
++                  parentMap.add(moduleId);
++                }
++                if (isEntry && chunk.facadeModuleId) {
++                  const facadeMap = clientCSSMap[chunk.facadeModuleId] ||= /* @__PURE__ */ new Set();
++                  facadeMap.add(moduleId);
++                }
++              }
++              continue;
++            }
++            const relativePath = relativeToSrcDir(moduleId);
++            if (relativePath in cssMap) {
++              cssMap[relativePath].inBundle = cssMap[relativePath].inBundle ?? (isVue(moduleId) && !!relativeToSrcDir(moduleId) || isEntry);
++            }
++          }
++          return null;
++        },
++        async transform(code, id) {
++          if (environment.name === "client") {
++            if (id === entry && (options.shouldInline === true || typeof options.shouldInline === "function" && options.shouldInline(id))) {
++              const s = new MagicString(code);
++              const idClientCSSMap = clientCSSMap[id] ||= /* @__PURE__ */ new Set();
++              if (!options.globalCSS.length) {
++                return;
++              }
++              for (const file of options.globalCSS) {
++                const resolved = await this.resolve(file) ?? await this.resolve(file, id);
++                const res = await this.resolve(file + "?inline&used") ?? await this.resolve(file + "?inline&used", id);
++                if (!resolved || !res) {
++                  if (!warnCache.has(file)) {
++                    warnCache.add(file);
++                    this.warn(`[nuxt] Cannot extract styles for \`${file}\`. Its styles will not be inlined when server-rendering.`);
++                  }
++                  s.prepend(`${genImport(file)}
++`);
++                  continue;
++                }
++                idClientCSSMap.add(resolved.id);
++              }
++              if (s.hasChanged()) {
++                return {
++                  code: s.toString(),
++                  map: s.generateMap({ hires: true })
++                };
++              }
++            }
++            return;
++          }
++          const { pathname, search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
++          if (!(id in clientCSSMap) && !islands.some((c) => c.filePath === pathname)) {
++            return;
++          }
++          const query = parseQuery(search);
++          if (query.macro || query.nuxt_component) {
+             return;
+           }
+-          for (const file of options.globalCSS) {
++          if (!islands.some((c) => c.filePath === pathname)) {
++            if (options.shouldInline === false || typeof options.shouldInline === "function" && !options.shouldInline(id)) {
++              return;
++            }
++          }
++          const relativeId = relativeToSrcDir(id);
++          const idMap = cssMap[relativeId] ||= { files: [] };
++          const emittedIds = /* @__PURE__ */ new Set();
++          let styleCtr = 0;
++          const ids = clientCSSMap[id] || [];
++          for (const file of ids) {
+             const resolved = await this.resolve(file) ?? await this.resolve(file, id);
+             const res = await this.resolve(file + "?inline&used") ?? await this.resolve(file + "?inline&used", id);
+             if (!resolved || !res) {
+@@ -1591,95 +1746,192 @@ function SSRStylesPlugin(options) {
+                 warnCache.add(file);
+                 this.warn(`[nuxt] Cannot extract styles for \`${file}\`. Its styles will not be inlined when server-rendering.`);
+               }
+-              s.prepend(`${genImport(file)}
+-`);
+               continue;
+             }
+-            idClientCSSMap.add(resolved.id);
++            if (emittedIds.has(file)) {
++              continue;
++            }
++            const ref = this.emitFile({
++              type: "chunk",
++              name: `${filename(id)}-styles-${++styleCtr}.mjs`,
++              id: file + "?inline&used"
++            });
++            idRefMap[relativeToSrcDir(file)] = ref;
++            idMap.files.push(ref);
+           }
+-          if (s.hasChanged()) {
+-            return {
+-              code: s.toString(),
+-              map: s.generateMap({ hires: true })
+-            };
++          if (!SUPPORTED_FILES_RE.test(pathname)) {
++            return;
++          }
++          for (const i of findStaticImports(code)) {
++            const { type } = parseQuery(i.specifier);
++            if (type !== "style" && !i.specifier.endsWith(".css")) {
++              continue;
++            }
++            const resolved = await this.resolve(i.specifier, id);
++            if (!resolved) {
++              continue;
++            }
++            if (!await this.resolve(resolved.id + "?inline&used")) {
++              if (!warnCache.has(resolved.id)) {
++                warnCache.add(resolved.id);
++                this.warn(`[nuxt] Cannot extract styles for \`${i.specifier}\`. Its styles will not be inlined when server-rendering.`);
++              }
++              continue;
++            }
++            if (emittedIds.has(resolved.id)) {
++              continue;
++            }
++            const ref = this.emitFile({
++              type: "chunk",
++              name: `${filename(id)}-styles-${++styleCtr}.mjs`,
++              id: resolved.id + "?inline&used"
++            });
++            idRefMap[relativeToSrcDir(resolved.id)] = ref;
++            idMap.files.push(ref);
++          }
++        }
++      };
++    }
++  };
++}
++function filename(name) {
++  return filename$1(name.replace(/\?.+$/, ""));
++}
++
++function ReplacePlugin() {
++  return {
++    name: "nuxt:replace",
++    enforce: "post",
++    async applyToEnvironment(environment) {
++      const config = environment.getTopLevelConfig();
++      const replaceOptions = /* @__PURE__ */ Object.create(null);
++      for (const define of [config.define || {}, environment.config.define || {}]) {
++        for (const key in define) {
++          if (key.startsWith("import.meta.")) {
++            replaceOptions[key] = define[key];
+           }
+         }
+-        return;
+-      }
+-      const { pathname, search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
+-      if (!(id in options.clientCSSMap) && !islands.some((c) => c.filePath === pathname)) {
+-        return;
+       }
+-      const query = parseQuery(search);
+-      if (query.macro || query.nuxt_component) {
+-        return;
++      if (vite.rolldownVersion) {
++        const { replacePlugin: replacePlugin2 } = await import('rolldown/experimental');
++        return replacePlugin2(replaceOptions);
++      } else {
++        return replacePlugin({ ...replaceOptions, preventAssignment: true });
+       }
+-      if (!islands.some((c) => c.filePath === pathname)) {
+-        if (options.shouldInline === false || typeof options.shouldInline === "function" && !options.shouldInline(id)) {
++    }
++  };
++}
++
++function LayerDepOptimizePlugin(nuxt) {
++  if (!nuxt.options.dev) {
++    return;
++  }
++  const layerDirs = [];
++  const delimitedRootDir = nuxt.options.rootDir + "/";
++  for (const dirs of getLayerDirectories(nuxt)) {
++    if (dirs.app !== nuxt.options.srcDir && !dirs.app.startsWith(delimitedRootDir)) {
++      layerDirs.push(dirs.app);
++    }
++  }
++  if (layerDirs.length > 0) {
++    layerDirs.sort().reverse();
++    const dirs = [...layerDirs];
++    return {
++      name: "nuxt:optimize-layer-deps",
++      enforce: "pre",
++      async resolveId(source, _importer) {
++        if (!_importer || !dirs.length) {
+           return;
+         }
+-      }
+-      const relativeId = relativeToSrcDir(id);
+-      const idMap = cssMap[relativeId] ||= { files: [] };
+-      const emittedIds = /* @__PURE__ */ new Set();
+-      let styleCtr = 0;
+-      const ids = options.clientCSSMap[id] || [];
+-      for (const file of ids) {
+-        const resolved = await this.resolve(file) ?? await this.resolve(file, id);
+-        const res = await this.resolve(file + "?inline&used") ?? await this.resolve(file + "?inline&used", id);
+-        if (!resolved || !res) {
+-          if (!warnCache.has(file)) {
+-            warnCache.add(file);
+-            this.warn(`[nuxt] Cannot extract styles for \`${file}\`. Its styles will not be inlined when server-rendering.`);
+-          }
+-          continue;
+-        }
+-        if (emittedIds.has(file)) {
+-          continue;
++        const importer = normalize(_importer);
++        const layerIndex = dirs.findIndex((dir) => importer.startsWith(dir));
++        if (layerIndex !== -1) {
++          dirs.splice(layerIndex, 1);
++          await this.resolve(source, join(nuxt.options.srcDir, "index.html"), { skipSelf: true }).catch(() => null);
+         }
+-        const ref = this.emitFile({
+-          type: "chunk",
+-          name: `${filename(id)}-styles-${++styleCtr}.mjs`,
+-          id: file + "?inline&used"
+-        });
+-        idRefMap[relativeToSrcDir(file)] = ref;
+-        idMap.files.push(ref);
+       }
+-      if (!SUPPORTED_FILES_RE.test(pathname)) {
+-        return;
++    };
++  }
++}
++
++function EnvironmentsPlugin(nuxt) {
++  const fileNames = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, "[hash].js"));
++  const clientOutputDir = join(useNitro().options.output.publicDir, nuxt.options.app.buildAssetsDir);
++  const clientAliases = {
++    "nitro/runtime": join(nuxt.options.buildDir, "nitro.client.mjs"),
++    // TODO: remove in v5
++    "#internal/nitro": join(nuxt.options.buildDir, "nitro.client.mjs"),
++    "nitropack/runtime": join(nuxt.options.buildDir, "nitro.client.mjs"),
++    // work around vite optimizer bug
++    "#app-manifest": resolveModulePath("mocked-exports/empty", { from: import.meta.url })
++  };
++  return {
++    name: "nuxt:environments",
++    config() {
++      if (!nuxt.options.dev) {
++        return {
++          base: "./"
++        };
+       }
+-      for (const i of findStaticImports(code)) {
+-        const { type } = parseQuery(i.specifier);
+-        if (type !== "style" && !i.specifier.endsWith(".css")) {
+-          continue;
+-        }
+-        const resolved = await this.resolve(i.specifier, id);
+-        if (!resolved) {
+-          continue;
+-        }
+-        if (!await this.resolve(resolved.id + "?inline&used")) {
+-          if (!warnCache.has(resolved.id)) {
+-            warnCache.add(resolved.id);
+-            this.warn(`[nuxt] Cannot extract styles for \`${i.specifier}\`. Its styles will not be inlined when server-rendering.`);
++    },
++    configEnvironment(name, config) {
++      if (name === "client") {
++        const outputConfig = config.build?.rollupOptions?.output;
++        return {
++          build: {
++            rollupOptions: {
++              output: {
++                chunkFileNames: outputConfig?.chunkFileNames ?? (nuxt.options.dev ? void 0 : fileNames),
++                entryFileNames: outputConfig?.entryFileNames ?? (nuxt.options.dev ? "entry.js" : fileNames),
++                sourcemapPathTransform: outputConfig?.sourcemapPathTransform ?? ((relativeSourcePath, sourcemapPath) => {
++                  if (!isAbsolute(relativeSourcePath)) {
++                    const absoluteSourcePath = resolve(dirname(sourcemapPath), relativeSourcePath);
++                    return relative(clientOutputDir, absoluteSourcePath);
++                  }
++                  return relativeSourcePath;
++                })
++              }
++            }
++          }
++        };
++      }
++      if (name === "ssr") {
++        if (config.build?.rollupOptions?.output && !Array.isArray(config.build.rollupOptions.output)) {
++          config.build.rollupOptions.output.manualChunks = void 0;
++          if (vite.rolldownVersion) {
++            config.build.rollupOptions.output.advancedChunks = void 0;
+           }
+-          continue;
+-        }
+-        if (emittedIds.has(resolved.id)) {
+-          continue;
+         }
+-        const ref = this.emitFile({
+-          type: "chunk",
+-          name: `${filename(id)}-styles-${++styleCtr}.mjs`,
+-          id: resolved.id + "?inline&used"
+-        });
+-        idRefMap[relativeToSrcDir(resolved.id)] = ref;
+-        idMap.files.push(ref);
+       }
++    },
++    applyToEnvironment(environment) {
++      if (environment.name === "client") {
++        return [
++          ...nuxt.options.experimental.clientNodeCompat ? [NodeCompatAliasPlugin()] : [],
++          {
++            name: "nuxt:client:aliases",
++            enforce: "post",
++            resolveId: (source) => clientAliases[source]
++          }
++        ];
++      } else if (environment.name === "ssr") ;
++      return false;
+     }
+   };
+ }
+-function filename(name) {
+-  return filename$1(name.replace(/\?.+$/, ""));
++function NodeCompatAliasPlugin() {
++  const nodeCompatAlias = defineEnv({ nodeCompat: true, resolve: true }).env.alias;
++  return {
++    name: "nuxt:client:node-compat-aliases",
++    resolveId: {
++      order: "pre",
++      handler(source) {
++        if (source in nodeCompatAlias) {
++          return nodeCompatAlias[source];
++        }
++      }
++    }
++  };
+ }
+ 
+ const bundle = async (nuxt) => {
+@@ -1782,7 +2034,11 @@ const bundle = async (nuxt) => {
+           PublicDirsPlugin({
+             dev: nuxt.options.dev,
+             baseURL: nuxt.options.app.baseURL
+-          })
++          }),
++          ReplacePlugin(),
++          LayerDepOptimizePlugin(nuxt),
++          SSRStylesPlugin(nuxt),
++          EnvironmentsPlugin(nuxt)
+         ],
+         server: {
+           watch: { ...nuxt.options.watchers.chokidar, ignored: [isIgnored, /[\\/]node_modules[\\/]/] },
+@@ -1794,113 +2050,99 @@ const bundle = async (nuxt) => {
        viteConfig
      )
    };
+-  if (!nuxt.options.dev) {
+-    ctx.config.server.watch = void 0;
+-    ctx.config.build.watch = void 0;
+-  }
+-  if (nuxt.options.dev) {
+-    const layerDirs = [];
+-    const delimitedRootDir = nuxt.options.rootDir + "/";
+-    for (const dirs of getLayerDirectories(nuxt)) {
+-      if (dirs.app !== nuxt.options.srcDir && !dirs.app.startsWith(delimitedRootDir)) {
+-        layerDirs.push(dirs.app);
+-      }
+-    }
+-    if (layerDirs.length > 0) {
+-      layerDirs.sort().reverse();
+-      nuxt.hook("vite:extendConfig", (config) => {
+-        const dirs = [...layerDirs];
+-        config.plugins.push({
+-          name: "nuxt:optimize-layer-deps",
+-          enforce: "pre",
+-          async resolveId(source, _importer) {
+-            if (!_importer || !dirs.length) {
+-              return;
+-            }
+-            const importer = normalize(_importer);
+-            const layerIndex = dirs.findIndex((dir) => importer.startsWith(dir));
+-            if (layerIndex !== -1) {
+-              dirs.splice(layerIndex, 1);
+-              await this.resolve(source, join(nuxt.options.srcDir, "index.html"), { skipSelf: true }).catch(() => null);
 +  const { client, server, serverChunks, clientChunks } = vueOnigiriPluginFactory({
 +    serverAssetsDir: "_nuxt/",
 +    clientAssetsDir: "_nuxt/",
@@ -193,12 +1305,64 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
 +                  export default new Map([ ${[...mapValues].map(([k, v]) => `['${k}', ${v}]`).join(", ")}] )
 +                `
 +              };
-+            }
-+          }
+             }
+           }
+-        });
 +        }
-+      });
-+    }
-+  });
+       });
+     }
+-  }
+-  if (!nuxt.options.test && (nuxt.options.typescript.typeCheck === true || nuxt.options.typescript.typeCheck === "build" && !nuxt.options.dev)) {
+-    const tsconfigPath = await resolveTSConfig(nuxt.options.rootDir);
+-    const supportsProjects = await readTSConfig(tsconfigPath).then((r) => !!r.references?.length);
+-    const checker = await import('vite-plugin-checker').then((r) => r.default);
+-    addVitePlugin(checker({
+-      vueTsc: {
+-        tsconfigPath,
+-        buildMode: supportsProjects
+-      }
+-    }), { server: nuxt.options.ssr });
+-  }
+-  await nuxt.callHook("vite:extend", ctx);
+-  nuxt.hook("vite:extendConfig", async (config) => {
+-    const replaceOptions = /* @__PURE__ */ Object.create(null);
+-    for (const key in config.define) {
+-      if (key.startsWith("import.meta.")) {
+-        replaceOptions[key] = config.define[key];
+-      }
+-    }
+-    if (vite.rolldownVersion) {
+-      const { replacePlugin: replacePlugin2 } = await import('rolldown/experimental');
+-      config.plugins.push(replacePlugin2(replaceOptions));
+-    } else {
+-      config.plugins.push(replacePlugin({ ...replaceOptions, preventAssignment: true }));
+-    }
+   });
+-  if (!nuxt.options.dev) {
+-    const chunksWithInlinedCSS = /* @__PURE__ */ new Set();
+-    const clientCSSMap = {};
+-    nuxt.hook("vite:extendConfig", (config, { isServer }) => {
+-      config.plugins.unshift(SSRStylesPlugin({
+-        srcDir: nuxt.options.srcDir,
+-        clientCSSMap,
+-        chunksWithInlinedCSS,
+-        shouldInline: nuxt.options.features.inlineStyles,
+-        components: nuxt.apps.default.components || [],
+-        globalCSS: nuxt.options.css,
+-        mode: isServer ? "server" : "client",
+-        entry: ctx.entry
+-      }));
+-    });
+-    nuxt.hook("build:manifest", (manifest) => {
+-      for (const id of chunksWithInlinedCSS) {
+-        const chunk = manifest[id];
+-        if (!chunk) {
+-          continue;
+-        }
+-        if (chunk.isEntry) {
+-          chunk._globalCSS = true;
+-        } else {
+-          chunk.css &&= [];
 +  useNitro().hooks.hook("rollup:before", (_, rollupConfig) => {
 +    const allComponents = nuxt.apps.default.components;
 +    rollupConfig.plugins.push({
@@ -230,53 +1394,25 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986
 +                `
 +            };
 +          }
-+        }
-+      }
-+    });
-+  });
-   if (!nuxt.options.dev) {
-     ctx.config.server.watch = void 0;
-     ctx.config.build.watch = void 0;
-@@ -1821,15 +1917,19 @@ const bundle = async (nuxt) => {
-     }), { server: nuxt.options.ssr });
-   }
-   await nuxt.callHook("vite:extend", ctx);
--  nuxt.hook("vite:extendConfig", (config) => {
-+  nuxt.hook("vite:extendConfig", async (config) => {
-     const replaceOptions = /* @__PURE__ */ Object.create(null);
--    replaceOptions.preventAssignment = true;
-     for (const key in config.define) {
-       if (key.startsWith("import.meta.")) {
-         replaceOptions[key] = config.define[key];
-       }
-     }
--    config.plugins.push(replace(replaceOptions));
-+    if (vite.rolldownVersion) {
-+      const { replacePlugin: replacePlugin2 } = await import('rolldown/experimental');
-+      config.plugins.push(replacePlugin2(replaceOptions));
-+    } else {
-+      config.plugins.push(replacePlugin({ ...replaceOptions, preventAssignment: true }));
-+    }
-   });
-   if (!nuxt.options.dev) {
-     const chunksWithInlinedCSS = /* @__PURE__ */ new Set();
-@@ -1860,24 +1960,24 @@ const bundle = async (nuxt) => {
+         }
        }
      });
++  });
++  if (!nuxt.options.dev) {
++    ctx.config.server.watch = void 0;
++    ctx.config.build.watch = void 0;
    }
 -  nuxt.hook("vite:serverCreated", (server, env) => {
-+  nuxt.hook("vite:serverCreated", (server2, env) => {
-     nuxt.hook("app:templatesGenerated", async (_app, changedTemplates) => {
-       await Promise.all(changedTemplates.map(async (template) => {
+-    nuxt.hook("app:templatesGenerated", async (_app, changedTemplates) => {
+-      await Promise.all(changedTemplates.map(async (template) => {
 -        for (const mod of server.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
 -          server.moduleGraph.invalidateModule(mod);
 -          await server.reloadModule(mod);
-+        for (const mod of server2.moduleGraph.getModulesByFile(`virtual:nuxt:${encodeURIComponent(template.dst)}`) || []) {
-+          server2.moduleGraph.invalidateModule(mod);
-+          await server2.reloadModule(mod);
-         }
-       }));
-     });
+-        }
+-      }));
+-    });
++  await nuxt.callHook("vite:extend", ctx);
++  nuxt.hook("vite:serverCreated", (server2, env) => {
      if (nuxt.options.vite.warmupEntry !== false) {
        useNitro().hooks.hookOnce("compiled", () => {
          const start = Date.now();
@@ -418,6 +1554,55 @@ index 0000000000000000000000000000000000000000..d5c8870def937f83d901e9d0ef58ba0a
 +    stack,
 +  }
 +}
+diff --git a/dist/runtime/vite-node-shared.d.mts b/dist/runtime/vite-node-shared.d.mts
+index 9268a1887d62105a273fb66a2c3a0bedba7d2d0e..66667804b79bed331972792c427dc21a285ed4e4 100644
+--- a/dist/runtime/vite-node-shared.d.mts
++++ b/dist/runtime/vite-node-shared.d.mts
+@@ -1,10 +1,10 @@
+ /** @typedef {import('node:net').Socket} Socket */
+-/** @typedef {import('../vite-node').ViteNodeFetch} ViteNodeFetch */
+-/** @type {import('../vite-node').ViteNodeServerOptions} */
+-export const viteNodeOptions: import("../vite-node").ViteNodeServerOptions;
++/** @typedef {import('../plugins/vite-node').ViteNodeFetch} ViteNodeFetch */
++/** @type {import('../plugins/vite-node').ViteNodeServerOptions} */
++export const viteNodeOptions: import("../plugins/vite-node").ViteNodeServerOptions;
+ /**
+  * @type {ViteNodeFetch}
+  */
+ export const viteNodeFetch: ViteNodeFetch;
+ export type Socket = import("node:net").Socket;
+-export type ViteNodeFetch = import("../vite-node").ViteNodeFetch;
++export type ViteNodeFetch = import("../plugins/vite-node").ViteNodeFetch;
+diff --git a/dist/runtime/vite-node-shared.mjs b/dist/runtime/vite-node-shared.mjs
+index e940df5e0c193dd05f5ff911adefb7a787fe4016..8b6247ddad2854775e73d520b9ce6685657782cf 100644
+--- a/dist/runtime/vite-node-shared.mjs
++++ b/dist/runtime/vite-node-shared.mjs
+@@ -4,9 +4,9 @@ import { Buffer } from 'node:buffer'
+ import { isTest } from 'std-env'
+ 
+ /** @typedef {import('node:net').Socket} Socket */
+-/** @typedef {import('../vite-node').ViteNodeFetch} ViteNodeFetch */
++/** @typedef {import('../plugins/vite-node').ViteNodeFetch} ViteNodeFetch */
+ 
+-/** @type {import('../vite-node').ViteNodeServerOptions} */
++/** @type {import('../plugins/vite-node').ViteNodeServerOptions} */
+ export const viteNodeOptions = JSON.parse(process.env.NUXT_VITE_NODE_OPTIONS || '{}')
+ 
+ /** @type {Map<number, { resolve: (value: any) => void, reject: (reason?: any) => void }>} */
+@@ -218,10 +218,10 @@ function connectSocket () {
+ 
+ /**
+  * Sends a request over the IPC socket with automatic reconnection.
+- * @template {keyof import('../vite-node').ViteNodeRequestMap} T
++ * @template {keyof import('../plugins/vite-node').ViteNodeRequestMap} T
+  * @param {T} type - The type of the request.
+- * @param {import('../vite-node').ViteNodeRequestMap[T]['request']} [payload] - The payload for the request.
+- * @returns {Promise<import('../vite-node').ViteNodeRequestMap[T]['response']>} A promise that resolves with the response data.
++ * @param {import('../plugins/vite-node').ViteNodeRequestMap[T]['request']} [payload] - The payload for the request.
++ * @returns {Promise<import('../plugins/vite-node').ViteNodeRequestMap[T]['response']>} A promise that resolves with the response data.
+  */
+ async function sendRequest (type, payload) {
+   const requestId = requestIdCounter++
 diff --git a/dist/runtime/vite-node.d.mts b/dist/runtime/vite-node.d.mts
 index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdbbe715f98 100644
 --- a/dist/runtime/vite-node.d.mts
@@ -442,3 +1627,62 @@ index e497e8e0aab6eed45d47862a8e79f9245d72ac78..2f8c77174c113d37fa3324b8e48564e3
  /** @param {import('#app').NuxtSSRContext} ssrContext */
  export default async (ssrContext) => {
    // Workaround for stub mode
+diff --git a/package.json b/package.json
+index 84490ca16008070677a82fefbc8a7bf3f9f5ebc8..e2402bb70a5f24065e75b8934fa02334fd120f66 100644
+--- a/package.json
++++ b/package.json
+@@ -20,15 +20,20 @@
+   "files": [
+     "dist"
+   ],
++  "scripts": {
++    "prepack": "unbuild",
++    "test:attw": "attw --pack"
++  },
+   "devDependencies": {
+-    "nitropack": "2.12.6",
+-    "rolldown": "1.0.0-beta.41",
++    "@nuxt/schema": "workspace:*",
++    "nitropack": "2.12.7",
++    "rolldown": "1.0.0-beta.42",
+     "rollup": "4.52.4",
+     "unbuild": "3.6.1",
+-    "vue": "3.5.22",
+-    "@nuxt/schema": "4.1.3"
++    "vue": "3.5.22"
+   },
+   "dependencies": {
++    "@nuxt/kit": "workspace:*",
+     "@rollup/plugin-replace": "^6.0.2",
+     "@vitejs/plugin-vue": "^6.0.1",
+     "@vitejs/plugin-vue-jsx": "^5.1.1",
+@@ -50,16 +55,18 @@
+     "pkg-types": "^2.3.0",
+     "postcss": "^8.5.6",
+     "rollup-plugin-visualizer": "^6.0.4",
++    "seroval": "^1.3.2",
+     "std-env": "^3.9.0",
+     "ufo": "^1.6.1",
+     "unenv": "^2.0.0-rc.21",
+     "vite": "^7.1.9",
+     "vite-node": "^3.2.4",
++    "vue-onigiri": "^0.2.0",
+     "vite-plugin-checker": "^0.11.0",
+-    "vue-bundle-renderer": "^2.2.0",
+-    "@nuxt/kit": "4.1.3"
++    "vue-bundle-renderer": "^2.2.0"
+   },
+   "peerDependencies": {
++    "nuxt": "workspace:*",
+     "rolldown": "^1.0.0-beta.38",
+     "vue": "^3.3.4"
+   },
+@@ -70,8 +77,5 @@
+   },
+   "engines": {
+     "node": "^20.19.0 || >=22.12.0"
+-  },
+-  "scripts": {
+-    "test:attw": "attw --pack"
+   }
+ }
