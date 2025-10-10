@@ -9,7 +9,7 @@
 
             <div class="col-span-3">
                 <h2 class="text-lg">{{ t('title') }}</h2>
-            </div>
+            </div> 
 
             <div class="text-xs col-span-5 flex flex-col justify-around h-full">
                 <a href="https://github.com/huang-julien" target="_blank" rel="noopener noreferrer"
@@ -417,7 +417,7 @@ p {
                     "description": "Part of the Nuxt Core Team, maintaining and developing Nuxt and its ecosystem."
                 },
                 "nuxtScripts": {
-                    "description": "A module created in collaboration between the (former) Aurora Team and the Nuxt WebPerf team, providing best practices for third-party scripts in Nuxt."
+                    "description": "A module created in collaboration between the Aurora Team of Google Chrome and the Nuxt WebPerf team, providing best practices for third-party scripts in Nuxt."
                 },
                 "nuxtHints": {
                     "description": "To be released. Nuxt module to actively detect bad development and performance practices in Nuxt."
@@ -509,10 +509,10 @@ p {
             "projects": {
                 "title": "Projets",
                 "nuxt": {
-                    "description": "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème."
+                    "description": "Après quelques mois de contributions sur Nuxt, j'ai été invité à rejoindre l'équipe Insiders en 2022 puis la Core Team début 2023. En tant que membre de la Core Team, je participe à la maintenance et au développement de Nuxt et de son écosystème ainsi que représenter Nuxt lors de conférences, meetups et sur des projets en collaboration avec d'autres équipes."
                 },
                 "nuxtScripts": {
-                    "description": "Module créé en collaboration entre l'équipe Aurora et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
+                    "description": "Module créé en collaboration entre l'équipe Aurora de Google Chrome et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
                 },
                 "nuxtHints": {
                     "description": "In progress. Module Nuxt pour activement détecter les mauvaises pratiques de développement et de performance dans Nuxt."
@@ -531,23 +531,23 @@ p {
                     "description": [
                         "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème.",
                         "Mainteneur de plusieurs projets open-source liés à Nuxt et Nitro.",
-                        "Contributeur actif à la communauté Nuxt à travers les forums, GitHub et les réseaux sociaux."
+                        "Speaker lors de diverses conférences et meetups à propos de Nuxt et du développement web.",
+                        "Décideur actif sur les futures fonctionnalités de Nuxt."
                     ],
                     "subtitle": "Après quelques mois de contributions sur Nuxt, j'ai été invité à rejoindre l'équipe Insiders en 2022 puis la Core Team début 2023. En tant que membre de la Core Team, je participe à la maintenance et au développement de Nuxt et de son écosystème et représente Nuxt lors de conférences, meetups et sur des projets en collaboration avec d'autres équipes tels que Google ou Github."
                 },
                 "leetchi": {
                     "title": "Développeur frontend - Référent Frontend",
-                    "subtitle": "Arrivé dans le cadre de la refonte complète de la plateforme Leetchi, dans un environnement agile organisé autour de microservices. La phase build s'est étalée sur 8 mois, avant de passer en mode \"run/build\" pour assurer la continuité évolutive et corrective. Projet à fort enjeu technique et stratégique, avec des problématiques de scalabilité, dette technique et migration technologique",
+                    "subtitle": "J'ai rejoint l'équipe en tant que développeur frontend dans une équipe de 25 personnes, dans le cadre de la refonte complète de la plateforme Leetchi vers une architecture microservices (Azure Cloud). Ce fut un projet à forts enjeux techniques et stratégiques, impliquant des défis liés à la scalabilité, la dette technique, et une migration technologique majeure. Puis j'ai pris le rôle de référent technique frontend en phase de run et suis devenu plus polyvalent en support aux développeurs Backend et à l'équipe QA. La phase de build a duré 8 mois, suivie d'une phase run/build (avec une réduction des équipes pour revenir à 10 devs) pour assurer la livraison continue des futures fonctionnalités et la maintenance.",
                     "description": [
-                        "Responsable des décisions d'architecture frontend",
                         "Participation aux décisions et à la conception technique des features",
                         "Formation et mentorat des autres développeurs frontend",
-                        "Team Design Core - Dev reviewer",
-                        "Développement de la refonte complète du frontoffice de Leetchi en Nuxt 2 (bridge) avec la gestion de la dette technique",
-                        "Résponsable de la migration de Nuxt 2 vers Nuxt 3 suite à la refonte",
-                        "Développement de nouvelles fonctionnalités et maintenance du frontoffice et du backoffice",
-                        "Montée en compétence sur ASP.NET",
-                        "Support de l'équipe QA avec les tests Cypress"
+                        "Développement de la refonte complète du front office de Leetchi en Nuxt 2 (bridge) avec gestion de la dette technique",
+                        "Migration Nuxt 2 vers Nuxt 3",
+                        "Développement de features et maintenance du front office et back office",
+                        "Développement de features et maintenance en C# .NET",
+                        "Support à l'équipe QA avec des tests Cypress",
+                        "Design Core Team - Dev reviewer"
                     ]
                 },
                 "hskDigital": {
