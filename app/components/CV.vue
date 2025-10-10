@@ -444,7 +444,7 @@ p {
                 "leetchi": {
                     "name": "Leetchi",
                     "title": "Frontend Developer - Frontend Technical Lead",
-                    "subtitle": "Joined the team as a Frontend developer in a 25 persons team, part of the complete remake of the Leetchi platform into a microservices architecture (Azure Cloud), then took the role of frontend technical lead in run phase and became more versatile as a support for Backend developers and QA. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery for upcoming features and maintenance. A project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration.",
+                    "subtitle": "Joined the team as a Frontend developer in a 25 persons team, part of the complete remake of the Leetchi platform into a microservices architecture (Azure Cloud), this was a project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration. Then I took the role of frontend technical lead in run phase and became more versatile as a support for Backend developers and QA. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery for upcoming features and maintenance.",
                     "description": [
                         "Participation in technical decisions and design of features",
                         "Training and mentoring other frontend developers",
@@ -509,7 +509,7 @@ p {
             "projects": {
                 "title": "Projets",
                 "nuxt": {
-                    "description": "Après quelques mois de contributions sur Nuxt, j'ai été invité à rejoindre l'équipe Insiders en 2022 puis la Core Team début 2023. En tant que membre de la Core Team, je participe à la maintenance et au développement de Nuxt et de son écosystème ainsi que représenter Nuxt lors de conférences, meetups et sur des projets en collaboration avec d'autres équipes."
+                    "description": "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème."
                 },
                 "nuxtScripts": {
                     "description": "Module créé en collaboration entre l'équipe Aurora de Google Chrome et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
