@@ -1,8 +1,15 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382f7809b00 100644
+index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..23a4825bc1f5a2ed02ef1f72b81b6986e4e0db61 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
-@@ -9,7 +9,7 @@ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailing
+@@ -3,13 +3,13 @@ import * as vite from 'vite';
+ import { isCSSRequest, createLogger } from 'vite';
+ import { dirname, normalize, resolve, join, relative, basename, isAbsolute } from 'pathe';
+ import { useNitro, logger, useNuxt, resolvePath, getLayerDirectories, createIsIgnored, addVitePlugin } from '@nuxt/kit';
+-import replace from '@rollup/plugin-replace';
++import replacePlugin from '@rollup/plugin-replace';
+ import { findStaticImports, sanitizeFilePath } from 'mlly';
+ import { parseURL, parseQuery, joinURL, getQuery, withLeadingSlash, withTrailingSlash, withoutLeadingSlash, withoutBase } from 'ufo';
  import { filename as filename$1 } from 'pathe/utils';
  import { resolveTSConfig, readTSConfig } from 'pkg-types';
  import { resolveModulePath } from 'exsolve';
@@ -11,7 +18,26 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
  import viteJsxPlugin from '@vitejs/plugin-vue-jsx';
  import { getPort } from 'get-port-please';
  import defu$1, { defu } from 'defu';
-@@ -560,14 +560,19 @@ async function writeDevServer(nuxt) {
+@@ -28,7 +28,7 @@ import { colorize } from 'consola/utils';
+ import escapeStringRegexp from 'escape-string-regexp';
+ import { isBuiltin } from 'node:module';
+ import { createJiti } from 'jiti';
+-import { genImport, genObjectFromRawEntries } from 'knitwork';
++import { genImport, genArrayFromRaw, genObjectFromRawEntries } from 'knitwork';
+ 
+ function isVue(id, opts = {}) {
+   const { search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
+@@ -357,9 +357,6 @@ function ViteNodePlugin(nuxt) {
+ let _node;
+ function getNode(server) {
+   return _node ||= new ViteNodeServer(server, {
+-    deps: {
+-      inline: [/^#/, /\?/]
+-    },
+     transformMode: {
+       ssr: [/.*/],
+       web: []
+@@ -560,14 +557,19 @@ async function writeDevServer(nuxt) {
    const serverResolvedPath = resolve(distDir, "runtime/vite-node.mjs");
    const manifestResolvedPath = resolve(distDir, "runtime/client.manifest.mjs");
    await mkdir(join(nuxt.options.buildDir, "dist/server"), { recursive: true });
@@ -32,7 +58,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
      )
    ]);
  }
-@@ -850,7 +855,7 @@ function isSupported(target) {
+@@ -850,7 +852,7 @@ function isSupported(target) {
    return Number.isNaN(version) || Number(version) >= constraint;
  }
  
@@ -41,7 +67,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
    const nodeCompat = nuxt.options.experimental.clientNodeCompat ? {
      alias: defineEnv({ nodeCompat: true, resolve: true }).env.alias,
      define: { global: "globalThis" }
-@@ -1010,7 +1015,7 @@ async function buildClient(nuxt, ctx) {
+@@ -1010,7 +1012,7 @@ async function buildClient(nuxt, ctx) {
    }
    await nuxt.callHook("vite:extendConfig", clientConfig, { isClient: true, isServer: false });
    clientConfig.plugins.unshift(
@@ -50,7 +76,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
      viteJsxPlugin(clientConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", clientConfig, { isClient: true, isServer: false });
-@@ -1239,7 +1244,7 @@ function VueFeatureFlagsPlugin(nuxt) {
+@@ -1239,7 +1241,7 @@ function VueFeatureFlagsPlugin(nuxt) {
    };
  }
  
@@ -59,24 +85,36 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
    const serverEntry = nuxt.options.ssr ? ctx.entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
    const serverConfig = vite.mergeConfig(ctx.config, vite.mergeConfig({
      configFile: false,
-@@ -1280,6 +1285,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1266,7 +1268,8 @@ async function buildServer(nuxt, ctx) {
+       "XMLHttpRequest": "undefined"
+     },
+     optimizeDeps: {
+-      noDiscovery: true
++      noDiscovery: true,
++      include: void 0
+     },
+     resolve: {
+       conditions: nuxt._nitro?.options.exportConditions
+@@ -1276,7 +1279,8 @@ async function buildServer(nuxt, ctx) {
+         "nitro/runtime",
+         // TODO: remove in v5
+         "#internal/nitro",
+-        "#internal/nitro/utils"
++        "#internal/nitro/utils",
++        "vue-onigiri"
        ],
        noExternal: [
          ...transpile({ isServer: true, isDev: nuxt.options.dev }),
-+        "vue-onigiri",
-         "/__vue-jsx",
-         "#app",
-         /^nuxt(\/|$)/,
-@@ -1294,7 +1300,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1294,7 +1298,7 @@ async function buildServer(nuxt, ctx) {
        outDir: resolve(nuxt.options.buildDir, "dist/server"),
        ssr: true,
        rollupOptions: {
 -        input: { server: serverEntry },
-+        input: { "server": serverEntry, 'components.islands': resolve(ctx.nuxt.options.buildDir, 'components.islands') },
++        input: { "server": serverEntry, "components.islands": resolve(ctx.nuxt.options.buildDir, "components.islands") },
          external: [
            "nitro/runtime",
            // TODO: remove in v5
-@@ -1346,7 +1352,7 @@ async function buildServer(nuxt, ctx) {
+@@ -1346,7 +1350,7 @@ async function buildServer(nuxt, ctx) {
    serverConfig.customLogger = createViteLogger(serverConfig, { hideOutput: !nuxt.options.dev });
    await nuxt.callHook("vite:extendConfig", serverConfig, { isClient: false, isServer: true });
    serverConfig.plugins.unshift(
@@ -85,7 +123,36 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
      viteJsxPlugin(serverConfig.vueJsx)
    );
    await nuxt.callHook("vite:configResolved", serverConfig, { isClient: false, isServer: true });
-@@ -1775,6 +1781,84 @@ const bundle = async (nuxt) => {
+@@ -1503,12 +1507,26 @@ function SSRStylesPlugin(options) {
+           source: ""
+         });
+         const baseDir = dirname(base);
++        const cssImports = /* @__PURE__ */ new Set();
++        const exportNames = /* @__PURE__ */ new Set();
++        const importStatements = /* @__PURE__ */ new Set();
++        let i = 0;
++        for (const css of files) {
++          const file2 = this.getFileName(css);
++          if (cssImports.has(file2)) {
++            continue;
++          }
++          cssImports.add(file2);
++          const name = `style_${i++}`;
++          importStatements.add(genImport(`./${relative(baseDir, file2)}`, name));
++          exportNames.add(name);
++        }
+         emitted[file] = this.emitFile({
+           type: "asset",
+           name: `${fileName}-styles.mjs`,
+           source: [
+-            ...files.map((css, i) => `import style_${i} from './${relative(baseDir, this.getFileName(css))}';`),
+-            `export default [${files.map((_, i) => `style_${i}`).join(", ")}]`
++            ...importStatements,
++            `export default ${genArrayFromRaw([...exportNames])}`
+           ].join("\n")
+         });
+       }
+@@ -1775,6 +1793,84 @@ const bundle = async (nuxt) => {
        viteConfig
      )
    };
@@ -117,7 +184,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
 +                    continue;
 +                  }
 +                  imports.add(`import { ${component.export} as ${component.pascalName} } from 'virtual:vsc:${serverSideCounterPart.filePath}'`);
-+                  mapValues.set(`/${chunk.id}#${component.export}`, component.pascalName);
++                  mapValues.set(`/${chunk.filename}__${component.export}`, component.pascalName);
 +                }
 +              }
 +              return {
@@ -170,7 +237,30 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
    if (!nuxt.options.dev) {
      ctx.config.server.watch = void 0;
      ctx.config.build.watch = void 0;
-@@ -1860,24 +1944,24 @@ const bundle = async (nuxt) => {
+@@ -1821,15 +1917,19 @@ const bundle = async (nuxt) => {
+     }), { server: nuxt.options.ssr });
+   }
+   await nuxt.callHook("vite:extend", ctx);
+-  nuxt.hook("vite:extendConfig", (config) => {
++  nuxt.hook("vite:extendConfig", async (config) => {
+     const replaceOptions = /* @__PURE__ */ Object.create(null);
+-    replaceOptions.preventAssignment = true;
+     for (const key in config.define) {
+       if (key.startsWith("import.meta.")) {
+         replaceOptions[key] = config.define[key];
+       }
+     }
+-    config.plugins.push(replace(replaceOptions));
++    if (vite.rolldownVersion) {
++      const { replacePlugin: replacePlugin2 } = await import('rolldown/experimental');
++      config.plugins.push(replacePlugin2(replaceOptions));
++    } else {
++      config.plugins.push(replacePlugin({ ...replaceOptions, preventAssignment: true }));
++    }
+   });
+   if (!nuxt.options.dev) {
+     const chunksWithInlinedCSS = /* @__PURE__ */ new Set();
+@@ -1860,24 +1960,24 @@ const bundle = async (nuxt) => {
        }
      });
    }
@@ -204,7 +294,7 @@ index 80af223dc9d45fc97801b2f2c8a7b6bfce86ae23..8a7a1f3dbdc142217db2b2451a9da382
    if (!enabled) {
 diff --git a/dist/runtime/island.d.mts b/dist/runtime/island.d.mts
 new file mode 100644
-index 0000000000000000000000000000000000000000..ce4051125830aa99da2848623d3d4765eea129d7
+index 0000000000000000000000000000000000000000..d604bdd8dc5fe041b5a64f62d17c3517dc8cff1c
 --- /dev/null
 +++ b/dist/runtime/island.d.mts
 @@ -0,0 +1,2 @@
@@ -329,7 +419,7 @@ index 0000000000000000000000000000000000000000..d5c8870def937f83d901e9d0ef58ba0a
 +  }
 +}
 diff --git a/dist/runtime/vite-node.d.mts b/dist/runtime/vite-node.d.mts
-index 1cced675d75a6add3a63b7c474ea268999d6f654..b2983bfc3ad6ad76a2c6bf0c8933be741635a9da 100644
+index 1cced675d75a6add3a63b7c474ea268999d6f654..819a6319272ab78db1a94d46b576efdbbe715f98 100644
 --- a/dist/runtime/vite-node.d.mts
 +++ b/dist/runtime/vite-node.d.mts
 @@ -1,2 +1,3 @@
@@ -337,7 +427,7 @@ index 1cced675d75a6add3a63b7c474ea268999d6f654..b2983bfc3ad6ad76a2c6bf0c8933be74
  declare function _default(ssrContext: any): Promise<any>;
  export default _default;
 diff --git a/dist/runtime/vite-node.mjs b/dist/runtime/vite-node.mjs
-index e497e8e0aab6eed45d47862a8e79f9245d72ac78..de739a4aac743fdae824d59aeeba318c530b91bf 100644
+index e497e8e0aab6eed45d47862a8e79f9245d72ac78..2f8c77174c113d37fa3324b8e48564e35cbc0228 100644
 --- a/dist/runtime/vite-node.mjs
 +++ b/dist/runtime/vite-node.mjs
 @@ -11,6 +11,11 @@ const runner = createRunner()
