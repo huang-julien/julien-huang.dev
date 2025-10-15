@@ -1,24 +1,36 @@
-diff --git a/dist/app/compat/interval.d.ts b/dist/app/compat/interval.d.ts
-index 9c88d28c5ee24c46b4b23354106a16c2764b2c13..65b5e9c05287c242b15899c84a5dfeab0c99a94a 100644
---- a/dist/app/compat/interval.d.ts
-+++ b/dist/app/compat/interval.d.ts
-@@ -1 +1 @@
--export declare const setInterval: (((handler: TimerHandler, timeout?: number, ...arguments: any[]) => number) & typeof globalThis.setInterval) | (() => void);
-+export declare const setInterval: typeof globalThis.setInterval | (() => void);
-diff --git a/dist/app/compat/interval.js b/dist/app/compat/interval.js
-index 484356f26e0df2a4a55dddc9e9a3873b80b36837..86e4f2b1932223340acf1849a2da23670cb83884 100644
---- a/dist/app/compat/interval.js
-+++ b/dist/app/compat/interval.js
-@@ -1,6 +1,6 @@
- import { createError } from "../composables/error.js";
- const intervalError = "[nuxt] `setInterval` should not be used on the server. Consider wrapping it with an `onNuxtReady`, `onBeforeMount` or `onMounted` lifecycle hook, or ensure you only call it in the browser by checking `import.meta.client`.";
--export const setInterval = import.meta.client ? window.setInterval : () => {
-+export const setInterval = import.meta.client ? globalThis.setInterval : () => {
-   if (import.meta.dev) {
-     throw createError({
-       statusCode: 500,
+diff --git a/README.md b/README.md
+index f96ad2e925c3bb1faa6728f76cca975c73ae40a9..904177e9276afcd1bcf0e8fd4ce28ee7716d4a3f 100644
+--- a/README.md
++++ b/README.md
+@@ -60,7 +60,7 @@ Example of an `app.vue`:
+ <script setup lang="ts">
+ useSeoMeta({
+   title: 'Meet Nuxt',
+-  description: 'The Intuitive Vue Framework.',
++  description: 'The Intuitive Vue Framework.'
+ })
+ </script>
+ 
+@@ -93,13 +93,13 @@ Discover our [list of modules](https://nuxt.com/modules) to supercharge your Nux
+ We invite you to contribute and help improve Nuxt 💚
+ 
+ Here are a few ways you can get involved:
+-- **Reporting Bugs:** If you come across any bugs or issues, please check out the [reporting bugs guide](https://nuxt.com/docs/4.x/community/reporting-bugs) to learn how to submit a bug report.
+-- **Suggestions:** Have ideas to enhance Nuxt? We'd love to hear them! Check out the [contribution guide](https://nuxt.com/docs/4.x/community/contribution) to share your suggestions.
+-- **Questions:** If you have questions or need assistance, the [getting help guide](https://nuxt.com/docs/4.x/community/getting-help) provides resources to help you out.
++- **Reporting Bugs:** If you come across any bugs or issues, please check out the [reporting bugs guide](https://nuxt.com/docs/community/reporting-bugs) to learn how to submit a bug report.
++- **Suggestions:** Have ideas to enhance Nuxt? We'd love to hear them! Check out the [contribution guide](https://nuxt.com/docs/community/contribution) to share your suggestions.
++- **Questions:** If you have questions or need assistance, the [getting help guide](https://nuxt.com/docs/community/getting-help) provides resources to help you out.
+ 
+ ## <a name="local-development">🏠 Local Development</a>
+ 
+-Follow the docs to [Set Up Your Local Development Environment](https://nuxt.com/docs/4.x/community/framework-contribution#setup) to contribute to the framework and documentation.
++Follow the docs to [Set Up Your Local Development Environment](https://nuxt.com/docs/community/framework-contribution#setup) to contribute to the framework and documentation.
+ 
+ ## <a name="professional-support">🛟 Professional Support</a>
+ 
 diff --git a/dist/app/components/client-only.d.ts b/dist/app/components/client-only.d.ts
-index 57cc2c294e911310f97b73ee4a788d692653890a..af0f733a51114c63c1b4fbafbcf08aef02d46fa3 100644
+index 57cc2c294e911310f97b73ee4a788d692653890a..67897283994572f9335730fd359c60a0bd353a88 100644
 --- a/dist/app/components/client-only.d.ts
 +++ b/dist/app/components/client-only.d.ts
 @@ -1,13 +1,13 @@
@@ -45,7 +57,7 @@ index 57cc2c294e911310f97b73ee4a788d692653890a..af0f733a51114c63c1b4fbafbcf08aef
 +export declare function isStartFragment(element: RendererNode): boolean;
 +export declare function isEndFragment(element: RendererNode): boolean;
 diff --git a/dist/app/components/client-only.js b/dist/app/components/client-only.js
-index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..a3d850d42d832080ed0a3aa74a97b398875af43f 100644
+index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..54a2141a77d02017ba8b8a562e2abcc4fb154bf0 100644
 --- a/dist/app/components/client-only.js
 +++ b/dist/app/components/client-only.js
 @@ -1,8 +1,8 @@
@@ -76,53 +88,26 @@ index 19e76ad081b5ffe8aaa9cd073f8e8bab95d9ddeb..a3d850d42d832080ed0a3aa74a97b398
 +export function isEndFragment(element) {
 +  return element.nodeName === "#comment" && element.nodeValue === "]";
 +}
-diff --git a/dist/app/components/error-404.vue b/dist/app/components/error-404.vue
-index f7de60ee125295a395374c1ec9e022d7a33d4943..86fcfc385a2c528d3afc14eb05b537ecdfdb3ef7 100644
---- a/dist/app/components/error-404.vue
-+++ b/dist/app/components/error-404.vue
-@@ -26,7 +26,7 @@ useHead({
-   title: `${props.statusCode} - ${props.statusMessage} | ${props.appName}`,
-   script: [
-     {
--      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-+      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-     }
-   ],
-   style: [
-diff --git a/dist/app/components/error-500.vue b/dist/app/components/error-500.vue
-index 701b21ad7c0310825552d62a0e81dfca0bb7411a..26642be6680a252972ef41a7b7d3aeccc66d0f2a 100644
---- a/dist/app/components/error-500.vue
-+++ b/dist/app/components/error-500.vue
-@@ -26,7 +26,7 @@ useHead({
-   title: `${props.statusCode} - ${props.statusMessage} | ${props.appName}`,
-   script: [
-     {
--      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-+      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-     }
-   ],
-   style: [
-diff --git a/dist/app/components/error-dev.vue b/dist/app/components/error-dev.vue
-index 77833df60927cdf86f5abb19db1afd879e7e2454..496c5c7f57ad284c06d6a30c42c8aef7501136d2 100644
---- a/dist/app/components/error-dev.vue
-+++ b/dist/app/components/error-dev.vue
-@@ -26,7 +26,7 @@ useHead({
-   title: `${props.statusCode} - ${props.statusMessage || "Internal Server Error"}`,
-   script: [
-     {
--      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-+      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-     }
-   ],
-   style: [
 diff --git a/dist/app/components/island-renderer.d.ts b/dist/app/components/island-renderer.d.ts
 deleted file mode 100644
 index 33ebee4e499af20ebae33ab7489f144ca7f9253a..0000000000000000000000000000000000000000
 diff --git a/dist/app/components/island-renderer.js b/dist/app/components/island-renderer.js
 deleted file mode 100644
 index 29d6a08a9f611f63a14a420ff1445b70a45379d4..0000000000000000000000000000000000000000
+diff --git a/dist/app/components/nuxt-error-page.vue b/dist/app/components/nuxt-error-page.vue
+index 97a60e1a9bce9f6e7ea22b46ee8df7da9973a9aa..aec6d221e1d29526ebf243a62fdace665b3cd693 100644
+--- a/dist/app/components/nuxt-error-page.vue
++++ b/dist/app/components/nuxt-error-page.vue
+@@ -21,6 +21,6 @@ const statusMessage = _error.statusMessage ?? (is404 ? "Page Not Found" : "Inter
+ const description = _error.message || _error.toString();
+ const stack = import.meta.dev && !is404 ? _error.description || `<pre>${stacktrace}</pre>` : void 0;
+ const _Error404 = defineAsyncComponent(() => import("./error-404.vue"));
+-const _Error = import.meta.dev ? defineAsyncComponent(() => import("./error-dev.vue")) : defineAsyncComponent(() => import("./error-500.vue"));
++const _Error = defineAsyncComponent(() => import("./error-500.vue"));
+ const ErrorTemplate = is404 ? _Error404 : _Error;
+ </script>
 diff --git a/dist/app/components/nuxt-island.d.ts b/dist/app/components/nuxt-island.d.ts
-index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..2196cbcea97c2d0c43a85a49913d0d1078b7be4e 100644
+index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..40ffe00c2af77b60f831ee89591e57b2e038962a 100644
 --- a/dist/app/components/nuxt-island.d.ts
 +++ b/dist/app/components/nuxt-island.d.ts
 @@ -1,4 +1,4 @@
@@ -147,10 +132,10 @@ index 7fb9a5fe489c1a03f8bfeccb6574628302905c1b..2196cbcea97c2d0c43a85a49913d0d10
          type: StringConstructor;
          required: true;
 diff --git a/dist/app/components/nuxt-island.js b/dist/app/components/nuxt-island.js
-index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856a9df3a42 100644
+index a4c4faf4b3e28a6920ed7b934a191e4fc193d577..9ebf6bcb32f58fd8aa9bbf0b932665deccf2b94f 100644
 --- a/dist/app/components/nuxt-island.js
 +++ b/dist/app/components/nuxt-island.js
-@@ -1,42 +1,39 @@
+@@ -1,43 +1,31 @@
 -import { Fragment, Teleport, computed, createStaticVNode, createVNode, defineComponent, getCurrentInstance, h, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch, withMemo } from "vue";
 +import { computed, defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, ref, shallowRef, useId, watch } from "vue";
  import { debounce } from "perfect-debounce";
@@ -161,32 +146,24 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
 +import { renderOnigiri } from "vue-onigiri/runtime/deserialize";
 +import { join } from "pathe";
  import { useNuxtApp, useRuntimeConfig } from "../nuxt.js";
+ import { createError } from "../composables/error.js";
  import { prerenderRoutes, useRequestEvent } from "../composables/ssr.js";
  import { injectHead } from "../composables/head.js";
 -import { getFragmentHTML, isEndFragment, isStartFragment } from "./utils.js";
 -import { appBaseURL, remoteComponentIslands, selectiveClient } from "#build/nuxt.config.mjs";
-+import { remoteComponentIslands, devRootDir } from "#build/nuxt.config.mjs";
-+
-+
-+const viteFetch = import.meta.server 
-+  ? import.meta.dev 
-+    ? (src, exportName) => import("#build/dist/server/server.mjs").then((r) => r.executeFile(src)).then((r) => {
-+      debugger
-+      return r[exportName];
-+    }) 
-+    : (
-+      // todo path association between server and client chunks
-+      ((src, exportName) =>import("virtual:vue-onigiri").then(mod => (mod.default ?? mod).get(`${src}#${exportName}`)))
-+    ) 
-+  : (src, exportName) => import("virtual:vue-onigiri").then(mod => {
-+      if(import.meta.dev) {
-+        return import(/* @vite-ignore */ `/_nuxt/@fs/${devRootDir}/${src.replace('_nuxt/', '')}`).then(m => {
-+          return m[exportName]
-+        })
-+      }
-+
-+    return mod.default[`${src}#${exportName}`]
-+  });
++import { remoteComponentIslands } from "#build/nuxt.config.mjs";
++const viteFetch = import.meta.server ? import.meta.dev ? (src, exportName) => import("#build/dist/server/server.mjs").then((r) => r.executeFile(src)).then((r) => {
++  return r[exportName];
++}) : (
++  // todo path association between server and client chunks
++  ((src, exportName) => import("virtual:vue-onigiri").then((r) => {
++    console.log(src, exportName);
++    return r.default.get(src + "__" + exportName);
++  }))
++) : (src) => import(
++  /* @vite-ignore */
++  join(src.replace("/app", ""))
++).then((r) => r.default || r);
  const pKey = "_islandPromises";
 -const SSR_UID_RE = /data-island-uid="([^"]*)"/;
 -const DATA_ISLAND_UID_RE = /data-island-uid(="")?(?!="[^"])/g;
@@ -218,7 +195,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
  export default defineComponent({
    name: "NuxtIsland",
    inheritAttrs: false,
-@@ -68,18 +65,16 @@ export default defineComponent({
+@@ -69,18 +57,16 @@ export default defineComponent({
      }
    },
    emits: ["error"],
@@ -239,9 +216,9 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
      const event = useRequestEvent();
 +    const ast = ref(nuxtApp.payload.data[`${props.name}_${hashId.value}`]?.ast);
      let activeHead;
-     const eventFetch = import.meta.server ? event.fetch : import.meta.dev ? $fetch.raw : globalThis.fetch;
+     const eventFetch = import.meta.server ? event.fetch : globalThis.fetch;
      const mounted = shallowRef(false);
-@@ -92,100 +87,31 @@ export default defineComponent({
+@@ -93,100 +79,31 @@ export default defineComponent({
          activeHead.dispose();
        }
      });
@@ -353,7 +330,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
        if (import.meta.server && import.meta.prerender) {
          nuxtApp.runWithContext(() => prerenderRoutes(url));
        }
-@@ -201,7 +127,7 @@ export default defineComponent({
+@@ -205,7 +122,7 @@ export default defineComponent({
              appendResponseHeader(event, "x-nitro-prerender", hints);
            }
          }
@@ -362,7 +339,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
          return result;
        } catch (e) {
          if (r.status !== 200) {
-@@ -217,16 +143,10 @@ export default defineComponent({
+@@ -221,16 +138,10 @@ export default defineComponent({
        });
        try {
          const res = await nuxtApp[pKey][uid.value];
@@ -382,7 +359,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
          if (res?.head) {
            if (activeHead) {
              activeHead.patch(res.head);
-@@ -234,12 +154,6 @@ export default defineComponent({
+@@ -238,12 +149,6 @@ export default defineComponent({
              activeHead = head.push(res.head);
            }
          }
@@ -395,7 +372,7 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
        } catch (e) {
          error.value = e;
          emit("error", e);
-@@ -260,68 +174,12 @@ export default defineComponent({
+@@ -264,68 +169,12 @@ export default defineComponent({
        fetchComponent();
      } else if (import.meta.server || !instance.vnode.el || !nuxtApp.payload.serverRendered) {
        await fetchComponent();
@@ -469,8 +446,21 @@ index 71ace1b1242a03419444f5fee57f676a3d7332a7..e466e7ae110e00799a4b562f534fb856
      };
    }
  });
+diff --git a/dist/app/components/nuxt-link.d.ts b/dist/app/components/nuxt-link.d.ts
+index 9c5704b697f769226522298f6565d8e59d12b98c..4b1dbed22b64dfb4649a2c267f52be36d2b4c0e5 100644
+--- a/dist/app/components/nuxt-link.d.ts
++++ b/dist/app/components/nuxt-link.d.ts
+@@ -96,6 +96,6 @@ type NuxtLinkDefaultSlotProps<CustomProp extends boolean = false> = CustomProp e
+ type NuxtLinkSlots<CustomProp extends boolean = false> = {
+     default?: (props: NuxtLinkDefaultSlotProps<CustomProp>) => VNode[];
+ };
+-export declare function defineNuxtLink(options: NuxtLinkOptions): (new <CustomProp extends boolean = false>(props: NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & AnchorHTMLAttributes) => InstanceType<DefineSetupFnComponent<NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & AnchorHTMLAttributes, [], SlotsType<NuxtLinkSlots<CustomProp>>>>) & Record<string, any>;
+-declare const _default: (new <CustomProp extends boolean = false>(props: NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & AnchorHTMLAttributes) => InstanceType<DefineSetupFnComponent<NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & AnchorHTMLAttributes, [], SlotsType<NuxtLinkSlots<CustomProp>>>>) & Record<string, any>;
++export declare function defineNuxtLink(options: NuxtLinkOptions): (new <CustomProp extends boolean = false>(props: NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & Omit<AnchorHTMLAttributes, keyof NuxtLinkProps<CustomProp>>) => InstanceType<DefineSetupFnComponent<NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & Omit<AnchorHTMLAttributes, keyof NuxtLinkProps<CustomProp>>, [], SlotsType<NuxtLinkSlots<CustomProp>>>>) & Record<string, any>;
++declare const _default: (new <CustomProp extends boolean = false>(props: NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & Omit<AnchorHTMLAttributes, keyof NuxtLinkProps<CustomProp>>) => InstanceType<DefineSetupFnComponent<NuxtLinkProps<CustomProp> & VNodeProps & AllowedComponentProps & Omit<AnchorHTMLAttributes, keyof NuxtLinkProps<CustomProp>>, [], SlotsType<NuxtLinkSlots<CustomProp>>>>) & Record<string, any>;
+ export default _default;
 diff --git a/dist/app/components/nuxt-root.vue b/dist/app/components/nuxt-root.vue
-index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..a5894dc18d2906055a7b12e06a7d85ca85876b2d 100644
+index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..017c67866082f15c45f2b0110aed0955d670c59c 100644
 --- a/dist/app/components/nuxt-root.vue
 +++ b/dist/app/components/nuxt-root.vue
 @@ -4,11 +4,7 @@
@@ -502,7 +492,7 @@ index 3d28794b56afa4fef5321a12cf1c8702928ccf0c..a5894dc18d2906055a7b12e06a7d85ca
 -const islandContext = import.meta.server && nuxtApp.ssrContext.islandContext;
  </script>
 diff --git a/dist/app/components/utils.d.ts b/dist/app/components/utils.d.ts
-index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..efd5350b60ade5e3efb52a3c5cf93aefc3227c70 100644
+index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..1ad5b2d50159dad5c007df0258063c695ff4388d 100644
 --- a/dist/app/components/utils.d.ts
 +++ b/dist/app/components/utils.d.ts
 @@ -1,4 +1,4 @@
@@ -525,7 +515,7 @@ index e44c8cb70ff2d33f6708dd95c69b0f72f04878cd..efd5350b60ade5e3efb52a3c5cf93aef
 -export declare function isStartFragment(element: RendererNode): boolean;
 -export declare function isEndFragment(element: RendererNode): boolean;
 diff --git a/dist/app/components/utils.js b/dist/app/components/utils.js
-index a1404a6721fb288b4a85697eb0133f39c7ff18ec..4522b79754de0097be3ec58e7f9d6ee6149383e5 100644
+index a1404a6721fb288b4a85697eb0133f39c7ff18ec..904ed639017596b5e3315d9bc90d7d3218fa5083 100644
 --- a/dist/app/components/utils.js
 +++ b/dist/app/components/utils.js
 @@ -1,4 +1,4 @@
@@ -551,46 +541,317 @@ index a1404a6721fb288b4a85697eb0133f39c7ff18ec..4522b79754de0097be3ec58e7f9d6ee6
 -export function isEndFragment(element) {
 -  return element.nodeName === "#comment" && element.nodeValue === "]";
 -}
-diff --git a/dist/app/components/welcome.vue b/dist/app/components/welcome.vue
-index f96b90bef3a874ad226308160b4343bc83184812..b51b94b45a1d5e2ad2b6173f7d25ba8008bda9f3 100644
---- a/dist/app/components/welcome.vue
-+++ b/dist/app/components/welcome.vue
-@@ -14,7 +14,7 @@ useHead({
-   title: `${props.title}`,
-   script: [
-     {
--      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-+      innerHTML: `!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();`
-     }
-   ],
-   style: [
-diff --git a/dist/app/composables/cookie.js b/dist/app/composables/cookie.js
-index f6e68574ec71b468458aab2c7b5f345b48f4366b..fc1b1d7028169c8ab377f4bc5ff54da8b01f4ed8 100644
---- a/dist/app/composables/cookie.js
-+++ b/dist/app/composables/cookie.js
-@@ -13,7 +13,7 @@ const CookieDefaults = {
-   decode: (val) => destr(decodeURIComponent(val)),
-   encode: (val) => encodeURIComponent(typeof val === "string" ? val : JSON.stringify(val))
+diff --git a/dist/app/composables/asyncData.d.ts b/dist/app/composables/asyncData.d.ts
+index 2ce396cf508b44243bf3150fb2dcc7a86a4fbd9a..d3cfba8ebf9fcfb4b1d154e514e2a6f0c25e473b 100644
+--- a/dist/app/composables/asyncData.d.ts
++++ b/dist/app/composables/asyncData.d.ts
+@@ -3,6 +3,9 @@ import type { NuxtApp } from '../nuxt.js';
+ import type { NuxtError } from './error.js';
+ export type AsyncDataRequestStatus = 'idle' | 'pending' | 'success' | 'error';
+ export type _Transform<Input = any, Output = any> = (input: Input) => Output | Promise<Output>;
++export type AsyncDataHandler<ResT> = (nuxtApp: NuxtApp, options: {
++    signal: AbortSignal;
++}) => Promise<ResT>;
+ export type PickFrom<T, K extends Array<string>> = T extends Array<any> ? T : T extends Record<string, any> ? keyof T extends K[number] ? T : K[number] extends never ? T : Pick<T, K[number]> : T;
+ export type KeysOf<T> = Array<T extends T ? keyof T extends string ? keyof T : never : never>;
+ export type KeyOfRes<Transform extends _Transform> = KeysOf<ReturnType<Transform>>;
+@@ -60,6 +63,10 @@ export interface AsyncDataOptions<ResT, DataT = ResT, PickKeys extends KeysOf<Da
+      * @default 'cancel'
+      */
+     dedupe?: 'cancel' | 'defer';
++    /**
++     * A timeout in milliseconds after which the request will be aborted if it has not resolved yet.
++     */
++    timeout?: number;
+ }
+ export interface AsyncDataExecuteOptions {
+     /**
+@@ -71,6 +78,8 @@ export interface AsyncDataExecuteOptions {
+     cause?: AsyncDataRefreshCause;
+     /** @internal */
+     cachedData?: any;
++    signal?: AbortSignal;
++    timeout?: number;
+ }
+ export interface _AsyncData<DataT, ErrorT> {
+     data: Ref<DataT>;
+@@ -89,8 +98,8 @@ export type AsyncData<Data, Error> = _AsyncData<Data, Error> & Promise<_AsyncDat
+  * @param handler An asynchronous function that must return a truthy value (for example, it should not be `undefined` or `null`) or the request may be duplicated on the client side.
+  * @param options customize the behavior of useAsyncData
+  */
+-export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(handler: (ctx?: NuxtApp) => Promise<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+-export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(handler: (ctx?: NuxtApp) => Promise<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(handler: AsyncDataHandler<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(handler: AsyncDataHandler<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+ /**
+  * Provides access to data that resolves asynchronously in an SSR-friendly composable.
+  * See {@link https://nuxt.com/docs/4.x/api/composables/use-async-data}
+@@ -98,8 +107,8 @@ export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = Res
+  * @param handler An asynchronous function that must return a truthy value (for example, it should not be `undefined` or `null`) or the request may be duplicated on the client side.
+  * @param options customize the behavior of useAsyncData
+  */
+-export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(key: MaybeRefOrGetter<string>, handler: (ctx?: NuxtApp) => Promise<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+-export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(key: MaybeRefOrGetter<string>, handler: (ctx?: NuxtApp) => Promise<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(key: MaybeRefOrGetter<string>, handler: AsyncDataHandler<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(key: MaybeRefOrGetter<string>, handler: AsyncDataHandler<ResT>, options?: AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+ /**
+  * Provides access to data that resolves asynchronously in an SSR-friendly composable.
+  * See {@link https://nuxt.com/docs/4.x/api/composables/use-lazy-async-data}
+@@ -107,8 +116,8 @@ export declare function useAsyncData<ResT, NuxtErrorDataT = unknown, DataT = Res
+  * @param handler An asynchronous function that must return a truthy value (for example, it should not be `undefined` or `null`) or the request may be duplicated on the client side.
+  * @param options customize the behavior of useLazyAsyncData
+  */
+-export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(handler: (ctx?: NuxtApp) => Promise<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+-export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(handler: (ctx?: NuxtApp) => Promise<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(handler: AsyncDataHandler<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(handler: AsyncDataHandler<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+ /**
+  * Provides access to data that resolves asynchronously in an SSR-friendly composable.
+  * See {@link https://nuxt.com/docs/4.x/api/composables/use-lazy-async-data}
+@@ -116,8 +125,8 @@ export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT =
+  * @param handler An asynchronous function that must return a truthy value (for example, it should not be `undefined` or `null`) or the request may be duplicated on the client side.
+  * @param options customize the behavior of useLazyAsyncData
+  */
+-export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(key: MaybeRefOrGetter<string>, handler: (ctx?: NuxtApp) => Promise<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+-export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(key: MaybeRefOrGetter<string>, handler: (ctx?: NuxtApp) => Promise<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined>(key: MaybeRefOrGetter<string>, handler: AsyncDataHandler<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
++export declare function useLazyAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = DataT>(key: MaybeRefOrGetter<string>, handler: AsyncDataHandler<ResT>, options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>): AsyncData<PickFrom<DataT, PickKeys> | DefaultT, (NuxtErrorDataT extends Error | NuxtError ? NuxtErrorDataT : NuxtError<NuxtErrorDataT>) | undefined>;
+ /** @since 3.1.0 */
+ export declare function useNuxtData<DataT = any>(key: string): {
+     data: Ref<DataT | undefined>;
+@@ -133,4 +142,5 @@ export type CreatedAsyncData<ResT, NuxtErrorDataT = unknown, DataT = ResT, Defau
+     _init: boolean;
+     _deps: number;
+     _execute: (opts?: AsyncDataExecuteOptions) => Promise<void>;
++    _abortController?: AbortController;
  };
--const store = import.meta.client && cookieStore ? window.cookieStore : void 0;
-+const store = import.meta.client && cookieStore ? globalThis.cookieStore : void 0;
- export function useCookie(name, _opts) {
-   const opts = { ...CookieDefaults, ..._opts };
-   opts.filter ??= (key) => key === name;
-diff --git a/dist/app/composables/url.js b/dist/app/composables/url.js
-index d0365905a038de1e9c97560b8863d9e3a998b80a..bcdb8094cd0291905eae2933de7934c7958febcc 100644
---- a/dist/app/composables/url.js
-+++ b/dist/app/composables/url.js
-@@ -4,5 +4,5 @@ export function useRequestURL(opts) {
-   if (import.meta.server) {
-     return getRequestURL(useRequestEvent(), opts);
+diff --git a/dist/app/composables/asyncData.js b/dist/app/composables/asyncData.js
+index c1140eea00efa15d61db0deb26a61403f99a44e2..c6baf2ef63ff05383f85b6693b890d1deac1d197 100644
+--- a/dist/app/composables/asyncData.js
++++ b/dist/app/composables/asyncData.js
+@@ -174,7 +174,17 @@ You can use a different key or move the call to a composable to ensure the optio
+       return nuxtApp._asyncData[key.value].execute(...args2);
+     },
+     execute: (...args2) => asyncReturn.refresh(...args2),
+-    clear: () => clearNuxtDataByKey(nuxtApp, key.value)
++    clear: () => {
++      const entry = nuxtApp._asyncData[key.value];
++      if (entry?._abortController) {
++        try {
++          entry._abortController.abort(new DOMException("AsyncData aborted by user.", "AbortError"));
++        } finally {
++          entry._abortController = void 0;
++        }
++      }
++      clearNuxtDataByKey(nuxtApp, key.value);
++    }
+   };
+   const asyncDataPromise = Promise.resolve(nuxtApp._asyncDataPromises[key.value]).then(() => asyncReturn);
+   Object.assign(asyncDataPromise, asyncReturn);
+@@ -280,9 +290,6 @@ function clearNuxtDataByKey(nuxtApp, key) {
+     nuxtApp._asyncData[key].status.value = "idle";
    }
--  return new URL(window.location.href);
-+  return new URL(globalThis.location.href);
+   if (key in nuxtApp._asyncDataPromises) {
+-    if (nuxtApp._asyncDataPromises[key]) {
+-      nuxtApp._asyncDataPromises[key].cancelled = true;
+-    }
+     nuxtApp._asyncDataPromises[key] = void 0;
+   }
+ }
+@@ -296,13 +303,13 @@ function pick(obj, keys) {
+ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
+   nuxtApp.payload._errors[key] ??= void 0;
+   const hasCustomGetCachedData = options.getCachedData !== getDefaultCachedData;
+-  const handler = import.meta.client || !import.meta.prerender || !nuxtApp.ssrContext?._sharedPrerenderCache ? _handler : () => {
+-    const value = nuxtApp.ssrContext._sharedPrerenderCache.get(key);
++  const handler = import.meta.client || !import.meta.prerender || !nuxtApp.ssrContext?._sharedPrerenderCache ? _handler : (nuxtApp2, options2) => {
++    const value = nuxtApp2.ssrContext._sharedPrerenderCache.get(key);
+     if (value) {
+       return value;
+     }
+-    const promise = Promise.resolve().then(() => nuxtApp.runWithContext(() => _handler(nuxtApp)));
+-    nuxtApp.ssrContext._sharedPrerenderCache.set(key, promise);
++    const promise = Promise.resolve().then(() => nuxtApp2.runWithContext(() => _handler(nuxtApp2, options2)));
++    nuxtApp2.ssrContext._sharedPrerenderCache.set(key, promise);
+     return promise;
+   };
+   const _ref = options.deep ? ref : shallowRef;
+@@ -327,7 +334,6 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
+         if ((opts.dedupe ?? options.dedupe) === "defer") {
+           return nuxtApp._asyncDataPromises[key];
+         }
+-        nuxtApp._asyncDataPromises[key].cancelled = true;
+       }
+       if (granularCachedData || opts.cause === "initial" || nuxtApp.isHydrating) {
+         const cachedData = "cachedData" in opts ? opts.cachedData : options.getCachedData(key, nuxtApp, { cause: opts.cause ?? "refresh:manual" });
+@@ -341,19 +347,31 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
+       if (pendingWhenIdle) {
+         asyncData.pending.value = true;
+       }
++      if (asyncData._abortController) {
++        asyncData._abortController.abort(new DOMException("AsyncData request cancelled by deduplication", "AbortError"));
++      }
++      asyncData._abortController = new AbortController();
+       asyncData.status.value = "pending";
+       const promise = new Promise(
+         (resolve, reject) => {
+           try {
+-            resolve(handler(nuxtApp));
++            const timeout = opts.timeout ?? options.timeout;
++            const mergedSignal = mergeAbortSignals([asyncData._abortController?.signal, opts?.signal], timeout);
++            if (mergedSignal.aborted) {
++              const reason = mergedSignal.reason;
++              reject(reason instanceof Error ? reason : new DOMException(String(reason ?? "Aborted"), "AbortError"));
++              return;
++            }
++            mergedSignal.addEventListener("abort", () => {
++              const reason = mergedSignal.reason;
++              reject(reason instanceof Error ? reason : new DOMException(String(reason ?? "Aborted"), "AbortError"));
++            }, { once: true });
++            return Promise.resolve(handler(nuxtApp, { signal: mergedSignal })).then(resolve, reject);
+           } catch (err) {
+             reject(err);
+           }
+         }
+       ).then(async (_result) => {
+-        if (promise.cancelled) {
+-          return nuxtApp._asyncDataPromises[key];
+-        }
+         let result = _result;
+         if (options.transform) {
+           result = await options.transform(_result);
+@@ -371,16 +389,20 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
+         asyncData.error.value = void 0;
+         asyncData.status.value = "success";
+       }).catch((error) => {
+-        if (promise.cancelled) {
+-          return nuxtApp._asyncDataPromises[key];
++        if (nuxtApp._asyncDataPromises[key] && nuxtApp._asyncDataPromises[key] !== promise) {
++          return;
++        }
++        if (asyncData._abortController?.signal.aborted) {
++          return;
++        }
++        if (typeof DOMException !== "undefined" && error instanceof DOMException && error.name === "AbortError") {
++          asyncData.status.value = "idle";
++          return;
+         }
+         asyncData.error.value = createError(error);
+         asyncData.data.value = unref(options.default());
+         asyncData.status.value = "error";
+       }).finally(() => {
+-        if (promise.cancelled) {
+-          return;
+-        }
+         if (pendingWhenIdle) {
+           asyncData.pending.value = false;
+         }
+@@ -428,3 +450,40 @@ function createHash(_handler, options) {
+     getCachedData: options.getCachedData ? hash(options.getCachedData) : void 0
+   };
+ }
++function mergeAbortSignals(signals, timeout) {
++  const list = signals.filter((s) => !!s);
++  if (typeof timeout === "number" && timeout >= 0) {
++    const timeoutSignal = AbortSignal.timeout?.(timeout);
++    if (timeoutSignal) {
++      list.push(timeoutSignal);
++    }
++  }
++  if (AbortSignal.any) {
++    return AbortSignal.any(list);
++  }
++  const controller = new AbortController();
++  for (const sig of list) {
++    if (sig.aborted) {
++      const reason = sig.reason ?? new DOMException("Aborted", "AbortError");
++      try {
++        controller.abort(reason);
++      } catch {
++        controller.abort();
++      }
++      return controller.signal;
++    }
++  }
++  const onAbort = () => {
++    const abortedSignal = list.find((s) => s.aborted);
++    const reason = abortedSignal?.reason ?? new DOMException("Aborted", "AbortError");
++    try {
++      controller.abort(reason);
++    } catch {
++      controller.abort();
++    }
++  };
++  for (const sig of list) {
++    sig.addEventListener?.("abort", onAbort, { once: true });
++  }
++  return controller.signal;
++}
+diff --git a/dist/app/composables/fetch.d.ts b/dist/app/composables/fetch.d.ts
+index 446e00ad0b30c48a28a5b6b1a23d626fa89459b7..e2acf83ed4164a2ae38ca632c823312c73051a7d 100644
+--- a/dist/app/composables/fetch.d.ts
++++ b/dist/app/composables/fetch.d.ts
+@@ -11,7 +11,7 @@ interface NitroFetchOptions<R extends NitroFetchRequest, M extends AvailableRout
+     method?: M;
+ }
+ type ComputedFetchOptions<R extends NitroFetchRequest, M extends AvailableRouterMethod<R>, DataT = any> = ComputedOptions<NitroFetchOptions<R, M, DataT>>;
+-export interface UseFetchOptions<ResT, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined, R extends NitroFetchRequest = string & {}, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>> extends Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'watch'>, ComputedFetchOptions<R, M, DataT> {
++export interface UseFetchOptions<ResT, DataT = ResT, PickKeys extends KeysOf<DataT> = KeysOf<DataT>, DefaultT = undefined, R extends NitroFetchRequest = string & {}, M extends AvailableRouterMethod<R> = AvailableRouterMethod<R>> extends Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'watch'>, Omit<ComputedFetchOptions<R, M, DataT>, 'timeout'> {
+     key?: MaybeRefOrGetter<string>;
+     $fetch?: typeof globalThis.$fetch;
+     watch?: MultiWatchSources | false;
+diff --git a/dist/app/composables/fetch.js b/dist/app/composables/fetch.js
+index 2447b55bb89e2fb1ad667e2f9f57691becfddf03..c688082b475d731171ad924ac9535bc16ea9f9c5 100644
+--- a/dist/app/composables/fetch.js
++++ b/dist/app/composables/fetch.js
+@@ -22,6 +22,7 @@ export function useFetch(request, arg1, arg2) {
+     getCachedData,
+     deep,
+     dedupe,
++    timeout,
+     ...fetchOptions
+   } = opts;
+   const _fetchOptions = reactive({
+@@ -39,6 +40,7 @@ export function useFetch(request, arg1, arg2) {
+     getCachedData,
+     deep,
+     dedupe,
++    timeout,
+     watch: watchSources === false ? [] : [...watchSources || [], _fetchOptions]
+   };
+   if (import.meta.dev) {
+@@ -51,16 +53,7 @@ export function useFetch(request, arg1, arg2) {
+     watch(key, setImmediate, { flush: "sync", once: true });
+     watch([...watchSources || [], _fetchOptions], setImmediate, { flush: "sync", once: true });
+   }
+-  let controller;
+-  const asyncData = useAsyncData(watchSources === false ? key.value : key, () => {
+-    controller?.abort?.(new DOMException("Request aborted as another request to the same endpoint was initiated.", "AbortError"));
+-    controller = typeof AbortController !== "undefined" ? new AbortController() : {};
+-    const timeoutLength = toValue(opts.timeout);
+-    let timeoutId;
+-    if (timeoutLength) {
+-      timeoutId = setTimeout(() => controller.abort(new DOMException("Request aborted due to timeout.", "AbortError")), timeoutLength);
+-      controller.signal.onabort = () => clearTimeout(timeoutId);
+-    }
++  const asyncData = useAsyncData(watchSources === false ? key.value : key, (_, { signal }) => {
+     let _$fetch = opts.$fetch || globalThis.$fetch;
+     if (import.meta.server && !opts.$fetch) {
+       const isLocalFetch = typeof _request.value === "string" && _request.value[0] === "/" && (!toValue(opts.baseURL) || toValue(opts.baseURL)[0] === "/");
+@@ -68,9 +61,7 @@ export function useFetch(request, arg1, arg2) {
+         _$fetch = useRequestFetch();
+       }
+     }
+-    return _$fetch(_request.value, { signal: controller.signal, ..._fetchOptions }).finally(() => {
+-      clearTimeout(timeoutId);
+-    });
++    return _$fetch(_request.value, { signal, ..._fetchOptions });
+   }, _asyncDataOptions);
+   return asyncData;
  }
 diff --git a/dist/app/deserialize.d.ts b/dist/app/deserialize.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..0927a40f456d437fdf9abf2a0ac7df1592d6327b
+index 0000000000000000000000000000000000000000..2f07a2fdeb3e30b09fb39572fda159387059cdad
 --- /dev/null
 +++ b/dist/app/deserialize.d.ts
 @@ -0,0 +1,4 @@
@@ -600,7 +861,7 @@ index 0000000000000000000000000000000000000000..0927a40f456d437fdf9abf2a0ac7df15
 +export declare function renderChildren(data: VServerComponent | VServerComponent[] | undefined): VNode | undefined;
 diff --git a/dist/app/deserialize.js b/dist/app/deserialize.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..2bd08546c069ddc6724f77cc450e8fd77c45fb4d
+index 0000000000000000000000000000000000000000..4cdf208b89739d33cf180de20c10f9a916fd630e
 --- /dev/null
 +++ b/dist/app/deserialize.js
 @@ -0,0 +1,30 @@
@@ -635,14 +896,10 @@ index 0000000000000000000000000000000000000000..2bd08546c069ddc6724f77cc450e8fd7
 +  }
 +}
 diff --git a/dist/app/entry.js b/dist/app/entry.js
-index e6821aaa297411937119f71de6d86c3c2b8b2343..5fef2577f1e2089f580e85f0548dbbad9c0c5563 100644
+index e6821aaa297411937119f71de6d86c3c2b8b2343..fcb30f22c04cf66d994f86943377065a5f617bbc 100644
 --- a/dist/app/entry.js
 +++ b/dist/app/entry.js
-@@ -7,10 +7,11 @@ import "#build/css";
- import plugins from "#build/plugins";
- import RootComponent from "#build/root-component.mjs";
- import { appId, appSpaLoaderAttrs, multiApp, spaLoadingTemplateOutside, vueAppRootContainer } from "#build/nuxt.config.mjs";
-+
+@@ -10,7 +10,7 @@ import { appId, appSpaLoaderAttrs, multiApp, spaLoadingTemplateOutside, vueAppRo
  let entry;
  if (import.meta.server) {
    entry = async function createNuxtAppServer(ssrContext) {
@@ -653,7 +910,7 @@ index e6821aaa297411937119f71de6d86c3c2b8b2343..5fef2577f1e2089f580e85f0548dbbad
        await applyPlugins(nuxt, plugins);
 diff --git a/dist/app/island.d.ts b/dist/app/island.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..23e4ac4570acc8c9b7df76ce10492a8d7e2f3b4c
+index 0000000000000000000000000000000000000000..df62284ee8906db0ac4abab8abbd0064753a0ae0
 --- /dev/null
 +++ b/dist/app/island.d.ts
 @@ -0,0 +1,7 @@
@@ -666,7 +923,7 @@ index 0000000000000000000000000000000000000000..23e4ac4570acc8c9b7df76ce10492a8d
 +}>;
 diff --git a/dist/app/island.js b/dist/app/island.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..44021736fc31507dfa923e0431dbb2b1acfac3bb
+index 0000000000000000000000000000000000000000..83f3a64b2f8c15845c4c2f9a4a9f40814d62d56f
 --- /dev/null
 +++ b/dist/app/island.js
 @@ -0,0 +1,24 @@
@@ -694,8 +951,27 @@ index 0000000000000000000000000000000000000000..44021736fc31507dfa923e0431dbb2b1
 +    ast
 +  };
 +}
+diff --git a/dist/app/middleware/manifest-route-rule.js b/dist/app/middleware/manifest-route-rule.js
+index 9b0134ae15b0b50d4bdbff75c5522f0d838d72b3..0c8734c72296978cc0ac211ace9706da7b41ed93 100644
+--- a/dist/app/middleware/manifest-route-rule.js
++++ b/dist/app/middleware/manifest-route-rule.js
+@@ -7,10 +7,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
+   }
+   const rules = await getRouteRules({ path: to.path });
+   if (rules.redirect) {
+-    if (hasProtocol(rules.redirect, { acceptRelative: true })) {
+-      window.location.href = rules.redirect;
++    const path = rules.redirect.includes("#") ? rules.redirect : rules.redirect + to.hash;
++    if (hasProtocol(path, { acceptRelative: true })) {
++      window.location.href = path;
+       return false;
+     }
+-    return rules.redirect;
++    return path;
+   }
+ });
 diff --git a/dist/app/nuxt.d.ts b/dist/app/nuxt.d.ts
-index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..f4d5032f273910f836833fde03ad545982770c2d 100644
+index 3fe5d7eafb308564f6e664ee933688a29667d1f5..13c020f84c116115eaec557f9c441c76224a2805 100644
 --- a/dist/app/nuxt.d.ts
 +++ b/dist/app/nuxt.d.ts
 @@ -73,6 +73,7 @@ export interface NuxtSSRContext extends SSRContext {
@@ -706,21 +982,51 @@ index 084269f5159dc23cdb0b69bdedcf7f1747abdf0d..f4d5032f273910f836833fde03ad5459
  }
  export interface NuxtPayload {
      path?: string;
-diff --git a/dist/core/runtime/nitro/handlers/island.d.ts b/dist/core/runtime/nitro/handlers/island.d.ts
-index ea7b2201536514931228ea584d1707a694853fb9..a91d25b07072f74135ee00b8db15a8feb0c0acc3 100644
---- a/dist/core/runtime/nitro/handlers/island.d.ts
-+++ b/dist/core/runtime/nitro/handlers/island.d.ts
-@@ -1,4 +1,4 @@
- import type { RenderResponse } from 'nitropack/types';
- import type { NuxtIslandResponse } from '../utils/renderer/islands.js';
--declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<NuxtIslandResponse | Partial<RenderResponse>>>;
-+declare const _default: import("h3").EventHandler<import("h3").EventHandlerRequest, Promise<Partial<RenderResponse> | NuxtIslandResponse>>;
- export default _default;
+@@ -123,6 +124,8 @@ interface _NuxtApp {
+         _execute: (opts?: AsyncDataExecuteOptions) => Promise<void>;
+         /** @internal */
+         _hash?: Record<string, string | undefined>;
++        /** @internal */
++        _abortController?: AbortController;
+     } | undefined>;
+     /** @internal */
+     _loadingIndicator?: LoadingIndicator;
+diff --git a/dist/core/runtime/nitro/handlers/error.js b/dist/core/runtime/nitro/handlers/error.js
+index 1c837516ea028281dda3e34ea7d9e49997526a0d..df17a9b8aa9e1880a2dbddd7f41127f8855ea31d 100644
+--- a/dist/core/runtime/nitro/handlers/error.js
++++ b/dist/core/runtime/nitro/handlers/error.js
+@@ -2,6 +2,7 @@ import { joinURL, withQuery, withoutBase } from "ufo";
+ import { appendResponseHeader, getRequestHeaders, send, setResponseHeader, setResponseHeaders, setResponseStatus } from "h3";
+ import { useNitroApp, useRuntimeConfig } from "nitropack/runtime";
+ import { isJsonRequest } from "../utils/error.js";
++import { generateErrorOverlayHTML } from "../utils/dev.js";
+ export default (async function errorhandler(error, event, { defaultHandler }) {
+   if (event.handled || isJsonRequest(event)) {
+     return;
+@@ -38,7 +39,7 @@ export default (async function errorhandler(error, event, { defaultHandler }) {
+     return;
+   }
+   if (!res) {
+-    const { template } = import.meta.dev ? await import("../templates/error-dev") : await import("../templates/error-500");
++    const { template } = await import("../templates/error-500.js");
+     if (import.meta.dev) {
+       errorObject.description = errorObject.message;
+     }
+@@ -54,5 +55,9 @@ export default (async function errorhandler(error, event, { defaultHandler }) {
+     setResponseHeader(event, header, value);
+   }
+   setResponseStatus(event, res.status && res.status !== 200 ? res.status : defaultRes.status, res.statusText || defaultRes.statusText);
++  if (import.meta.dev) {
++    const prettyResponse = await defaultHandler(error, event, { json: false });
++    return send(event, html.replace("</body>", `${generateErrorOverlayHTML(prettyResponse.body)}</body>`));
++  }
+   return send(event, html);
+ });
 diff --git a/dist/core/runtime/nitro/handlers/island.js b/dist/core/runtime/nitro/handlers/island.js
-index 5d35c092874880bf098414df7f9d3410e12d7516..e4ee87727de09199e2af57d0b50c7843f60d3567 100644
+index 50eb45513a4b50648461d71ec214f32bf8796960..4af757b56a6dbf38788430df2874d0b46dd604e5 100644
 --- a/dist/core/runtime/nitro/handlers/island.js
 +++ b/dist/core/runtime/nitro/handlers/island.js
-@@ -4,11 +4,11 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
+@@ -4,11 +4,12 @@ import { defineEventHandler, getQuery, readBody, setResponseHeaders } from "h3";
  import { resolveUnrefHeadInput } from "@unhead/vue";
  import { getRequestDependencies } from "vue-bundle-renderer/runtime";
  import { getQuery as getURLQuery } from "ufo";
@@ -731,38 +1037,32 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..e4ee87727de09199e2af57d0b50c7843
 +import { getComponentsIslands, getSSRRenderer, getServerEntry } from "../utils/renderer/build-files.js";
  import { renderInlineStyles } from "../utils/renderer/inline-styles.js";
 -import { getClientIslandResponse, getServerComponentHTML, getSlotIslandResponse } from "../utils/renderer/islands.js";
++const components = (await getComponentsIslands()).islandComponents;
  const ISLAND_SUFFIX_RE = /\.json(?:\?.*)?$/;
  export default defineEventHandler(async (event) => {
    const nitroApp = useNitroApp();
-@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
-     return islandCache.getItem(event.path);
-   }
-   const islandContext = await getIslandContext(event);
-+  
-+const components = (await getComponentsIslands());
-   const ssrContext = {
-     ...createSSRContext(event),
-     islandContext,
-@@ -27,12 +29,13 @@ export default defineEventHandler(async (event) => {
+@@ -27,15 +28,15 @@ export default defineEventHandler(async (event) => {
      url: islandContext.url
    };
    const renderer = await getSSRRenderer();
--  const renderResult = await renderer.renderToString(ssrContext).catch(async (error) => {
--    await ssrContext.nuxt?.hooks.callHook("app:error", error);
--    throw error;
+-  const renderResult = await renderer.renderToString(ssrContext).catch(async (err) => {
+-    await ssrContext.nuxt?.hooks.callHook("app:error", err);
+-    throw err;
 -  });
 +  const createSSRApp = await getServerEntry();
-+  console.log(components)
 +  ssrContext.rootComponent = components[islandContext.name];
 +  const app = await createSSRApp(ssrContext, renderer.rendererContext);
 +  const ast = await app.runWithContext(() => serializeApp(app, ssrContext));
+   if (ssrContext.payload?.error) {
+     throw ssrContext.payload.error;
+   }
    const inlinedStyles = await renderInlineStyles(ssrContext.modules ?? []);
 -  await ssrContext.nuxt?.hooks.callHook("app:rendered", { ssrContext, renderResult });
 +  await ssrContext.nuxt?.hooks.callHook("app:rendered", { ssrContext });
    if (inlinedStyles.length) {
      ssrContext.head.push({ style: inlinedStyles });
    }
-@@ -44,7 +47,7 @@ export default defineEventHandler(async (event) => {
+@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
          continue;
        }
        if (resource.file.includes("scoped") && !resource.file.includes("pages/")) {
@@ -771,7 +1071,7 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..e4ee87727de09199e2af57d0b50c7843
        }
      }
      if (link.length) {
-@@ -64,9 +67,7 @@ export default defineEventHandler(async (event) => {
+@@ -67,9 +68,7 @@ export default defineEventHandler(async (event) => {
    const islandResponse = {
      id: islandContext.id,
      head: islandHead,
@@ -783,10 +1083,16 @@ index 5d35c092874880bf098414df7f9d3410e12d7516..e4ee87727de09199e2af57d0b50c7843
    await nitroApp.hooks.callHook("render:island", islandResponse, { event, islandContext });
    if (import.meta.prerender) {
 diff --git a/dist/core/runtime/nitro/handlers/renderer.js b/dist/core/runtime/nitro/handlers/renderer.js
-index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3639dcc1f 100644
+index 7a97ee4e0a594f4fc62e3cbbf09e2bfd26899b73..821c1794dd6082e956ff3ae1de496648d77c352a 100644
 --- a/dist/core/runtime/nitro/handlers/renderer.js
 +++ b/dist/core/runtime/nitro/handlers/renderer.js
-@@ -15,9 +15,8 @@ import { payloadCache } from "../utils/cache.js";
+@@ -10,14 +10,14 @@ import { getQuery as getURLQuery, joinURL } from "ufo";
+ import { propsToString, renderSSRHead } from "@unhead/vue/server";
+ import destr from "destr";
+ import { defineRenderHandler, getRouteRules, useNitroApp } from "nitropack/runtime";
+-import { getEntryIds, getRenderer } from "../utils/renderer/build-files.js";
++import { getRenderer } from "../utils/renderer/build-files.js";
+ import { payloadCache } from "../utils/cache.js";
  import { renderPayloadJsonScript, renderPayloadResponse, renderPayloadScript, splitPayload } from "../utils/renderer/payload.js";
  import { createSSRContext, setSSRError } from "../utils/renderer/app.js";
  import { renderInlineStyles } from "../utils/renderer/inline-styles.js";
@@ -794,10 +1100,20 @@ index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3
  import { renderSSRHeadOptions } from "#internal/unhead.config.mjs";
 -import { appHead, appTeleportAttrs, appTeleportTag, componentIslands, appManifest as isAppManifestEnabled } from "#internal/nuxt.config.mjs";
 +import { appHead, appTeleportAttrs, appTeleportTag, appManifest as isAppManifestEnabled } from "#internal/nuxt.config.mjs";
++import entryIds from "#internal/nuxt/entry-ids.mjs";
  import { entryFileName } from "#internal/entry-chunk.mjs";
  import { buildAssetsURL, publicAssetsURL } from "#internal/nuxt/paths";
- globalThis.__buildAssetsURL = buildAssetsURL;
-@@ -136,7 +135,7 @@ export default defineRenderHandler(async (event) => {
+ import { relative } from "pathe";
+@@ -77,7 +77,7 @@ export default defineRenderHandler(async (event) => {
+     }
+   }
+   if (process.env.NUXT_INLINE_STYLES) {
+-    for (const id of await getEntryIds()) {
++    for (const id of entryIds) {
+       ssrContext.modules.add(id);
+     }
+   }
+@@ -150,7 +150,7 @@ export default defineRenderHandler(async (event) => {
      ssrContext.head.push({ style: inlinedStyles });
    }
    const link = [];
@@ -806,7 +1122,7 @@ index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3
      if (import.meta.dev && "inline" in getURLQuery(resource.file)) {
        continue;
      }
-@@ -147,10 +146,10 @@ export default defineRenderHandler(async (event) => {
+@@ -161,10 +161,10 @@ export default defineRenderHandler(async (event) => {
    }
    if (!NO_SCRIPTS) {
      ssrContext.head.push({
@@ -819,7 +1135,7 @@ index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3
      }, headEntryOptions);
      ssrContext.head.push({
        script: _PAYLOAD_EXTRACTION ? process.env.NUXT_JSON_PAYLOADS ? renderPayloadJsonScript({ ssrContext, data: splitPayload(ssrContext).initial, src: payloadURL }) : renderPayloadScript({ ssrContext, data: splitPayload(ssrContext).initial, src: payloadURL }) : process.env.NUXT_JSON_PAYLOADS ? renderPayloadJsonScript({ ssrContext, data: ssrContext.payload }) : renderPayloadScript({ ssrContext, data: ssrContext.payload })
-@@ -182,7 +181,7 @@ export default defineRenderHandler(async (event) => {
+@@ -196,7 +196,7 @@ export default defineRenderHandler(async (event) => {
      bodyAttrs: bodyAttrs ? [bodyAttrs] : [],
      bodyPrepend: normalizeChunks([bodyTagsOpen, ssrContext.teleports?.body]),
      body: [
@@ -828,30 +1144,349 @@ index 7046c97992c550e1af5e28acc258aad332ba8ebe..ab1f3ec2719dc978df4499ae918379c3
        APP_TELEPORT_OPEN_TAG + (HAS_APP_TELEPORTS ? joinTags([ssrContext.teleports?.[`#${appTeleportAttrs.id}`]]) : "") + APP_TELEPORT_CLOSE_TAG
      ],
      bodyAppend: [bodyTags]
-diff --git a/dist/core/runtime/nitro/templates/error-500.js b/dist/core/runtime/nitro/templates/error-500.js
-index ae62858380d6ad65d8193c809b294b3112210266..224ae7db11c59ceb463664c4e7a47a07b2c0ff53 100644
---- a/dist/core/runtime/nitro/templates/error-500.js
-+++ b/dist/core/runtime/nitro/templates/error-500.js
-@@ -2,5 +2,5 @@ import { escapeHtml } from "@vue/shared";
- const _messages = { "appName": "Nuxt", "statusCode": 500, "statusMessage": "Internal server error", "description": "This page is temporarily unavailable.", "refresh": "Refresh this page" };
- export const template = (messages) => {
-   messages = { ..._messages, ...messages };
--  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage) + " | " + escapeHtml(messages.appName) + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1,h2{font-size:inherit;font-weight:inherit}h1,h2,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.grid{display:grid}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.max-w-520px{max-width:520px}.min-h-screen{min-height:100vh}.place-content-center{place-content:center}.overflow-hidden{overflow:hidden}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.px-2{padding-left:.5rem;padding-right:.5rem}.text-center{text-align:center}.text-\\[80px\\]{font-size:80px}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\\[\\#020420\\]{--un-text-opacity:1;color:rgb(2 4 32/var(--un-text-opacity))}.text-\\[\\#64748B\\]{--un-text-opacity:1;color:rgb(100 116 139/var(--un-text-opacity))}.font-semibold{font-weight:600}.leading-none{line-height:1}.tracking-wide{letter-spacing:.025em}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.tabular-nums{--un-numeric-spacing:tabular-nums;font-variant-numeric:var(--un-ordinal) var(--un-slashed-zero) var(--un-numeric-figure) var(--un-numeric-spacing) var(--un-numeric-fraction)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:text-\\[110px\\]{font-size:110px}.sm\\:text-3xl{font-size:1.875rem;line-height:2.25rem}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white font-sans grid min-h-screen overflow-hidden place-content-center text-[#020420] tracking-wide"><div class="max-w-520px text-center"><h1 class="font-semibold leading-none mb-4 sm:text-[110px] tabular-nums text-[80px]">` + escapeHtml(messages.statusCode) + '</h1><h2 class="font-semibold mb-2 sm:text-3xl text-2xl">' + escapeHtml(messages.statusMessage) + '</h2><p class="mb-4 px-2 text-[#64748B] text-md">' + escapeHtml(messages.description) + "</p></div></body></html>";
-+  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage) + " | " + escapeHtml(messages.appName) + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1,h2{font-size:inherit;font-weight:inherit}h1,h2,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.grid{display:grid}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.max-w-520px{max-width:520px}.min-h-screen{min-height:100vh}.place-content-center{place-content:center}.overflow-hidden{overflow:hidden}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.px-2{padding-left:.5rem;padding-right:.5rem}.text-center{text-align:center}.text-\\[80px\\]{font-size:80px}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\\[\\#020420\\]{--un-text-opacity:1;color:rgb(2 4 32/var(--un-text-opacity))}.text-\\[\\#64748B\\]{--un-text-opacity:1;color:rgb(100 116 139/var(--un-text-opacity))}.font-semibold{font-weight:600}.leading-none{line-height:1}.tracking-wide{letter-spacing:.025em}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.tabular-nums{--un-numeric-spacing:tabular-nums;font-variant-numeric:var(--un-ordinal) var(--un-slashed-zero) var(--un-numeric-figure) var(--un-numeric-spacing) var(--un-numeric-fraction)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:text-\\[110px\\]{font-size:110px}.sm\\:text-3xl{font-size:1.875rem;line-height:2.25rem}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white font-sans grid min-h-screen overflow-hidden place-content-center text-[#020420] tracking-wide"><div class="max-w-520px text-center"><h1 class="font-semibold leading-none mb-4 sm:text-[110px] tabular-nums text-[80px]">` + escapeHtml(messages.statusCode) + '</h1><h2 class="font-semibold mb-2 sm:text-3xl text-2xl">' + escapeHtml(messages.statusMessage) + '</h2><p class="mb-4 px-2 text-[#64748B] text-md">' + escapeHtml(messages.description) + "</p></div></body></html>";
- };
-diff --git a/dist/core/runtime/nitro/templates/error-dev.js b/dist/core/runtime/nitro/templates/error-dev.js
-index 20087a8abcee6700b182fd521f39a5aba63969f9..4594533c87de48633591e64c86816ab06973b1c7 100644
---- a/dist/core/runtime/nitro/templates/error-dev.js
-+++ b/dist/core/runtime/nitro/templates/error-dev.js
-@@ -2,5 +2,5 @@ import { escapeHtml } from "@vue/shared";
- const _messages = { "appName": "Nuxt", "statusCode": 500, "statusMessage": "Server error", "description": "An error occurred in the application and the page could not be served.", "stack": "" };
- export const template = (messages) => {
-   messages = { ..._messages, ...messages };
--  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage || "Internal Server Error") + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver(e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)}).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}h1,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.absolute{position:absolute}.top-6{top:1.5rem}.z-10{z-index:10}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.inline-block{display:inline-block}.h-auto{height:auto}.min-h-screen{min-height:100vh}.flex{display:flex}.flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.overflow-y-auto{overflow-y:auto}.border{border-width:1px}.border-b-0{border-bottom-width:0}.border-black\\/5{border-color:#0000000d}.rounded-t-md{border-top-left-radius:.375rem;border-top-right-radius:.375rem}.bg-gray-50\\/50{background-color:#f5f5f580}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.pt-12{padding-top:3rem}.text-6xl{font-size:3.75rem;line-height:1}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-black{--un-text-opacity:1;color:rgb(0 0 0/var(--un-text-opacity))}.hover\\:text-\\[\\#00DC82\\]:hover{--un-text-opacity:1;color:rgb(0 220 130/var(--un-text-opacity))}.font-light{font-weight:300}.font-medium{font-weight:500}.leading-tight{line-height:1.25}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.hover\\:underline:hover{text-decoration-line:underline}.underline-offset-3{text-underline-offset:3px}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:border-white\\/10{border-color:#ffffff1a}.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:bg-white\\/5{background-color:#ffffff0d}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:right-6{right:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\\:text-8xl{font-size:6rem;line-height:1}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white flex flex-col font-sans min-h-screen pt-12 px-10 text-black"><h1 class="font-medium mb-4 sm:text-8xl text-6xl">` + escapeHtml(messages.statusCode) + '</h1><p class="font-light leading-tight mb-8 sm:text-2xl text-xl">' + escapeHtml(messages.description) + '</p><a href="https://nuxt.com/docs/getting-started/error-handling?utm_source=nuxt-error-dev-page" target="_blank" class="absolute font-medium hover:text-[#00DC82] hover:underline inline-block mx-auto sm:right-6 text-sm top-6 underline-offset-3">Customize this page</a><div class="bg-gray-50/50 border border-b-0 border-black/5 dark:bg-white/5 dark:border-white/10 flex-1 h-auto overflow-y-auto rounded-t-md"><div class="font-light leading-tight p-8 text-xl z-10">' + escapeHtml(messages.stack) + "</div></div></body></html>";
-+  return '<!DOCTYPE html><html lang="en"><head><title>' + escapeHtml(messages.statusCode) + " - " + escapeHtml(messages.statusMessage || "Internal Server Error") + `</title><meta charset="utf-8"><meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0" name="viewport"><script>!function(){const e=document.createElement("link").relList;if(!(e&&e.supports&&e.supports("modulepreload"))){for(const e of document.querySelectorAll('link[rel="modulepreload"]'))r(e);new MutationObserver((e=>{for(const o of e)if("childList"===o.type)for(const e of o.addedNodes)"LINK"===e.tagName&&"modulepreload"===e.rel&&r(e)})).observe(document,{childList:!0,subtree:!0})}function r(e){if(e.ep)return;e.ep=!0;const r=function(e){const r={};return e.integrity&&(r.integrity=e.integrity),e.referrerPolicy&&(r.referrerPolicy=e.referrerPolicy),"use-credentials"===e.crossOrigin?r.credentials="include":"anonymous"===e.crossOrigin?r.credentials="omit":r.credentials="same-origin",r}(e);fetch(e.href,r)}}();<\/script><style>*,:after,:before{border-color:var(--un-default-border-color,#e5e7eb);border-style:solid;border-width:0;box-sizing:border-box}:after,:before{--un-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-moz-tab-size:4;tab-size:4;-webkit-tap-highlight-color:transparent}body{line-height:inherit;margin:0}h1{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}h1,p{margin:0}*,:after,:before{--un-rotate:0;--un-rotate-x:0;--un-rotate-y:0;--un-rotate-z:0;--un-scale-x:1;--un-scale-y:1;--un-scale-z:1;--un-skew-x:0;--un-skew-y:0;--un-translate-x:0;--un-translate-y:0;--un-translate-z:0;--un-pan-x: ;--un-pan-y: ;--un-pinch-zoom: ;--un-scroll-snap-strictness:proximity;--un-ordinal: ;--un-slashed-zero: ;--un-numeric-figure: ;--un-numeric-spacing: ;--un-numeric-fraction: ;--un-border-spacing-x:0;--un-border-spacing-y:0;--un-ring-offset-shadow:0 0 transparent;--un-ring-shadow:0 0 transparent;--un-shadow-inset: ;--un-shadow:0 0 transparent;--un-ring-inset: ;--un-ring-offset-width:0px;--un-ring-offset-color:#fff;--un-ring-width:0px;--un-ring-color:rgba(147,197,253,.5);--un-blur: ;--un-brightness: ;--un-contrast: ;--un-drop-shadow: ;--un-grayscale: ;--un-hue-rotate: ;--un-invert: ;--un-saturate: ;--un-sepia: ;--un-backdrop-blur: ;--un-backdrop-brightness: ;--un-backdrop-contrast: ;--un-backdrop-grayscale: ;--un-backdrop-hue-rotate: ;--un-backdrop-invert: ;--un-backdrop-opacity: ;--un-backdrop-saturate: ;--un-backdrop-sepia: }.absolute{position:absolute}.top-6{top:1.5rem}.z-10{z-index:10}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.inline-block{display:inline-block}.h-auto{height:auto}.min-h-screen{min-height:100vh}.flex{display:flex}.flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.overflow-y-auto{overflow-y:auto}.border{border-width:1px}.border-b-0{border-bottom-width:0}.border-black\\/5{border-color:#0000000d}.rounded-t-md{border-top-left-radius:.375rem;border-top-right-radius:.375rem}.bg-gray-50\\/50{background-color:#f5f5f580}.bg-white{--un-bg-opacity:1;background-color:rgb(255 255 255/var(--un-bg-opacity))}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.pt-12{padding-top:3rem}.text-6xl{font-size:3.75rem;line-height:1}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-black{--un-text-opacity:1;color:rgb(0 0 0/var(--un-text-opacity))}.hover\\:text-\\[\\#00DC82\\]:hover{--un-text-opacity:1;color:rgb(0 220 130/var(--un-text-opacity))}.font-light{font-weight:300}.font-medium{font-weight:500}.leading-tight{line-height:1.25}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.hover\\:underline:hover{text-decoration-line:underline}.underline-offset-3{text-underline-offset:3px}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}@media (prefers-color-scheme:dark){.dark\\:border-white\\/10{border-color:#ffffff1a}.dark\\:bg-\\[\\#020420\\]{--un-bg-opacity:1;background-color:rgb(2 4 32/var(--un-bg-opacity))}.dark\\:bg-white\\/5{background-color:#ffffff0d}.dark\\:text-white{--un-text-opacity:1;color:rgb(255 255 255/var(--un-text-opacity))}}@media (min-width:640px){.sm\\:right-6{right:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\\:text-8xl{font-size:6rem;line-height:1}}</style></head><body class="antialiased bg-white dark:bg-[#020420] dark:text-white flex flex-col font-sans min-h-screen pt-12 px-10 text-black"><h1 class="font-medium mb-4 sm:text-8xl text-6xl">` + escapeHtml(messages.statusCode) + '</h1><p class="font-light leading-tight mb-8 sm:text-2xl text-xl">' + escapeHtml(messages.description) + '</p><a href="https://nuxt.com/docs/getting-started/error-handling?utm_source=nuxt-error-dev-page" target="_blank" class="absolute font-medium hover:text-[#00DC82] hover:underline inline-block mx-auto sm:right-6 text-sm top-6 underline-offset-3">Customize this page</a><div class="bg-gray-50/50 border border-b-0 border-black/5 dark:bg-white/5 dark:border-white/10 flex-1 h-auto overflow-y-auto rounded-t-md"><div class="font-light leading-tight p-8 text-xl z-10">' + escapeHtml(messages.stack) + "</div></div></body></html>";
- };
+diff --git a/dist/core/runtime/nitro/utils/dev.d.ts b/dist/core/runtime/nitro/utils/dev.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..a47e23331c21b2b89d6da5ae47775055806bbb06
+--- /dev/null
++++ b/dist/core/runtime/nitro/utils/dev.d.ts
+@@ -0,0 +1 @@
++export declare function generateErrorOverlayHTML(html: string): string;
+diff --git a/dist/core/runtime/nitro/utils/dev.js b/dist/core/runtime/nitro/utils/dev.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..2327e5a994862a7bc61ac04119842bfe742aa2ac
+--- /dev/null
++++ b/dist/core/runtime/nitro/utils/dev.js
+@@ -0,0 +1,328 @@
++const iframeStorageBridge = (nonce) => (
++  /* js */
++  `
++(function() {
++  const memoryStore = {};
++
++  const NONCE = ${JSON.stringify(nonce)}
++  
++  const mockStorage = {
++    getItem: function(key) {
++      return memoryStore[key] !== undefined ? memoryStore[key] : null;
++    },
++    setItem: function(key, value) {
++      memoryStore[key] = String(value);
++      window.parent.postMessage({
++        type: 'storage-set',
++        key: key,
++        value: String(value),
++        nonce: NONCE
++      }, '*');
++    },
++    removeItem: function(key) {
++      delete memoryStore[key];
++      window.parent.postMessage({
++        type: 'storage-remove',
++        key: key,
++        nonce: NONCE
++      }, '*');
++    },
++    clear: function() {
++      for (const key in memoryStore) {
++        delete memoryStore[key];
++      }
++      window.parent.postMessage({
++        type: 'storage-clear',
++        nonce: NONCE
++      }, '*');
++    },
++    key: function(index) {
++      const keys = Object.keys(memoryStore);
++      return keys[index] !== undefined ? keys[index] : null;
++    },
++    get length() {
++      return Object.keys(memoryStore).length;
++    }
++  };
++  
++  try {
++    Object.defineProperty(window, 'localStorage', {
++      value: mockStorage,
++      writable: false,
++      configurable: true
++    });
++  } catch (e) {
++    window.localStorage = mockStorage;
++  }
++  
++  window.addEventListener('message', function(event) {
++    if (event.data.type === 'storage-sync-data' && event.data.nonce === NONCE) {
++      const data = event.data.data;
++      for (const key in data) {
++        if (Object.prototype.hasOwnProperty.call(data, key)) {
++          memoryStore[key] = data[key];
++        }
++      }
++      if (typeof window.initTheme === 'function') {
++        window.initTheme();
++      }
++      window.dispatchEvent(new Event('storage-ready'));
++    }
++  });
++  
++  window.parent.postMessage({ 
++    type: 'storage-sync-request',
++    nonce: NONCE
++  }, '*');
++})();
++`
++);
++const parentStorageBridge = (nonce) => (
++  /* js */
++  `
++(function() {
++  const host = document.querySelector('nuxt-error-overlay');
++  if (!host) return;
++  
++  // Wait for shadow root to be attached
++  const checkShadow = setInterval(function() {
++    if (host.shadowRoot) {
++      clearInterval(checkShadow);
++      const iframe = host.shadowRoot.getElementById('frame');
++      if (!iframe) return;
++
++      const NONCE = ${JSON.stringify(nonce)}
++      
++      window.addEventListener('message', function(event) {
++        if (!event.data || event.data.nonce !== NONCE) return;
++        
++        const data = event.data;
++        
++        if (data.type === 'storage-set') {
++          localStorage.setItem(data.key, data.value);
++        } else if (data.type === 'storage-remove') {
++          localStorage.removeItem(data.key);
++        } else if (data.type === 'storage-clear') {
++          localStorage.clear();
++        } else if (data.type === 'storage-sync-request') {
++          const allData = {};
++          for (let i = 0; i < localStorage.length; i++) {
++            const key = localStorage.key(i);
++            allData[key] = localStorage.getItem(key);
++          }
++          iframe.contentWindow.postMessage({
++            type: 'storage-sync-data',
++            data: allData,
++            nonce: NONCE
++          }, '*');
++        }
++      });
++    }
++  }, 10);
++})();
++`
++);
++const errorCSS = (
++  /* css */
++  `
++:host {
++  --preview-width: 240px;
++  --preview-height: 180px;
++  --base-width: 1200px;
++  --base-height: 900px;
++  --z-base: 999999998;
++  all: initial;
++  display: contents;
++}
++.sr-only {
++  position: absolute;
++  width: 1px;
++  height: 1px;
++  padding: 0;
++  margin: -1px;
++  overflow: hidden;
++  clip: rect(0, 0, 0, 0);
++  white-space: nowrap;
++  border-width: 0;
++}
++#frame {
++  position: fixed;
++  left: 0;
++  top: 0;
++  width: 100vw;
++  height: 100vh;
++  z-index: var(--z-base);
++}
++#frame[inert] {
++  right: 5px;
++  bottom: 5px;
++  left: auto;
++  top: auto;
++  width: var(--base-width);
++  height: var(--base-height);
++  transform: scale(calc(240 / 1200));
++  transform-origin: bottom right;
++  overflow: hidden;
++  border-radius: calc(1200 * 8px / 240);
++}
++#preview {
++  position: fixed;
++  right: 5px;
++  bottom: 5px;
++  width: var(--preview-width);
++  height: var(--preview-height);
++  overflow: hidden;
++  border-radius: 8px;
++  pointer-events: none;
++  z-index: var(--z-base);
++  background: white;
++  display: none;
++}
++#frame:not([inert]) + #preview {
++  display: block;
++}
++#toggle {
++  position: fixed;
++  right: 5px;
++  bottom: 5px;
++  width: var(--preview-width);
++  height: var(--preview-height);
++  background: none;
++  border: 3px solid #00DC82;
++  border-radius: 8px;
++  cursor: pointer;
++  opacity: 0.8;
++  transition: opacity 0.2s, box-shadow 0.2s;
++  z-index: calc(var(--z-base) + 1);
++}
++#toggle:hover,
++#toggle:focus {
++  opacity: 1;
++  box-shadow: 0 0 20px rgba(0, 220, 130, 0.6);
++}
++#toggle:focus-visible {
++  outline: 3px solid #00DC82;
++  outline-offset: 3px;
++  box-shadow: 0 0 24px rgba(0, 220, 130, 0.8);
++}
++@media (prefers-reduced-motion: reduce) {
++  #toggle {
++    transition: none;
++  }
++}
++`
++);
++function webComponentScript(base64HTML) {
++  return (
++    /* js */
++    `
++  (function() {
++    try {
++      const host = document.querySelector('nuxt-error-overlay');
++      if (!host) return;
++      
++      const shadow = host.attachShadow({ mode: 'open' });
++      
++      // Create elements
++      const style = document.createElement('style');
++      style.textContent = ${JSON.stringify(errorCSS)};
++      
++      const iframe = document.createElement('iframe');
++      iframe.id = 'frame';
++      iframe.src = 'data:text/html;base64,${base64HTML}';
++      iframe.title = 'Detailed error stack trace';
++      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
++      
++      const preview = document.createElement('div');
++      preview.id = 'preview';
++      
++      const button = document.createElement('button');
++      button.id = 'toggle';
++      button.setAttribute('aria-expanded', 'true');
++      button.setAttribute('type', 'button');
++      button.innerHTML = '<span class="sr-only">Toggle detailed error view</span>';
++      
++      const liveRegion = document.createElement('div');
++      liveRegion.setAttribute('role', 'status');
++      liveRegion.setAttribute('aria-live', 'polite');
++      liveRegion.className = 'sr-only';
++      
++      // Update preview snapshot
++      function updatePreview() {
++        try {
++          let previewIframe = preview.querySelector('iframe');
++          if (!previewIframe) {
++            previewIframe = document.createElement('iframe');
++            previewIframe.style.cssText = 'width: 1200px; height: 900px; transform: scale(0.2); transform-origin: top left; border: none;';
++            previewIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
++            preview.appendChild(previewIframe);
++          }
++          
++          const doctype = document.doctype ? '<!DOCTYPE ' + document.doctype.name + '>' : '';
++          const cleanedHTML = document.documentElement.outerHTML
++            .replace(/<nuxt-error-overlay[^>]*>.*?<\\/nuxt-error-overlay>/gs, '')
++            .replace(/<script[^>]*>.*?<\\/script>/gs, '');
++          
++          const iframeDoc = previewIframe.contentDocument || previewIframe.contentWindow.document;
++          iframeDoc.open();
++          iframeDoc.write(doctype + cleanedHTML);
++          iframeDoc.close();
++        } catch (error) {
++          console.error('Failed to update preview:', error);
++        }
++      }
++      
++      function toggleView() {
++        const isMinimized = iframe.hasAttribute('inert');
++        
++        if (isMinimized) {
++          updatePreview();
++          iframe.removeAttribute('inert');
++          button.setAttribute('aria-expanded', 'true');
++          liveRegion.textContent = 'Showing detailed error view';
++          setTimeout(function() {
++            try { iframe.contentWindow.focus(); } catch {}
++          }, 100);
++        } else {
++          iframe.setAttribute('inert', '');
++          button.setAttribute('aria-expanded', 'false');
++          liveRegion.textContent = 'Showing error page';
++          button.focus();
++        }
++      }
++      
++      button.onclick = toggleView;
++      
++      document.addEventListener('keydown', function(e) {
++        if ((e.key === 'Escape' || e.key === 'Esc') && !iframe.hasAttribute('inert')) {
++          toggleView();
++        }
++      });
++      
++      // Append to shadow DOM
++      shadow.appendChild(style);
++      shadow.appendChild(liveRegion);
++      shadow.appendChild(iframe);
++      shadow.appendChild(preview);
++      shadow.appendChild(button);
++      
++      // Initialize preview
++      setTimeout(updatePreview, 100);
++      
++    } catch (error) {
++      console.error('Failed to initialize Nuxt error overlay:', error);
++    }
++  })();
++  `
++  );
++}
++export function generateErrorOverlayHTML(html) {
++  const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
++  const errorPage = html.replace("<head>", `<head><script>${iframeStorageBridge(nonce)}<\/script>`);
++  const base64HTML = Buffer.from(errorPage, "utf8").toString("base64");
++  return `
++    <script>${parentStorageBridge(nonce)}<\/script>
++    <nuxt-error-overlay></nuxt-error-overlay>
++    <script>${webComponentScript(base64HTML)}<\/script>
++  `;
++}
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.d.ts b/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
-index 53ccf5705763b46fde817535789b2712b1d7853c..a4b20118456845141876e1d20ff7e83073bdb7bc 100644
+index 53ccf5705763b46fde817535789b2712b1d7853c..e262dd3a7f6245bb58b8db95c147df7fb65536d9 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.d.ts
 @@ -1,4 +1,6 @@
@@ -861,28 +1496,90 @@ index 53ccf5705763b46fde817535789b2712b1d7853c..a4b20118456845141876e1d20ff7e830
  export declare const getSSRRenderer: () => Promise<{
      rendererContext: import("vue-bundle-renderer/runtime").RendererContext;
      renderToString(ssrContext: import("vue-bundle-renderer/runtime").SSRContext): Promise<{
+@@ -20,4 +22,3 @@ export declare function getRenderer(ssrContext: NuxtSSRContext): Promise<{
+     }>;
+ }>;
+ export declare const getSSRStyles: () => Promise<Record<string, () => Promise<string[]>>>;
+-export declare const getEntryIds: () => Promise<string[]>;
 diff --git a/dist/core/runtime/nitro/utils/renderer/build-files.js b/dist/core/runtime/nitro/utils/renderer/build-files.js
-index c1f27b5c0fa710386d83f5bb44162f9176b260c2..121b155bf2b6824fda4e582fd7647eca2e0a7078 100644
+index 2e2d743ae8da866f782601c4d0c2c00b858c8f74..cc274d8aed0a29814777daab25c90abe13434b49 100644
 --- a/dist/core/runtime/nitro/utils/renderer/build-files.js
 +++ b/dist/core/runtime/nitro/utils/renderer/build-files.js
-@@ -8,7 +8,14 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
+@@ -8,23 +8,22 @@ import { appRootAttrs, appRootTag, appSpaLoaderAttrs, appSpaLoaderTag, spaLoadin
  import { buildAssetsURL } from "#internal/nuxt/paths";
  const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
  const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
 -const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
 +export const getServerEntry = () => import("#build/dist/server/server.mjs").then((r) => r.default || r);
-+export const getComponentsIslands = () => import("#build/dist/server/components.islands.mjs").then((r) => {
-+  if(import.meta.dev) { 
-+    return r.default().then(r => r.islandComponents)
-+  }
-+   return r.islandComponents
-+});
-+
++export const getComponentsIslands = () => import("#build/dist/server/components.islands.mjs").then((r) => import.meta.dev ? r.default() : r);
  const getClientManifest = () => import("#build/dist/server/client.manifest.mjs").then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
++const getPrecomputedDependencies = () => import("#build/dist/server/client.precomputed.mjs").then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
  export const getSSRRenderer = lazyCachedFunction(async () => {
-   const manifest = await getClientManifest();
+-  const manifest = await getClientManifest();
+-  if (!manifest) {
+-    throw new Error("client.manifest is not available");
+-  }
+   const createSSRApp = await getServerEntry();
+   if (!createSSRApp) {
+     throw new Error("Server bundle is not available");
+   }
+-  const options = {
+-    manifest,
++  const precomputed = import.meta.dev ? void 0 : await getPrecomputedDependencies();
++  const renderer = createRenderer(createSSRApp, {
++    precomputed,
++    manifest: import.meta.dev ? await getClientManifest() : void 0,
+     renderToString,
+     buildAssetsURL
+-  };
+-  const renderer = createRenderer(createSSRApp, options);
++  });
+   async function renderToString(input, context) {
+     const html = await _renderToString(input, context);
+     if (import.meta.dev && process.env.NUXT_VITE_NODE_OPTIONS) {
+@@ -35,7 +34,7 @@ export const getSSRRenderer = lazyCachedFunction(async () => {
+   return renderer;
+ });
+ const getSPARenderer = lazyCachedFunction(async () => {
+-  const manifest = await getClientManifest();
++  const precomputed = import.meta.dev ? void 0 : await getPrecomputedDependencies();
+   const spaTemplate = await import("#spa-template").then((r) => r.template).catch(() => "").then((r) => {
+     if (spaLoadingTemplateOutside) {
+       const APP_SPA_LOADER_OPEN_TAG = `<${appSpaLoaderTag}${propsToString(appSpaLoaderAttrs)}>`;
+@@ -47,13 +46,13 @@ const getSPARenderer = lazyCachedFunction(async () => {
+       return APP_ROOT_OPEN_TAG + r + APP_ROOT_CLOSE_TAG;
+     }
+   });
+-  const options = {
+-    manifest,
++  const renderer = createRenderer(() => () => {
++  }, {
++    precomputed,
++    manifest: import.meta.dev ? await getClientManifest() : void 0,
+     renderToString: () => spaTemplate,
+     buildAssetsURL
+-  };
+-  const renderer = createRenderer(() => () => {
+-  }, options);
++  });
+   const result = await renderer.renderToString({});
+   const renderToString = (ssrContext) => {
+     const config = useRuntimeConfig(ssrContext.event);
+@@ -86,12 +85,3 @@ export function getRenderer(ssrContext) {
+   return process.env.NUXT_NO_SSR || ssrContext.noSSR ? getSPARenderer() : getSSRRenderer();
+ }
+ export const getSSRStyles = lazyCachedFunction(() => import("#build/dist/server/styles.mjs").then((r) => r.default || r));
+-export const getEntryIds = () => getClientManifest().then((r) => {
+-  const entryIds = [];
+-  for (const entry of Object.values(r)) {
+-    if (entry._globalCSS) {
+-      entryIds.push(entry.src);
+-    }
+-  }
+-  return entryIds;
+-});
 diff --git a/dist/core/runtime/nitro/utils/renderer/islands.d.ts b/dist/core/runtime/nitro/utils/renderer/islands.d.ts
-index bd881c1d4120c2555cc7c07178e7dc0328647138..448c1765372db61fcb20edcc2eb9d79d7578ffd5 100644
+index bd881c1d4120c2555cc7c07178e7dc0328647138..2dece41cd51f289983bd22a57a3817c1b19e359e 100644
 --- a/dist/core/runtime/nitro/utils/renderer/islands.d.ts
 +++ b/dist/core/runtime/nitro/utils/renderer/islands.d.ts
 @@ -1,13 +1,4 @@
@@ -1000,7 +1697,7 @@ index 9d3a049702291c09150ca9c187a3b6a1aef5988e..e69de29bb2d1d6434b8b29ae775ad8c2
 -  return html;
 -}
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a665d731d46 100644
+index 6f6d7012500f2ae604718d6d23f877e2ab8ca796..c75a177134c66da7af46a4ededf60b227403ceb3 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -5,7 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
@@ -1008,29 +1705,174 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
  import { createHooks, createDebugger } from 'hookable';
  import ignore from 'ignore';
 -import { useLogger, tryUseNuxt, useNuxt, directoryToURL, getLayerDirectories, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias as resolveAlias$1, addPluginTemplate, addImportsSources, addVitePlugin, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addWebpackPlugin, addServerPlugin, installModules, addServerTemplate, addServerHandler, addRouteMiddleware, resolveModuleWithOptions, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
-+import { useLogger, tryUseNuxt, useNuxt, directoryToURL, getLayerDirectories, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias as resolveAlias$1, addPluginTemplate, addImportsSources, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addVitePlugin, addWebpackPlugin, addServerPlugin, installModules, addServerTemplate, addServerHandler, addRouteMiddleware, resolveModuleWithOptions, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
- import { resolvePackageJSON, readPackageJSON } from 'pkg-types';
++import { useLogger, tryUseNuxt, useNuxt, directoryToURL, getLayerDirectories, resolveFiles, resolvePath, defineNuxtModule, findPath, addPlugin, addTemplate, addTypeTemplate, addComponent, useNitro, addBuildPlugin, isIgnored, resolveAlias as resolveAlias$1, addPluginTemplate, addImportsSources, createIsIgnored, updateTemplates, tryResolveModule, normalizeModuleTranspilePath, resolveNuxtModule, resolveIgnorePatterns, addVitePlugin, logger as logger$1, createResolver, importModule, tryImportModule, runWithNuxtContext, nuxtCtx, loadNuxtConfig, addWebpackPlugin, addServerPlugin, installModules, addServerTemplate, addServerHandler, addRouteMiddleware, resolveModuleWithOptions, normalizeTemplate, normalizePlugin } from '@nuxt/kit';
+ import { resolvePackageJSON, readPackage, readPackageJSON } from 'pkg-types';
  import { hash, isEqual, serialize } from 'ohash';
  import consola, { consola as consola$1 } from 'consola';
-@@ -39,8 +39,8 @@ import { stripLiteral } from 'strip-literal';
+@@ -19,28 +19,29 @@ import defu$1, { defu } from 'defu';
+ import { satisfies, coerce } from 'semver';
+ import { isCI, provider, isWindows, hasTTY } from 'std-env';
+ import { genArrayFromRaw, genSafeVariableName, genImport, genDynamicImport, genObjectFromRawEntries, genString, genExport } from 'knitwork';
++import { resolveModulePath } from 'exsolve';
+ import { addDependency } from 'nypm';
+ import { reverseResolveAlias, filename, resolveAlias } from 'pathe/utils';
+ import { createRoutesContext } from 'unplugin-vue-router';
+ import { resolveOptions } from 'unplugin-vue-router/options';
+ import { toRouteMatcher, createRouter, exportMatcher } from 'radix3';
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+-import { resolveModulePath } from 'exsolve';
+ import { runInNewContext } from 'node:vm';
+ import { klona } from 'klona';
+-import { parseAndWalk, ScopeTracker, walk, isBindingIdentifier, getUndeclaredIdentifiersInFunction } from 'oxc-walker';
++import { parseAndWalk as parseAndWalk$1, ScopeTracker as ScopeTracker$1, walk as walk$1, isBindingIdentifier, getUndeclaredIdentifiersInFunction } from 'oxc-walker';
+ import { parseSync } from 'oxc-parser';
+ import { transform } from 'oxc-transform';
+ import { splitByCase, kebabCase, pascalCase, camelCase } from 'scule';
+ import { createUnplugin } from 'unplugin';
+ import { findStaticImports, findExports, parseStaticImport, parseNodeModulePath, lookupNodeModuleSubpath } from 'mlly';
+ import MagicString from 'magic-string';
++import { stripLiteral } from 'strip-literal';
  import { unheadVueComposablesImports } from '@unhead/vue';
  import { defineUnimportPreset, createUnimport, toExports, scanDirExports } from 'unimport';
  import { glob } from 'tinyglobby';
 -import { parse, walk as walk$1, ELEMENT_NODE } from 'ultrahtml';
+ import { isObject } from '@vue/shared';
  import { parseQuery as parseQuery$1 } from 'vue-router';
-+import { parse, walk as walk$1 } from 'ultrahtml';
++import { parse, walk as walk$2 } from 'ultrahtml';
  import { createTransformer } from 'unctx/transform';
  import { cpus } from 'node:os';
  import { createNitro, scanHandlers, writeTypes, copyPublicAssets, prepare, build as build$1, prerender, createDevServer } from 'nitropack';
-@@ -1816,6 +1816,7 @@ export default {
-     nuxt.hooks.hook("nitro:config", (config) => {
-       config.virtual["#internal/unhead-options.mjs"] = () => nuxt.vfs["#build/unhead-options.mjs"] || "";
-       config.virtual["#internal/unhead.config.mjs"] = () => nuxt.vfs["#build/unhead.config.mjs"] || "";
-+      config.virtual["#internal/components.islands.mjs"] = () => nuxt.vfs["#build/components.islands.mjs"] || "";
-     });
-     addPlugin({ src: resolve(runtimeDir, "plugins/unhead") });
-   }
-@@ -2157,7 +2158,7 @@ const componentsIslandsTemplate = {
+@@ -406,7 +407,7 @@ function getRouteMeta(contents, absolutePath, extraExtractionKeys = /* @__PURE__
+       continue;
+     }
+     const dynamicProperties = /* @__PURE__ */ new Set();
+-    parseAndWalk(script.code, absolutePath.replace(/\.\w+$/, "." + script.loader), (node) => {
++    parseAndWalk$1(script.code, absolutePath.replace(/\.\w+$/, "." + script.loader), (node) => {
+       if (node.type !== "ExpressionStatement" || node.expression.type !== "CallExpression" || node.expression.callee.type !== "Identifier") {
+         return;
+       }
+@@ -943,7 +944,7 @@ const PageMetaPlugin = (options = {}) => createUnplugin(() => {
+           }
+         }
+       }
+-      const scopeTracker = new ScopeTracker({
++      const scopeTracker = new ScopeTracker$1({
+         preserveExitedScopes: true
+       });
+       function processDeclaration(scopeTrackerNode) {
+@@ -953,7 +954,7 @@ const PageMetaPlugin = (options = {}) => createUnplugin(() => {
+             if (!decl.init) {
+               continue;
+             }
+-            walk(decl.init, {
++            walk$1(decl.init, {
+               enter: (node, parent) => {
+                 if (node.type === "AwaitExpression") {
+                   logger.error(`Await expressions are not supported in definePageMeta. File: '${id}'`);
+@@ -981,7 +982,7 @@ const PageMetaPlugin = (options = {}) => createUnplugin(() => {
+           }
+         }
+       }
+-      const { program: ast } = parseAndWalk(code, id, {
++      const { program: ast } = parseAndWalk$1(code, id, {
+         scopeTracker,
+         parseOptions: {
+           lang: query.lang ?? "ts"
+@@ -989,7 +990,7 @@ const PageMetaPlugin = (options = {}) => createUnplugin(() => {
+       });
+       scopeTracker.freeze();
+       let instances = 0;
+-      walk(ast, {
++      walk$1(ast, {
+         scopeTracker,
+         enter: (node) => {
+           if (node.type !== "CallExpression" || node.callee.type !== "Identifier") {
+@@ -1025,7 +1026,7 @@ const PageMetaPlugin = (options = {}) => createUnplugin(() => {
+             }
+           }
+           const definePageMetaScope = scopeTracker.getCurrentScope();
+-          walk(meta, {
++          walk$1(meta, {
+             scopeTracker,
+             enter(node2, parent) {
+               if (isBindingIdentifier(node2, parent) || node2.type !== "Identifier") {
+@@ -1105,6 +1106,8 @@ function resolveEnd(node) {
+   return "fnNode" in node ? node.fnNode.end : node.end;
+ }
+ 
++const INJECTION_RE_TEMPLATE = /\b_ctx\.\$route\b/g;
++const INJECTION_RE_SCRIPT = /\bthis\.\$route\b/g;
+ const INJECTION_SINGLE_RE = /\bthis\.\$route\b|\b_ctx\.\$route\b/;
+ const RouteInjectionPlugin = (nuxt) => createUnplugin(() => {
+   return {
+@@ -1115,30 +1118,29 @@ const RouteInjectionPlugin = (nuxt) => createUnplugin(() => {
+     },
+     transform: {
+       filter: {
+-        code: {
+-          include: INJECTION_SINGLE_RE,
+-          exclude: [
+-            `_ctx._.provides[__nuxt_route_symbol`,
+-            "this._.provides[__nuxt_route_symbol"
+-          ]
+-        }
++        code: { include: INJECTION_SINGLE_RE }
+       },
+-      handler(code, id) {
++      handler(code) {
++        if (code.includes("_ctx._.provides[__nuxt_route_symbol") || code.includes("this._.provides[__nuxt_route_symbol")) {
++          return;
++        }
++        let replaced = false;
+         const s = new MagicString(code);
+-        parseAndWalk(code, id, (node) => {
+-          if (node.type !== "MemberExpression") {
+-            return;
+-          }
+-          if (node.object.type === "ThisExpression" && node.property.type === "Identifier" && node.property.name === "$route") {
+-            s.overwrite(node.start, node.end, "(this._.provides[__nuxt_route_symbol] || this.$route)");
+-            return;
+-          }
+-          if (node.object.type === "Identifier" && node.object.name === "_ctx" && node.property.type === "Identifier" && node.property.name === "$route") {
+-            s.overwrite(node.start, node.end, "(_ctx._.provides[__nuxt_route_symbol] || _ctx.$route)");
++        const strippedCode = stripLiteral(code);
++        const replaceMatches = (regExp, replacement) => {
++          for (const match of strippedCode.matchAll(regExp)) {
++            const start = match.index;
++            const end = start + match[0].length;
++            s.overwrite(start, end, replacement);
++            replaced ||= true;
+           }
+-        });
+-        if (s.hasChanged()) {
++        };
++        replaceMatches(INJECTION_RE_TEMPLATE, "(_ctx._.provides[__nuxt_route_symbol] || _ctx.$route)");
++        replaceMatches(INJECTION_RE_SCRIPT, "(this._.provides[__nuxt_route_symbol] || this.$route)");
++        if (replaced) {
+           s.prepend("import { PageRouteSymbol as __nuxt_route_symbol } from '#app/components/injections';\n");
++        }
++        if (s.hasChanged()) {
+           return {
+             code: s.toString(),
+             map: nuxt.options.sourcemap.client || nuxt.options.sourcemap.server ? s.generateMap({ hires: true }) : void 0
+@@ -1737,7 +1739,7 @@ const UnheadImportsPlugin = (options) => createUnplugin(() => {
+       handler(code, id) {
+         const s = new MagicString(code);
+         const importsToAdd = [];
+-        parseAndWalk(code, id, function(node) {
++        parseAndWalk$1(code, id, function(node) {
+           if (node.type === "ImportDeclaration" && [UnheadVue, "#app/composables/head"].includes(String(node.source.value))) {
+             importsToAdd.push(...node.specifiers);
+             const { start, end } = node;
+@@ -2049,7 +2051,6 @@ const vuePreset = defineUnimportPreset({
+     "hasInjectionContext",
+     "nextTick",
+     "provide",
+-    "mergeModels",
+     "toValue",
+     "useModel",
+     "useAttrs",
+@@ -2182,7 +2183,7 @@ const componentsIslandsTemplate = {
        component.mode === "server" && !components.some((c) => c.pascalName === component.pascalName && c.mode === "client")
      );
      const pageExports = pages?.filter((p) => p.mode === "server" && p.file && p.name).map((p) => {
@@ -1039,7 +1881,7 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
      }) || [];
      return [
        "import { defineAsyncComponent } from 'vue'",
-@@ -2166,19 +2167,19 @@ const componentsIslandsTemplate = {
+@@ -2191,7 +2192,7 @@ const componentsIslandsTemplate = {
          (c) => {
            const exp = c.export === "default" ? "c.default || c" : `c['${c.export}']`;
            const comment = createImportMagicComments(c);
@@ -1048,41 +1890,25 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
          }
        ).concat(pageExports).join(",\n"),
        "}"
-     ].join("\n");
--  }
-+  },
-+  write: true
- };
- const NON_VUE_RE = /\b\.(?!vue)\w+$/g;
--function resolveComponentTypes(nuxt, app) {
--  const buildDir = nuxt.options.buildDir;
-+function resolveComponentTypes(app, baseDir) {
-   const serverPlaceholderPath = resolve(distDir, "app/components/server-placeholder");
-   const componentTypes = app.components.filter((c) => !c.island).map((c) => {
--    const type = `typeof ${genDynamicImport(isAbsolute(c.filePath) ? relative(buildDir, c.filePath).replace(NON_VUE_RE, "") : c.filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
-+    const type = `typeof ${genDynamicImport(isAbsolute(c.filePath) ? relative(baseDir, c.filePath).replace(NON_VUE_RE, "") : c.filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
-     const isServerOnly = c.mode === "server" && c.filePath !== serverPlaceholderPath && !app.components.some((other) => other.pascalName === c.pascalName && other.mode === "client");
-     return [
-       c.pascalName,
-@@ -2204,7 +2205,7 @@ const componentsDeclarationTemplate = {
-   filename: "components.d.ts",
-   write: true,
-   getContents: ({ app, nuxt }) => {
--    const componentTypes = resolveComponentTypes(nuxt, app);
-+    const componentTypes = resolveComponentTypes(app, nuxt.options.buildDir);
-     return `
- import type { DefineComponent, SlotsType } from 'vue'
- ${nuxt.options.experimental.componentIslands ? islandType : ""}
-@@ -2220,7 +2221,7 @@ export const componentNames: string[]
- const componentsTypeTemplate = {
-   filename: "types/components.d.ts",
-   getContents: ({ app, nuxt }) => {
--    const componentTypes = resolveComponentTypes(nuxt, app);
-+    const componentTypes = resolveComponentTypes(app, join(nuxt.options.buildDir, "types"));
-     return `
- import type { DefineComponent, SlotsType } from 'vue'
- ${nuxt.options.experimental.componentIslands ? islandType : ""}
-@@ -2506,216 +2507,6 @@ function findComponent(components, name, mode) {
+@@ -2206,7 +2207,8 @@ function resolveComponentTypes(app, baseDir) {
+     if (c.island) {
+       continue;
+     }
+-    let type = `typeof ${genDynamicImport(isAbsolute(c.filePath) ? relative(baseDir, c.filePath).replace(NON_VUE_RE, "") : c.filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
++    const filePath = c.declarationPath || c.filePath;
++    let type = `typeof ${genDynamicImport(isAbsolute(filePath) ? relative(baseDir, filePath).replace(NON_VUE_RE, "") : filePath.replace(NON_VUE_RE, ""), { wrapper: false })}['${c.export}']`;
+     if (c.mode === "server") {
+       if (app.components.some((other) => other.pascalName === c.pascalName && other.mode === "client")) {
+         if (c.filePath.startsWith(serverPlaceholderPath)) {
+@@ -2348,6 +2350,7 @@ async function scanComponents(dirs, srcDir) {
+         preload: Boolean(dir.preload),
+         // specific to the file
+         filePath,
++        declarationPath: filePath,
+         pascalName,
+         kebabName,
+         chunkName,
+@@ -2536,222 +2539,6 @@ function findComponent(components, name, mode) {
    return otherModeComponent;
  }
  
@@ -1220,7 +2046,13 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
 -  if (Object.keys(bindings).length === 0) {
 -    return "undefined";
 -  }
--  const content = Object.entries(bindings).filter((b) => b[0] && (b[0] !== "_bind" && b[0] !== "v-for")).map(([name, value]) => isBinding(name) ? `[\`${name.slice(1)}\`]: ${value}` : `[\`${name}\`]: \`${value}\``).join(",");
+-  const contentParts = [];
+-  for (const [name, value] of Object.entries(bindings)) {
+-    if (name && (name !== "_bind" && name !== "v-for")) {
+-      contentParts.push(isBinding(name) ? `[\`${name.slice(1)}\`]: ${value}` : `[\`${name}\`]: \`${value}\``);
+-    }
+-  }
+-  const content = contentParts.join(",");
 -  const data = bindings._bind ? `__mergeProps(${bindings._bind}, { ${content} })` : `{ ${content} }`;
 -  if (!vfor) {
 -    return `[${data}]`;
@@ -1299,7 +2131,106 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
  const COMPONENT_QUERY_RE = /[?&]nuxt_component=/;
  function TransformPlugin$1(nuxt, options) {
    const componentUnimport = createUnimport({
-@@ -3509,32 +3300,7 @@ const componentsModule = defineNuxtModule({
+@@ -2887,7 +2674,7 @@ const TreeShakeTemplatePlugin = (options) => createUnplugin(() => {
+         return;
+       }
+       const componentsToRemoveSet = /* @__PURE__ */ new Set();
+-      const { program: ast } = parseAndWalk(code, id, (node) => {
++      const { program: ast } = parseAndWalk$1(code, id, (node) => {
+         if (!isSsrRender(node)) {
+           return;
+         }
+@@ -2906,7 +2693,7 @@ const TreeShakeTemplatePlugin = (options) => createUnplugin(() => {
+             s.remove(slot.start, slot.end + 1);
+             const removedCode = `({${code.slice(slot.start, slot.end + 1)}})`;
+             const currentState = s.toString();
+-            parseAndWalk(removedCode, id, (node2) => {
++            parseAndWalk$1(removedCode, id, (node2) => {
+               if (!isSsrRender(node2)) {
+                 return;
+               }
+@@ -2940,7 +2727,7 @@ const TreeShakeTemplatePlugin = (options) => createUnplugin(() => {
+ });
+ function removeFromSetupReturn(codeAst, name, magicString) {
+   let walkedInSetup = false;
+-  walk(codeAst, {
++  walk$1(codeAst, {
+     enter(node) {
+       if (walkedInSetup) {
+         this.skip();
+@@ -3000,9 +2787,9 @@ function isComponentNotCalledInSetup(code, id, name) {
+     return;
+   }
+   let found = false;
+-  parseAndWalk(code, id, function(node) {
++  parseAndWalk$1(code, id, function(node) {
+     if (node.type === "Property" && node.key.type === "Identifier" && node.value.type === "FunctionExpression" && node.key.name === "setup" || node.type === "FunctionDeclaration" && (node.id?.name === "_sfc_ssrRender" || node.id?.name === "ssrRender")) {
+-      walk(node, {
++      walk$1(node, {
+         enter(node2) {
+           if (found || node2.type === "VariableDeclaration") {
+             this.skip();
+@@ -3035,7 +2822,7 @@ function getComponentName(ssrRenderNode) {
+   }
+ }
+ function removeVariableDeclarator(codeAst, name, magicString, removedNodes) {
+-  walk(codeAst, {
++  walk$1(codeAst, {
+     enter(node) {
+       if (node.type !== "VariableDeclaration") {
+         return;
+@@ -3111,7 +2898,7 @@ const ComponentNamePlugin = (options) => createUnplugin(() => {
+         const s = new MagicString(code);
+         s.replace(NAME_RE, `__name: ${JSON.stringify(component.pascalName)}`);
+         if (!s.hasChanged()) {
+-          parseAndWalk(code, id, function(node) {
++          parseAndWalk$1(code, id, function(node) {
+             if (node.type !== "ExportDefaultDeclaration") {
+               return;
+             }
+@@ -3131,7 +2918,7 @@ const ComponentNamePlugin = (options) => createUnplugin(() => {
+   };
+ });
+ 
+-const SCRIPT_RE$1 = /(?<=<script[^>]*>)[\s\S]*?(?=<\/script>)/gi;
++const SCRIPT_RE$2 = /(?<=<script[^>]*>)[\s\S]*?(?=<\/script>)/gi;
+ const TEMPLATE_RE = /<template>([\s\S]*)<\/template>/;
+ const hydrationStrategyMap = {
+   hydrateOnIdle: "Idle",
+@@ -3170,19 +2957,19 @@ const LazyHydrationTransformPlugin = (options) => createUnplugin(() => {
+         }
+         try {
+           const ast = parse(template);
+-          const scopeTracker = new ScopeTracker({ preserveExitedScopes: true });
+-          for (const { 0: script } of code.matchAll(SCRIPT_RE$1)) {
++          const scopeTracker = new ScopeTracker$1({ preserveExitedScopes: true });
++          for (const { 0: script } of code.matchAll(SCRIPT_RE$2)) {
+             if (!script) {
+               continue;
+             }
+             try {
+-              parseAndWalk(script, id, { scopeTracker });
++              parseAndWalk$1(script, id, { scopeTracker });
+             } catch {
+             }
+           }
+           const s = new MagicString(code);
+           const components = new Set(options.getComponents().map((c) => c.pascalName));
+-          await walk$1(ast, (node) => {
++          await walk$2(ast, (node) => {
+             if (node.type !== 1) {
+               return;
+             }
+@@ -3273,7 +3060,7 @@ const LazyHydrationMacroTransformPlugin = (options) => createUnplugin(() => {
+         const s = new MagicString(code);
+         const names = /* @__PURE__ */ new Set();
+         const edits = [];
+-        parseAndWalk(code, id, (node, parent) => {
++        parseAndWalk$1(code, id, (node, parent) => {
+           if (node.type !== "CallExpression") {
+             return;
+           }
+@@ -3532,32 +3319,7 @@ const componentsModule = defineNuxtModule({
        }));
        addImportsSources(lazyHydrationMacroPreset);
      }
@@ -1319,7 +2250,7 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
 -          }
 -        }
 -      }, { server: false });
--      addBuildPlugin(IslandsTransformPlugin({ getComponents, selectiveClient }), { client: false });
+-      addBuildPlugin(IslandsTransformPlugin({ getComponents, selectiveClient }), { client: false, prepend: true });
 -      if (selectiveClient && nuxt.options.builder === "@nuxt/vite-builder") {
 -        addVitePlugin(() => ComponentsChunkPlugin({ dev: nuxt.options.dev, getComponents }));
 -      } else {
@@ -1332,13 +2263,51 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
 +    if (nuxt.options.experimental.componentIslands) ;
    }
  });
+ function normalizeDirs(dir, cwd, options) {
+@@ -3903,21 +3665,20 @@ const UnctxTransformPlugin = (options) => createUnplugin(() => {
+ });
  
-@@ -4157,8 +3923,18 @@ async function initNitro(nuxt) {
+ const TreeShakeComposablesPlugin = (options) => createUnplugin(() => {
+-  const allComposableNames = new Set(Object.values(options.composables).flat());
+-  if (!allComposableNames.size) {
+-    return [];
+-  }
++  const composableNames = Object.values(options.composables).flat();
++  const regexp = `(^\\s*)(${composableNames.join("|")})(?=\\((?!\\) \\{))`;
++  const COMPOSABLE_RE = new RegExp(regexp, "m");
+   return {
+     name: "nuxt:tree-shake-composables:transform",
+     enforce: "post",
+-    transformInclude(id) {
+-      return isVue(id, { type: ["script"] }) || isJS(id);
++    transformInclude(id2) {
++      return isVue(id2, { type: ["script"] }) || isJS(id2);
+     },
+     transform: {
+       filter: {
+-        code: { include: new RegExp(`\\b(?:${[...allComposableNames].map((r) => escapeRE(r)).join("|")})\\b`) }
++        code: { include: COMPOSABLE_RE }
+       },
+-      handler(code, id) {
++      handler(code) {
+         const s = new MagicString(code);
+         const scopeTracker = new ScopeTracker({ preserveExitedScopes: true });
+         const parseResult = parseAndWalk(code, id, {
+@@ -4206,7 +3967,8 @@ async function initNitro(nuxt) {
+       "#internal/nuxt/app-config": () => nuxt.vfs["#build/app.config.mjs"]?.replace(/\/\*\* client \*\*\/[\s\S]*\/\*\* client-end \*\*\//, "") || "",
+       "#spa-template": async () => `export const template = ${JSON.stringify(await spaLoadingTemplate(nuxt))}`,
+       // this will be overridden in vite plugin
+-      "#internal/entry-chunk.mjs": () => `export const entryFileName = undefined`
++      "#internal/entry-chunk.mjs": () => `export const entryFileName = undefined`,
++      "#internal/nuxt/entry-ids.mjs": () => `export default []`
+     },
+     routeRules: {
+       "/__nuxt_error": { cache: false }
+@@ -4280,7 +4042,21 @@ async function initNitro(nuxt) {
              }
              return targets;
            }, [])
 -        ] : []
--      ]
 +        ] : [],
 +        // todo fix 
 +        ...[
@@ -1351,19 +2320,13 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
 +          }, [])
 +        ]
 +      ],
++      // todo this too...
++      external: [
++        "vue"
+       ]
      },
      alias: {
-       // Vue 3 mocks
-@@ -4194,7 +3970,7 @@ async function initNitro(nuxt) {
-           // temporary fix for https://github.com/vuejs/core/issues/8351
-         }
-       },
--      plugins: []
-+      plugins: [],
-     },
-     logLevel: logLevelMapReverse[nuxt.options.logLevel]
-   });
-@@ -4570,6 +4346,7 @@ async function initNitro(nuxt) {
+@@ -4688,6 +4464,7 @@ async function initNitro(nuxt) {
          if (name === "server") {
            const memfs = compiler.outputFileSystem;
            nitro.options.virtual["#build/dist/server/server.mjs"] = () => memfs.readFileSync(join(nuxt.options.buildDir, "dist/server/server.mjs"), "utf-8");
@@ -1371,7 +2334,253 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
          }
        });
        nuxt.hook(`${builder}:compiled`, () => {
-@@ -6073,7 +5850,7 @@ const rootComponentTemplate = {
+@@ -4894,7 +4671,7 @@ function extractMetadata(code, loader = "ts") {
+   if (/defineNuxtPlugin\s*\([\w(]/.test(code)) {
+     return {};
+   }
+-  parseAndWalk(code, `file.${loader}`, (node) => {
++  parseAndWalk$1(code, `file.${loader}`, (node) => {
+     if (node.type !== "CallExpression" || node.callee.type !== "Identifier") {
+       return;
+     }
+@@ -4985,7 +4762,7 @@ const RemovePluginMetadataPlugin = (nuxt) => createUnplugin(() => {
+       let wrapped = false;
+       const wrapperNames = /* @__PURE__ */ new Set(["defineNuxtPlugin", "definePayloadPlugin"]);
+       try {
+-        parseAndWalk(code, id, (node) => {
++        parseAndWalk$1(code, id, (node) => {
+           if (node.type === "ImportSpecifier" && node.imported.type === "Identifier" && (node.imported.name === "defineNuxtPlugin" || node.imported.name === "definePayloadPlugin")) {
+             wrapperNames.add(node.local.name);
+           }
+@@ -5061,8 +4838,8 @@ const AsyncContextInjectionPlugin = (nuxt) => createUnplugin(() => {
+ 
+ const stringTypes = ["Literal", "TemplateLiteral"];
+ const NUXT_LIB_RE = /node_modules\/(?:nuxt|nuxt3|nuxt-nightly)\//;
+-const SUPPORTED_EXT_RE = /\.(?:m?[jt]sx?|vue)/;
+-const SCRIPT_RE = /(?<=<script[^>]*>)[\s\S]*?(?=<\/script>)/i;
++const SUPPORTED_EXT_RE$1 = /\.(?:m?[jt]sx?|vue)/;
++const SCRIPT_RE$1 = /(?<=<script[^>]*>)[\s\S]*?(?=<\/script>)/i;
+ const ComposableKeysPlugin = (options) => createUnplugin(() => {
+   const composableMeta = {};
+   const composableLengths = /* @__PURE__ */ new Set();
+@@ -5079,27 +4856,27 @@ const ComposableKeysPlugin = (options) => createUnplugin(() => {
+     enforce: "post",
+     transformInclude(id) {
+       const { pathname, search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
+-      return !NUXT_LIB_RE.test(pathname) && SUPPORTED_EXT_RE.test(pathname) && parseQuery(search).type !== "style" && !parseQuery(search).macro;
++      return !NUXT_LIB_RE.test(pathname) && SUPPORTED_EXT_RE$1.test(pathname) && parseQuery(search).type !== "style" && !parseQuery(search).macro;
+     },
+     transform: {
+       filter: {
+         code: { include: KEYED_FUNCTIONS_RE }
+       },
+       handler(code, id) {
+-        const { 0: script = code, index: codeIndex = 0 } = code.match(SCRIPT_RE) || { index: 0, 0: code };
++        const { 0: script = code, index: codeIndex = 0 } = code.match(SCRIPT_RE$1) || { index: 0, 0: code };
+         const s = new MagicString(code);
+         let imports;
+         let count = 0;
+         const relativeID = isAbsolute(id) ? relative(options.rootDir, id) : id;
+         const { pathname: relativePathname } = parseURL(relativeID);
+-        const scopeTracker = new ScopeTracker({
++        const scopeTracker = new ScopeTracker$1({
+           preserveExitedScopes: true
+         });
+-        const parseResult = parseAndWalk(script, id, {
++        const parseResult = parseAndWalk$1(script, id, {
+           scopeTracker
+         });
+         scopeTracker.freeze();
+-        walk(parseResult.program, {
++        walk$1(parseResult.program, {
+           scopeTracker,
+           enter(node) {
+             if (node.type !== "CallExpression" || node.callee.type !== "Identifier") {
+@@ -5342,7 +5119,7 @@ function PrehydrateTransformPlugin(options = {}) {
+       },
+       handler(code, id) {
+         const s = new MagicString(code);
+-        parseAndWalk(code, id, (node) => {
++        parseAndWalk$1(code, id, (node) => {
+           if (node.type !== "CallExpression" || node.callee.type !== "Identifier") {
+             return;
+           }
+@@ -5379,6 +5156,140 @@ function PrehydrateTransformPlugin(options = {}) {
+   }));
+ }
+ 
++const functionsToExtract = /* @__PURE__ */ new Set(["useAsyncData", "useLazyAsyncData"]);
++const FUNCTIONS_RE = /\buse(?:Lazy)?AsyncData\b/;
++const SUPPORTED_EXT_RE = /\.(?:m?[jt]sx?|vue)$/;
++const SCRIPT_RE = /(?<=<script[^>]*>)[\s\S]*?(?=<\/script>)/i;
++const ExtractAsyncDataHandlersPlugin = (options) => createUnplugin(() => {
++  const asyncDatas = {};
++  let count = 0;
++  return {
++    name: "nuxt:extract-async-data-handlers",
++    enforce: "post",
++    resolveId(source) {
++      if (source in asyncDatas) {
++        return source;
++      }
++    },
++    load(id) {
++      if (id in asyncDatas) {
++        return asyncDatas[id];
++      }
++    },
++    transformInclude(id) {
++      const { pathname, search } = parseURL(decodeURIComponent(pathToFileURL(id).href));
++      return SUPPORTED_EXT_RE.test(pathname) && parseQuery(search).type !== "style" && !parseQuery(search).macro;
++    },
++    transform: {
++      filter: {
++        id: {
++          exclude: [/nuxt\/(src|dist)\/app/]
++        },
++        code: { include: FUNCTIONS_RE }
++      },
++      handler(code, id) {
++        const { 0: script = code, index: codeIndex = 0 } = code.match(SCRIPT_RE) || { index: 0, 0: code };
++        let s;
++        const scopeTracker = new ScopeTracker$1({ preserveExitedScopes: true });
++        const parseResult = parseAndWalk$1(script, id, { scopeTracker });
++        scopeTracker.freeze();
++        walk$1(parseResult.program, {
++          scopeTracker,
++          enter(node) {
++            if (node.type !== "CallExpression" || node.callee.type !== "Identifier" || !functionsToExtract.has(node.callee.name)) {
++              return;
++            }
++            const callExpression = node;
++            const fetcherFunction = callExpression.arguments.find((fn) => fn.type === "ArrowFunctionExpression" || fn.type === "FunctionExpression");
++            if (!fetcherFunction || fetcherFunction.type !== "ArrowFunctionExpression" && fetcherFunction.type !== "FunctionExpression" || !fetcherFunction.body) {
++              return;
++            }
++            s ||= new MagicString(code);
++            const referencedVariables = /* @__PURE__ */ new Set();
++            const imports = /* @__PURE__ */ new Set();
++            walk$1(fetcherFunction.body, {
++              scopeTracker,
++              enter(innerNode, parent) {
++                if (innerNode.type !== "Identifier") {
++                  return;
++                }
++                if (parent) {
++                  if (parent.type === "MemberExpression" && parent.property === innerNode && parent.computed === false) {
++                    return;
++                  }
++                  if (parent.type === "Property" && parent.key === innerNode && parent.computed === false) {
++                    return;
++                  }
++                  if (parent.type === "MethodDefinition" && parent.key === innerNode && parent.computed === false) {
++                    return;
++                  }
++                  if (parent.type === "PropertyDefinition" && parent.key === innerNode && parent.computed === false) {
++                    return;
++                  }
++                }
++                const declaration = scopeTracker.getDeclaration(innerNode.name);
++                if (!declaration) {
++                  return;
++                }
++                if (declaration.type === "Import") {
++                  imports.add(innerNode.name);
++                } else if (declaration.type !== "FunctionParam") {
++                  const functionBodyStart = fetcherFunction.body.start;
++                  const functionBodyEnd = fetcherFunction.body.end;
++                  if (declaration.start < functionBodyStart || declaration.end > functionBodyEnd) {
++                    referencedVariables.add(innerNode.name);
++                  }
++                }
++              }
++            });
++            const importStatements = /* @__PURE__ */ new Set();
++            walk$1(parseResult.program, {
++              enter(importDecl) {
++                if (importDecl.type !== "ImportDeclaration") {
++                  return;
++                }
++                if (importDecl.specifiers?.some((spec) => spec.local && imports.has(spec.local.name))) {
++                  importStatements.add(script.slice(importDecl.start, importDecl.end));
++                }
++              }
++            });
++            const imps = Array.from(importStatements).join("\n");
++            const key = `${dirname(id)}/async-data-chunk-${count++}.js`;
++            const isBlockStatement = fetcherFunction.body.type === "BlockStatement";
++            const startOffset = codeIndex + fetcherFunction.body.start;
++            const endOffset = codeIndex + fetcherFunction.body.end;
++            const chunk = s.clone();
++            const parameters = [...referencedVariables].join(", ");
++            const returnPrefix = isBlockStatement ? "" : "return ";
++            const preface = `${imps}
++export default async function (${parameters}) { ${returnPrefix}`;
++            const suffix = ` }`;
++            if (isBlockStatement) {
++              chunk.overwrite(0, startOffset + 1, preface);
++              chunk.overwrite(endOffset - 1, code.length, suffix);
++            } else {
++              chunk.overwrite(0, startOffset, preface);
++              chunk.overwrite(endOffset, code.length, suffix);
++            }
++            asyncDatas[key] = {
++              code: chunk.toString(),
++              map: options.sourcemap ? chunk.generateMap({ hires: true }) : void 0
++            };
++            const importCall = `() => import('${key}').then(r => (r.default || r)(${parameters}))`;
++            s.overwrite(codeIndex + fetcherFunction.start, codeIndex + fetcherFunction.end, importCall);
++          }
++        });
++        if (s?.hasChanged()) {
++          return {
++            code: s.toString(),
++            map: options.sourcemap ? s.generateMap({ hires: true }) : void 0
++          };
++        }
++      }
++    }
++  };
++});
++
+ const PREFIX = "virtual:nuxt:";
+ const PREFIX_RE = /^\/?virtual:nuxt:/;
+ const RELATIVE_ID_RE = /^\.{1,2}[\\/]/;
+@@ -5608,6 +5519,10 @@ Using \`${fallbackCompatibilityDate}\` as fallback. More info at: ${colors.under
+     opts.nodeReferences.push({ path: resolve(nuxt.options.buildDir, "types/runtime-config.d.ts") });
+     opts.nodeReferences.push({ path: resolve(nuxt.options.buildDir, "types/app.config.d.ts") });
+     opts.nodeReferences.push({ types: "nuxt" });
++    opts.nodeReferences.push({ types: relative(nuxt.options.buildDir, resolveModulePath("@nuxt/vite-builder", { from: import.meta.url })) });
++    if (typeof nuxt.options.builder === "string" && nuxt.options.builder !== "@nuxt/vite-builder") {
++      opts.nodeReferences.push({ types: nuxt.options.builder });
++    }
+     opts.sharedReferences.push({ path: resolve(nuxt.options.buildDir, "types/runtime-config.d.ts") });
+     opts.sharedReferences.push({ path: resolve(nuxt.options.buildDir, "types/app.config.d.ts") });
+     paths ||= await resolveTypescriptPaths(nuxt);
+@@ -5703,6 +5618,12 @@ Using \`${fallbackCompatibilityDate}\` as fallback. More info at: ${colors.under
+     addBuildPlugin(DevOnlyPlugin({
+       sourcemap: !!nuxt.options.sourcemap.server || !!nuxt.options.sourcemap.client
+     }));
++    if (nuxt.options.experimental.extractAsyncDataHandlers) {
++      addBuildPlugin(ExtractAsyncDataHandlersPlugin({
++        sourcemap: !!nuxt.options.sourcemap.client,
++        rootDir: nuxt.options.rootDir
++      }), { server: false });
++    }
+   }
+   if (nuxt.options.dev) {
+     addPlugin(resolve(nuxt.options.appDir, "plugins/check-if-layout-used"));
+@@ -6040,6 +5961,9 @@ async function loadNuxt(opts) {
+   if (options.telemetry !== false && !process.env.NUXT_TELEMETRY_DISABLED) {
+     options._modules.push("@nuxt/telemetry");
+   }
++  if (options.experimental.typescriptPlugin) {
++    options._modules.push("@dxup/nuxt");
++  }
+   const allowedKeys = /* @__PURE__ */ new Set(["baseURL", "buildAssetsDir", "cdnURL", "buildId"]);
+   for (const key in options.runtimeConfig.app) {
+     if (!allowedKeys.has(key)) {
+@@ -6211,7 +6135,7 @@ const rootComponentTemplate = {
    filename: "root-component.mjs",
    // TODO: fix upstream in vite - this ensures that vite generates a module graph for islands
    // but should not be necessary (and has a warmup performance cost). See https://github.com/nuxt/nuxt/pull/24584.
@@ -1380,3 +2589,71 @@ index 11965d7262242d1981705e895515c6b15a93e8f5..a60532cb1a4526f62de720f0298d9a66
  };
  const errorComponentTemplate = {
    filename: "error-component.mjs",
+diff --git a/package.json b/package.json
+index 148fa513fc09a47b50bceb3330237bb493f37c6b..84dd9fa3c334c1e5a9a2daf7602c9dc69c02a9da 100644
+--- a/package.json
++++ b/package.json
+@@ -63,11 +63,19 @@
+     "kit.*",
+     "schema.*"
+   ],
++  "scripts": {
++    "prepack": "unbuild",
++    "test:attw": "attw --pack"
++  },
+   "dependencies": {
+-    "@nuxt/cli": "^3.29.0",
++    "@dxup/nuxt": "^0.1.0",
++    "@nuxt/cli": "^3.29.3",
+     "@nuxt/devalue": "^2.0.2",
+     "@nuxt/devtools": "^2.6.5",
++    "@nuxt/kit": "workspace:*",
++    "@nuxt/schema": "workspace:*",
+     "@nuxt/telemetry": "^2.6.6",
++    "@nuxt/vite-builder": "workspace:*",
+     "@unhead/vue": "^2.0.14",
+     "@vue/shared": "^3.5.22",
+     "c12": "^3.3.0",
+@@ -94,7 +102,7 @@
+     "mlly": "^1.8.0",
+     "mocked-exports": "^0.1.1",
+     "nanotar": "^0.2.0",
+-    "nitropack": "^2.12.6",
++    "nitropack": "^2.12.7",
+     "nypm": "^0.6.2",
+     "ofetch": "^1.4.1",
+     "ohash": "^2.0.11",
+@@ -108,8 +116,10 @@
+     "pkg-types": "^2.3.0",
+     "radix3": "^1.1.2",
+     "scule": "^1.3.0",
+-    "semver": "^7.7.2",
++    "semver": "^7.7.3",
++    "seroval": "^1.3.2",
+     "std-env": "^3.9.0",
++    "strip-literal": "^3.1.0",
+     "tinyglobby": "^0.2.15",
+     "ufo": "^1.6.1",
+     "ultrahtml": "^1.6.0",
+@@ -123,10 +133,8 @@
+     "vue": "^3.5.22",
+     "vue-bundle-renderer": "^2.2.0",
+     "vue-devtools-stub": "^0.1.0",
+-    "vue-router": "^4.5.1",
+-    "@nuxt/schema": "4.1.3",
+-    "@nuxt/kit": "4.1.3",
+-    "@nuxt/vite-builder": "4.1.3"
++    "vue-onigiri": "^0.2.0",
++    "vue-router": "^4.5.1"
+   },
+   "devDependencies": {
+     "@nuxt/scripts": "0.12.1",
+@@ -154,8 +162,5 @@
+   },
+   "engines": {
+     "node": "^20.19.0 || >=22.12.0"
+-  },
+-  "scripts": {
+-    "test:attw": "attw --pack"
+   }
+ }

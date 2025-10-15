@@ -509,7 +509,7 @@ p {
             "projects": {
                 "title": "Projets",
                 "nuxt": {
-                    "description": "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème."
+                    "description": "Après quelques mois de contributions sur Nuxt, j'ai été invité à rejoindre l'équipe Insiders en 2022 puis la Core Team début 2023. En tant que membre de la Core Team, je participe à la maintenance et au développement de Nuxt et de son écosystème ainsi que représenter Nuxt lors de conférences, meetups et sur des projets en collaboration avec d'autres équipes."
                 },
                 "nuxtScripts": {
                     "description": "Module créé en collaboration entre l'équipe Aurora de Google Chrome et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
