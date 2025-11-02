@@ -28,7 +28,13 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     "@nuxt/content",
     '@nuxthub/core',
+    '@nuxt/hints',
+    '@nuxt/a11y',
   ],
+
+  build: {
+    transpile: ['@nuxt/hints']
+  },
 
   experimental: {
     componentIslands: {

@@ -29,6 +29,8 @@
     "wrangler": "^4.20.0"
   },
   "dependencies": {
+    "@nuxt/a11y": "https://pkg.pr.new/nuxt/a11y/@nuxt/a11y@a80edda",
+    "@nuxt/hints": "https://pkg.pr.new/nuxt/hints/@nuxt/hints@c4f6d1e",
     "@nuxt/icon": "^2.0.0",
     "@nuxt/kit": "^4.1.0",
     "@nuxt/vite-builder": "^4.1.0",
