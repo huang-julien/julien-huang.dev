@@ -222,7 +222,7 @@ const skills: Skills[] = [
         level: 4
     },
     {
-        name: 'GitHub Actions',
+        name: 'Cloudflare Workers',
         level: 4
     }, 
     {
