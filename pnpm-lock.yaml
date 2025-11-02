@@ -81,8 +81,8 @@ importers:
         specifier: 3.0.0-beta.16
         version: 3.0.0-beta.16
       '@vueuse/core':
-        specifier: ^13.0.0
-        version: 13.6.0(vue@3.5.20(typescript@5.9.2))
+        specifier: ^14.0.0
+        version: 14.0.0(vue@3.5.20(typescript@5.9.2))
       eslint:
         specifier: ^9.24.0
         version: 9.33.0(jiti@2.5.1)
@@ -3397,6 +3397,11 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
+  '@vueuse/core@14.0.0':
+    resolution: {integrity: sha512-d6tKRWkZE8IQElX2aHBxXOMD478fHIYV+Dzm2y9Ag122ICBpNKtGICiXKOhWU3L1kKdttDD9dCMS4bGP3jhCTQ==}
+    peerDependencies:
+      vue: ^3.5.0
+
   '@vueuse/integrations@13.6.0':
     resolution: {integrity: sha512-dVFdgwYvkYjdizRL3ESdUW+Hg84i9Yhuzs+Ec3kEcuzJmT5xhiL/IGdw4z394qSBngUQvFi+wbHwhHX3EGbAxQ==}
     peerDependencies:
@@ -3448,6 +3453,9 @@ packages:
   '@vueuse/metadata@13.6.0':
     resolution: {integrity: sha512-rnIH7JvU7NjrpexTsl2Iwv0V0yAx9cw7+clymjKuLSXG0QMcLD0LDgdNmXic+qL0SGvgSVPEpM9IDO/wqo1vkQ==}
 
+  '@vueuse/metadata@14.0.0':
+    resolution: {integrity: sha512-6yoGqbJcMldVCevkFiHDBTB1V5Hq+G/haPlGIuaFZHpXC0HADB0EN1ryQAAceiW+ryS3niUwvdFbGiqHqBrfVA==}
+
   '@vueuse/shared@10.11.1':
     resolution: {integrity: sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==}
 
@@ -3456,6 +3464,11 @@ packages:
 
   '@vueuse/shared@13.6.0':
     resolution: {integrity: sha512-pDykCSoS2T3fsQrYqf9SyF0QXWHmcGPQ+qiOVjlYSzlWd9dgppB2bFSM1GgKKkt7uzn0BBMV3IbJsUfHG2+BCg==}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@vueuse/shared@14.0.0':
+    resolution: {integrity: sha512-mTCA0uczBgurRlwVaQHfG0Ja7UdGe4g9mwffiJmvLiTtp1G4AQyIjej6si/k8c8pUwTfVpNufck+23gXptPAkw==}
     peerDependencies:
       vue: ^3.5.0
 
@@ -4580,6 +4593,7 @@ packages:
   eslint-plugin-markdown@5.1.0:
     resolution: {integrity: sha512-SJeyKko1K6GwI0AN6xeCDToXDkfKZfXcexA6B+O2Wr2btUS9GrC+YgwSyVli5DJnctUHjFXcQ2cqTaAmVoLi2A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: Please use @eslint/markdown instead
     peerDependencies:
       eslint: '>=8'
 
@@ -6419,6 +6433,7 @@ packages:
   phin@3.7.1:
     resolution: {integrity: sha512-GEazpTWwTZaEQ9RhL7Nyz0WwqilbqgLahDM3D0hxWwmVDI52nXEybHqiN6/elwpkJBhcuj+WbBu+QfT0uhPGfQ==}
     engines: {node: '>= 8'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -12120,6 +12135,13 @@ snapshots:
       '@vueuse/shared': 13.6.0(vue@3.5.20(typescript@5.9.2))
       vue: 3.5.20(typescript@5.9.2)
 
+  '@vueuse/core@14.0.0(vue@3.5.20(typescript@5.9.2))':
+    dependencies:
+      '@types/web-bluetooth': 0.0.21
+      '@vueuse/metadata': 14.0.0
+      '@vueuse/shared': 14.0.0(vue@3.5.20(typescript@5.9.2))
+      vue: 3.5.20(typescript@5.9.2)
+
   '@vueuse/integrations@13.6.0(change-case@5.4.4)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.20(typescript@5.9.2))':
     dependencies:
       '@vueuse/core': 13.6.0(vue@3.5.20(typescript@5.9.2))
@@ -12136,6 +12158,8 @@ snapshots:
 
   '@vueuse/metadata@13.6.0': {}
 
+  '@vueuse/metadata@14.0.0': {}
+
   '@vueuse/shared@10.11.1(vue@3.5.20(typescript@5.9.2))':
     dependencies:
       vue-demi: 0.14.10(vue@3.5.20(typescript@5.9.2))
@@ -12150,6 +12174,10 @@ snapshots:
       - typescript
 
   '@vueuse/shared@13.6.0(vue@3.5.20(typescript@5.9.2))':
+    dependencies:
+      vue: 3.5.20(typescript@5.9.2)
+
+  '@vueuse/shared@14.0.0(vue@3.5.20(typescript@5.9.2))':
     dependencies:
       vue: 3.5.20(typescript@5.9.2)
 
