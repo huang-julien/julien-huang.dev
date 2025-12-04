@@ -17,12 +17,6 @@ const projects = [
     },
     
     {
-        name: 'nitro-applicationinsights',
-        description: 'ApplicationInsights module for Nitro.',
-        url: 'https://github.com/huang-julien/nitro-applicationinsights'
-    },
-    
-    {
         name: 'nitro-opentelemetry',
         description: 'opentelemetry integration for nitro',
         url: 'https://github.com/huang-julien/nitro-opentelemetry'
@@ -32,6 +26,11 @@ const projects = [
         name: 'nuxt/nuxt',
         description: 'The Intuitive Vue Framework.',
         url: 'https://github.com/nuxt/nuxt'
+    },
+    {
+        name: 'nuxt/hints',
+        description: 'Nuxt module that shows hints for aspects of your application such as Performance, A11Y, Security, and more!',
+        url: 'https://github.com/nuxt/hints'
     }
 ]
 </script>
