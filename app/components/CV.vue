@@ -515,7 +515,7 @@ p {
                     "description": "Module créé en collaboration entre l'équipe Aurora de Google Chrome et l'équipe Nuxt WebPerf, fournissant les meilleures pratiques pour les scripts tiers dans Nuxt."
                 },
                 "nuxtHints": {
-                    "description": "In progress. Module Nuxt pour activement détecter les mauvaises pratiques de développement et de performance dans Nuxt."
+                    "description": "Module Nuxt pour activement détecter les mauvaises pratiques de développement et de performance dans Nuxt."
                 },
                 "vueOnigiri": {
                     "description": "In progress. Bibliothèque Vue de bas niveau pour fournir une sérialisation et une désérialisation avancées des VNode, ce qui peut permettre les Server Components dans VueJS."
