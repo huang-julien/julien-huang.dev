@@ -681,10 +681,10 @@ index a99b5b03af66fe8be27548ee3eeaa564571042f7..1a6a75f952500ad3ea15dc705f5077f9
  export declare function getComponentRef(tag: string, context: CodegenContext): string;
  export declare function genComponent(node: ElementNode, context: CodegenContext): void;
 diff --git a/dist/template-compiler/codegen/components.js b/dist/template-compiler/codegen/components.js
-index 7cf462223c67bde4cdebc599ad44c37a8525b2fa..89b309d9fcc5a64314c8e5f66f2fad694bbc5281 100644
+index 7cf462223c67bde4cdebc599ad44c37a8525b2fa..f592b0a01726f8489f442fec608c12aae25a337b 100644
 --- a/dist/template-compiler/codegen/components.js
 +++ b/dist/template-compiler/codegen/components.js
-@@ -10,10 +10,18 @@ import { genSlotsObject } from "./slots.js";
+@@ -10,11 +10,19 @@ import { genSlotsObject } from "./slots.js";
  export function getComponentRef(tag, context) {
    const pascalName = tag.replace(/-./g, (x) => x[1]?.toUpperCase() ?? "").replace(/^./, (x) => x.toUpperCase());
    const camelName = pascalName.replace(/^./, (x) => x.toLowerCase());
@@ -693,6 +693,7 @@ index 7cf462223c67bde4cdebc599ad44c37a8525b2fa..89b309d9fcc5a64314c8e5f66f2fad69
    if (isImported) {
      return context.bindingMetadata[tag] ? tag : context.bindingMetadata[pascalName] ? pascalName : camelName;
    }
+-  const varName = "_component_" + tag.replace(/-/g, "_");
 +  const additionalEntry = context.additionalImports.get(tag) ?? context.additionalImports.get(pascalName) ?? context.additionalImports.get(camelName) ?? context.additionalImports.get(kebabName);
 +  if (additionalEntry) {
 +    const exportName = additionalEntry.export ?? "default";
@@ -700,9 +701,10 @@ index 7cf462223c67bde4cdebc599ad44c37a8525b2fa..89b309d9fcc5a64314c8e5f66f2fad69
 +    context.imports.add(genImport(additionalEntry.path, [{ name: exportName, as: importedName }]));
 +    return importedName;
 +  }
-   const varName = "_component_" + tag.replace(/-/g, "_");
++  const varName = "_component_" + tag.replace(/[^a-zA-Z0-9_$]/g, "_");
    if (!context.components.has(tag)) {
      context.components.set(tag, varName);
+     context.imports.add(
 @@ -114,8 +122,9 @@ function genDynamicComponent(node, context) {
    context.push(")");
  }
@@ -1003,7 +1005,7 @@ index 1a4a02f426b13fb216a2156c5b9b295fad60cdf1..5f360920b6e9f2828e7d61924363aeda
      },
      true,
 diff --git a/dist/template-compiler/codegen/slots.js b/dist/template-compiler/codegen/slots.js
-index f2549d57e479898e039d13aa969c23c9fab9af65..5d050ff1681404517cb6a2b17f973c6882462be3 100644
+index f2549d57e479898e039d13aa969c23c9fab9af65..bda66d55bf6cac0465852800bc9ce0af72acfaed 100644
 --- a/dist/template-compiler/codegen/slots.js
 +++ b/dist/template-compiler/codegen/slots.js
 @@ -5,6 +5,9 @@ import { genImport } from "knitwork";
@@ -1039,25 +1041,32 @@ index f2549d57e479898e039d13aa969c23c9fab9af65..5d050ff1681404517cb6a2b17f973c68
      });
    }
    return slots;
-@@ -119,13 +123,14 @@ export function genSlotOutlet(node, context) {
+@@ -119,18 +123,14 @@ export function genSlotOutlet(node, context) {
      context.push("undefined");
    }
    context.push(", ");
 -  if (children.length > 0) {
-+  const renderableChildren = dropRenderlessChildren(children);
-+  if (renderableChildren.length > 0) {
-     context.push("() => ");
+-    context.push("() => ");
 -    if (children.length === 1) {
 -      genNode(children[0], context);
-+    if (renderableChildren.length === 1) {
-+      genNode(renderableChildren[0], context);
-     } else {
-       context.push("[");
+-    } else {
+-      context.push("[");
 -      for (const [i, child] of children.entries()) {
-+      for (const [i, child] of renderableChildren.entries()) {
-         if (i > 0) context.push(", ");
-         genNode(child, context);
-       }
+-        if (i > 0) context.push(", ");
+-        genNode(child, context);
+-      }
+-      context.push("]");
++  const renderableChildren = dropRenderlessChildren(children);
++  if (renderableChildren.length > 0) {
++    context.push("() => [");
++    for (const [i, child] of renderableChildren.entries()) {
++      if (i > 0) context.push(", ");
++      genNode(child, context);
+     }
++    context.push("]");
+   } else {
+     context.push("undefined");
+   }
 diff --git a/dist/template-compiler/index.d.ts b/dist/template-compiler/index.d.ts
 index bfc03e83d900ebeb242c254eff4a3855654d5a8a..a4266317009bbaae8952b4183e03977b63f1ade1 100644
 --- a/dist/template-compiler/index.d.ts
@@ -1102,7 +1111,7 @@ index bfc03e83d900ebeb242c254eff4a3855654d5a8a..a4266317009bbaae8952b4183e03977b
  export interface OnigiriCodegenResult {
      code: string;
 diff --git a/dist/template-compiler/index.js b/dist/template-compiler/index.js
-index 84a0bdd6ea7e61d960b084fbd6daeaf29e39e17c..8e96a08c0b6c26b241183b03863d50ec9a4d3d11 100644
+index 84a0bdd6ea7e61d960b084fbd6daeaf29e39e17c..70d43816846e8edd0efca8bc705016a769b2d083 100644
 --- a/dist/template-compiler/index.js
 +++ b/dist/template-compiler/index.js
 @@ -39,14 +39,18 @@ export function compileOnigiri(template, options = {}) {
@@ -1126,7 +1135,7 @@ index 84a0bdd6ea7e61d960b084fbd6daeaf29e39e17c..8e96a08c0b6c26b241183b03863d50ec
    });
    if (ast.children.length === 0) {
      bodyContext.push("null");
-@@ -101,7 +105,9 @@ export function compileOnigiriInline(template, options = {}) {
+@@ -101,12 +105,19 @@ export function compileOnigiriInline(template, options = {}) {
      scopeId: options.scopeId,
      importMap: options.importMap,
      additionalImports: options.additionalImports,
@@ -1137,6 +1146,16 @@ index 84a0bdd6ea7e61d960b084fbd6daeaf29e39e17c..8e96a08c0b6c26b241183b03863d50ec
    });
    if (ast.children.length === 0) {
      context.push("null");
+   } else if (ast.children.length === 1) {
++    const before = context.code.length;
+     genNode(ast.children[0], context);
++    const produced = context.code.slice(before);
++    if (produced.startsWith("...")) {
++      context.code = context.code.slice(0, before) + "[" + VServerComponentType.Fragment.toString() + ", [" + produced + "]]";
++    }
+   } else {
+     context.push("[");
+     context.push(VServerComponentType.Fragment.toString());
 diff --git a/dist/vite/compiler/attach-property.d.ts b/dist/vite/compiler/attach-property.d.ts
 index 4aa2d782198a71c120862aa6fb59a7a4ffd3fab0..eaac05fe4949b674b9c7007b5cebf97b74a33cdf 100644
 --- a/dist/vite/compiler/attach-property.d.ts
