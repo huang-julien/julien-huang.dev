@@ -1,3 +1,12 @@
+allowBuilds:
+  '@parcel/watcher': false
+  better-sqlite3: true
+  core-js: false
+  esbuild: false
+  sharp: true
+  unrs-resolver: false
+  vue-demi: false
+  workerd: true
 ignoredBuiltDependencies:
   - vue-demi
 
