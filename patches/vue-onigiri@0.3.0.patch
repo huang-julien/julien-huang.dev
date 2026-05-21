@@ -313,7 +313,7 @@ index e3e044a007446f79c031ce89255c001c150f59b5..85f0c911ed5a28229bdb746214b35e50
   * Serialize a component within an existing render context. Called by
   * the compiled `__onigiriRender` function for each child component.
 diff --git a/dist/runtime/serialize.js b/dist/runtime/serialize.js
-index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f057aff5392 100644
+index e8c9c0dcd412da68e7557178f30204b8e3a937cd..0bf360b03c3a87b5bbad090a442eed9de2b6d96d 100644
 --- a/dist/runtime/serialize.js
 +++ b/dist/runtime/serialize.js
 @@ -4,9 +4,12 @@ import {
@@ -481,7 +481,15 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
          const setupState = instance.setupState;
          if (setupState && key in setupState) return true;
          const data = instance.data;
-@@ -180,7 +279,7 @@ export function serializeApp(app, slots, context = {}) {
+@@ -147,6 +246,7 @@ export function serializeApp(app, slots, context = {}) {
+   app.provide(ONIGIRI_RENDER_SYMBOL, true);
+   applyDirective(app);
+   const vnode = createVNode(input._component, input._props, slots);
++  vnode.appContext = input._context;
+   const instance = createComponentInstance(vnode, input._instance, null);
+   instance.appContext = input._context;
+   instance.provides = /* @__PURE__ */ Object.create(input._context.provides);
+@@ -180,7 +280,7 @@ export function serializeApp(app, slots, context = {}) {
          }
          return unrollServerComponentBufferPromises(injectRendered);
        }
@@ -490,7 +498,7 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
          const result2 = app.runWithContext(
            () => runOnigiriRender(componentType.__onigiriRender, instance)
          );
-@@ -194,6 +293,22 @@ export function serializeApp(app, slots, context = {}) {
+@@ -194,6 +294,22 @@ export function serializeApp(app, slots, context = {}) {
      });
    });
  }
@@ -513,7 +521,7 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
  export function unrollServerComponentBufferPromises(buffer) {
    if (isPromise(buffer)) {
      return buffer.then((r) => {
-@@ -202,6 +317,7 @@ export function unrollServerComponentBufferPromises(buffer) {
+@@ -202,6 +318,7 @@ export function unrollServerComponentBufferPromises(buffer) {
    }
    const result = [];
    const promises = [];
@@ -521,7 +529,7 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
    for (const i in buffer) {
      const item = buffer[i];
      if (isPromise(item)) {
-@@ -239,6 +355,12 @@ export function unrollServerComponentBufferPromises(buffer) {
+@@ -239,6 +356,12 @@ export function unrollServerComponentBufferPromises(buffer) {
            result[i] = unrolled;
          })
        );
@@ -534,7 +542,7 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
      } else {
        result[i] = item;
      }
-@@ -256,7 +378,17 @@ export async function serializeVNode(vnode, parentInstance) {
+@@ -256,7 +379,17 @@ export async function serializeVNode(vnode, parentInstance) {
        ];
      } else if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
        const componentType = vnode.type;
@@ -553,7 +561,7 @@ index e8c9c0dcd412da68e7557178f30204b8e3a937cd..127c8535489cb77ab06cb35b1c868f05
          const instance = createComponentInstance(vnode, parentInstance ?? null, null);
          inheritAppContext(instance, parentInstance);
          const res = setupComponent(instance, true);
-@@ -299,6 +431,8 @@ export async function serializeVNode(vnode, parentInstance) {
+@@ -299,6 +432,8 @@ export async function serializeVNode(vnode, parentInstance) {
        ];
      } else if (vnode.type === Text) {
        return [VServerComponentType.Text, vnode.children];
@@ -1287,7 +1295,7 @@ index 7524d5854584012980f340c377e2e4d3d826f109..e5ca352f5124bd75a13e51b501b74998
  /**
   * Vite plugin that adds onigiri serialization support to Vue SFCs.
 diff --git a/dist/vite/compiler/index.js b/dist/vite/compiler/index.js
-index f025868d3910bd9cac998aefd9c169de9a8a029e..d22b7555d1280b7aa23e0f2eb0a6a1e4f5d173ba 100644
+index f025868d3910bd9cac998aefd9c169de9a8a029e..3976dfad2a498fdc54544f1a918d1627f5852376 100644
 --- a/dist/vite/compiler/index.js
 +++ b/dist/vite/compiler/index.js
 @@ -2,13 +2,20 @@ import { ONIGIRI_PREFIX, ONIGIRI_SUFFIX } from "./constants.js";
@@ -1356,18 +1364,30 @@ index f025868d3910bd9cac998aefd9c169de9a8a029e..d22b7555d1280b7aa23e0f2eb0a6a1e4
          (msg) => this.error(msg)
        );
      },
-@@ -56,7 +83,9 @@ export function onigiriCompilerPlugin(options = {}) {
+@@ -56,10 +83,20 @@ export function onigiriCompilerPlugin(options = {}) {
          if (!query) {
            if (!code.includes("export default")) return null;
            const onigiriImport = `${ONIGIRI_PREFIX}${encodeURIComponent(filePath)}${ONIGIRI_SUFFIX}`;
 -          return attachAsProperty(code, onigiriImport, sourceMap);
 +          const sourcePath = toRootRelative(filePath, config.root);
 +          const descriptorChunk = resolveChunkUrl?.(sourcePath) ?? sourcePath;
-+          return attachAsProperty(code, onigiriImport, sourceMap, descriptorChunk);
++          let workCode = code;
++          const __hasInlineTpl = code.includes("_createElementVNode") || code.includes("_createVNode") || code.includes("_createBlock") || code.includes("ssrInterpolate") || code.includes("ssrRenderAttrs") || code.includes("ssrRenderComponent") || code.includes("ssrRenderSlot") || code.includes("ssrRenderList") || code.includes("ssrRenderClass") || code.includes("ssrRenderStyle") || code.includes("ssrRenderVNode") || code.includes("_push(`<") || code.includes("_push(ssr");
++          if (__hasInlineTpl) {
++            try {
++              const __injected = await injectIntoSetupAsync(code, filePath, sourceMap, config, isCustomElement, resolveAdditionalImports(), resolveChunkUrl, registerOnigiriTarget);
++              if (__injected && __injected.code) workCode = __injected.code;
++            } catch (e) { console.warn("[vue-onigiri] inject (no-query) failed for", filePath, e); }
++          }
++          return attachAsProperty(workCode, onigiriImport, sourceMap, descriptorChunk);
          }
          if (query.includes("type=script")) {
-           const hasInlineTemplate = code.includes("_createElementVNode") || code.includes("_createVNode") || code.includes("_createBlock") || code.includes("ssrInterpolate") || code.includes("ssrRenderAttrs");
-@@ -67,7 +96,9 @@ export function onigiriCompilerPlugin(options = {}) {
+-          const hasInlineTemplate = code.includes("_createElementVNode") || code.includes("_createVNode") || code.includes("_createBlock") || code.includes("ssrInterpolate") || code.includes("ssrRenderAttrs");
++          const hasInlineTemplate = code.includes("_createElementVNode") || code.includes("_createVNode") || code.includes("_createBlock") || code.includes("ssrInterpolate") || code.includes("ssrRenderAttrs") || code.includes("ssrRenderComponent") || code.includes("ssrRenderSlot") || code.includes("ssrRenderList") || code.includes("ssrRenderClass") || code.includes("ssrRenderStyle") || code.includes("ssrRenderVNode") || code.includes("_push(`<") || code.includes("_push(ssr");
+           if (hasInlineTemplate) {
+             return injectIntoSetupAsync(
+               code,
+@@ -67,7 +104,9 @@ export function onigiriCompilerPlugin(options = {}) {
                sourceMap,
                config,
                isCustomElement,
@@ -1398,10 +1418,10 @@ index 4fcfd8407079bd8222f1d10eb661b806e448f14c..8705af3d2866c3f80f04ca58e79df39e
      map: any;
  } | null>;
 diff --git a/dist/vite/compiler/inject-setup.js b/dist/vite/compiler/inject-setup.js
-index d81faf63889e20cf234fb396209c4c09dd4457a2..54f18601c1ff6c70f8d84822ac27973d30a807a4 100644
+index d81faf63889e20cf234fb396209c4c09dd4457a2..f75333f060290d04e7feef50d6d293b444c58dc7 100644
 --- a/dist/vite/compiler/inject-setup.js
 +++ b/dist/vite/compiler/inject-setup.js
-@@ -27,7 +27,7 @@ function buildBridgeObject(bindingMetadata) {
+@@ -27,10 +27,10 @@ function buildBridgeObject(bindingMetadata) {
    }
    return `{ ${entries.join(", ")} }`;
  }
@@ -1409,7 +1429,11 @@ index d81faf63889e20cf234fb396209c4c09dd4457a2..54f18601c1ff6c70f8d84822ac27973d
 +export async function injectIntoSetupAsync(code, filePath, sourceMap, config, isCustomElement, additionalImports, resolveChunkUrl, registerTarget) {
    const setupMatch = code.match(/setup\s*\(\s*([^,)]*?)(?:,\s*\{[^}]*\})?\s*\)\s*\{/);
    if (!setupMatch || setupMatch.index === void 0) return null;
-   const ssrRenderReturnMatch = code.slice(setupMatch.index).match(/return\s*\(\s*_ctx\s*,\s*_push\s*,\s*_parent\s*(?:,\s*_attrs\s*)?\)\s*=>\s*\{/);
+-  const ssrRenderReturnMatch = code.slice(setupMatch.index).match(/return\s*\(\s*_ctx\s*,\s*_push\s*,\s*_parent\s*(?:,\s*_attrs\s*)?\)\s*=>\s*\{/);
++  const ssrRenderReturnMatch = code.slice(setupMatch.index).match(/return\s*\(\s*_ctx\s*,\s*_push\s*,\s*_parent\s*(?:,\s*\w+\s*)?\)\s*=>\s*\{/);
+   const fs = await import("node:fs/promises");
+   const source = await fs.readFile(filePath, "utf8");
+   const { descriptor } = parse(source, { filename: filePath });
 @@ -55,7 +55,9 @@ export async function injectIntoSetupAsync(code, filePath, sourceMap, config, is
      scopeId,
      importMap,
@@ -1421,6 +1445,25 @@ index d81faf63889e20cf234fb396209c4c09dd4457a2..54f18601c1ff6c70f8d84822ac27973d
    });
    const s = new MagicString(code);
    const imports = `import { inject as __onigiri_inject, getCurrentInstance as __getCurrentInstance, unref as __onigiri_unref } from "vue";
+@@ -71,9 +73,17 @@ import { ONIGIRI_RENDER_SYMBOL as __ONIGIRI_SYMBOL } from "vue-onigiri/runtime/s
+         get(t, k) {
+           const v = Reflect.get(t, k);
+           if (v !== undefined) return v;
++          if (k === "slots" || k === "$slots") return __instance.slots;
++          if (k === "props" || k === "$props") return __instance.props;
++          if (k === "$attrs") return __instance.attrs;
++          if (k === "$emit") return __instance.emit;
++          if (k === "$refs") return __instance.refs;
++          if (k === "$parent") return __instance.parent;
++          if (k === "$root") return __instance.root;
++          if (k === "_") return __instance;
+           return _ctx ? _ctx[k] : undefined;
+         },
+-        has(t, k) { return Reflect.has(t, k) || (_ctx && k in _ctx) },
++        has(t, k) { return Reflect.has(t, k) || k === "slots" || k === "props" || (_ctx && k in _ctx) },
+       });
+       return __instance.type.__onigiriRender(_ctx2, __instance);
+     };
 diff --git a/dist/vite/compiler/load-virtual.d.ts b/dist/vite/compiler/load-virtual.d.ts
 index a3b71f229584c0d4fa961aaa7c44389769088483..3a988734fb3b8ea4113cf7cc2a466d6337302179 100644
 --- a/dist/vite/compiler/load-virtual.d.ts
