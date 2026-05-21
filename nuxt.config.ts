@@ -45,12 +45,6 @@ export default defineNuxtConfig({
     },
    },
 
-  experimental: {
-    componentIslands: {
-      selectiveClient: true
-    }
-  },
-
   hooks: {
     // vue-onigiri's Vite compiler plugin injects a setup-bridge + Proxy and
     // attaches `__onigiriRender` to every SFC so the SSR runtime can serialize
