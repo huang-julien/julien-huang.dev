@@ -15,7 +15,7 @@
     "@iconify-json/bi": "^1.2.7",
     "@iconify-json/lucide": "^1.2.100",
     "@nuxt/a11y": "1.0.0-alpha.1",
-    "@nuxt/content": "3.12.0",
+    "@nuxt/content": "3.14.0",
     "@nuxt/eslint-config": "^1.15.2",
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/hints": "^1.0.0",
@@ -25,7 +25,7 @@
     "@nuxt/nitro-server": "4.4.2",
     "@nuxt/ui": "^4.6.0",
     "@nuxt/vite-builder": "^4.4.2",
-    "@nuxtjs/i18n": "10.2.4",
+    "@nuxtjs/i18n": "10.4.0",
     "@nuxtjs/icon": "3.0.0-beta.16",
     "@vueuse/core": "^14.2.1",
     "better-sqlite3": "^12.10.0",
@@ -41,7 +41,7 @@
     "vue-onigiri": "^0.3.0",
     "wrangler": "^4.78.0"
   },
-  "packageManager": "pnpm@11.2.2+sha512.36e6621fad506178936455e70247b8808ef4ec25797a9f437a93281a020484e2607f6a469a22e982987c3dbb8866e3071514ab10a4a1749e06edcd1ec118436f",
+  "packageManager": "pnpm@11.8.0",
   "devDependencies": {
     "@nuxt/test-utils": "^4.0.3",
     "playwright-core": "^1.60.0",
