@@ -11349,7 +11349,7 @@ index d63bec6afafabf835722bbbbf98354936a0040e1..29ec50cadafbeb6662e313ecd03609ad
  const bundle = async (nuxt) => {
  	const useAsyncEntry = nuxt.options.experimental.asyncEntry || nuxt.options.dev;
  	const entry = await resolvePath(resolve(nuxt.options.appDir, useAsyncEntry ? "entry.async" : "entry"));
-@@ -2395,6 +2399,99 @@ const bundle = async (nuxt) => {
+@@ -2395,6 +2399,193 @@ const bundle = async (nuxt) => {
  		config.build.watch = void 0;
  	}
  	userOptimizeDepsInclude.set(nuxt, [...config.optimizeDeps?.include || []]);
@@ -11417,6 +11417,99 @@ index d63bec6afafabf835722bbbbf98354936a0040e1..29ec50cadafbeb6662e313ecd03609ad
 +		}
 +	];
 +	config.plugins.push(...onigiriPlugins);
++	const buildClientImportFnSource = () => {
++		const prefix = joinURL(nuxt.options.app.baseURL, nuxt.options.app.buildAssetsDir);
++		const entries = [];
++		const seen = new Set();
++		for (const [, entry] of onigiriComponentImports) {
++			if (!entry?.path) continue;
++			if (entry.path.startsWith("/") || entry.path.startsWith(".") || /^[a-z]:[\\/]/i.test(entry.path)) continue;
++			if (seen.has(entry.path)) continue;
++			seen.add(entry.path);
++			const url = joinURL(prefix, entry.path);
++			entries.push(`  ${JSON.stringify(url)}: () => import(${JSON.stringify(entry.path)})`);
++		}
++		return `
++const __chunkMap = {
++${entries.join(",\n")}
++}
++export const manifest = {}
++export async function importFn(src, exportName = 'default') {
++  const loader = __chunkMap[src]
++  if (loader) {
++    const mod = await loader()
++    return mod[exportName] ?? mod.default ?? mod
++  }
++  if (src.startsWith('/')) {
++    const mod = await import(/* @vite-ignore */ src)
++    return mod[exportName] ?? mod.default ?? mod
++  }
++  throw new Error('[vue-onigiri] No loader registered for chunk "' + src + '"')
++}
++`;
++	};
++	const onigiriClientManifestOverride = {
++		name: "nuxt:onigiri-client-manifest",
++		enforce: "pre",
++		applyToEnvironment: (env) => env.name === "client",
++		resolveId: {
++			order: "pre",
++			handler(id) {
++				if (id === "virtual:onigiri/manifest") return "\0virtual:onigiri/manifest";
++			}
++		},
++		load(id) {
++			if (id !== "\0virtual:onigiri/manifest") return;
++			return buildClientImportFnSource();
++		}
++	};
++	config.plugins.push(onigiriClientManifestOverride);
++	const buildServerImportFnSource = () => {
++		const prefix = joinURL(nuxt.options.app.baseURL, nuxt.options.app.buildAssetsDir);
++		const reverseMap = {};
++		for (const [src, url] of onigiriChunkMap) reverseMap[url] = src;
++		return `
++export const manifest = {}
++const PREFIX = ${JSON.stringify(prefix)}
++const REVERSE = ${JSON.stringify(reverseMap)}
++export async function importFn(src, exportName = 'default') {
++  let spec = REVERSE[src] || (src.startsWith(PREFIX) ? src.slice(PREFIX.length) : src)
++  if (spec.startsWith('/')) spec = spec.slice(1)
++  const mod = await import(/* @vite-ignore */ spec)
++  return mod[exportName] ?? mod.default ?? mod
++}
++`;
++	};
++	const onigiriServerManifestOverride = {
++		name: "nuxt:onigiri-server-manifest",
++		enforce: "pre",
++		applyToEnvironment: (env) => env.name !== "client",
++		resolveId: {
++			order: "pre",
++			handler(id) {
++				if (id === "virtual:onigiri/manifest") return "\0virtual:onigiri/manifest";
++			}
++		},
++		load(id) {
++			if (id !== "\0virtual:onigiri/manifest") return;
++			return buildServerImportFnSource();
++		}
++	};
++	config.plugins.push(onigiriServerManifestOverride);
++	const onigiriNitroManifestOverride = {
++		name: "nuxt:onigiri-nitro-manifest",
++		enforce: "pre",
++		resolveId: {
++			order: "pre",
++			handler(id) {
++				if (id === "virtual:onigiri/manifest") return "\0virtual:onigiri/manifest";
++			}
++		},
++		load(id) {
++			if (id !== "\0virtual:onigiri/manifest") return;
++			return buildServerImportFnSource();
++		}
++	};
 +	const onigiriNitroPlugins = () => [
 +		{
 +			name: "nuxt:virtual-vsc",
@@ -11427,6 +11520,7 @@ index d63bec6afafabf835722bbbbf98354936a0040e1..29ec50cadafbeb6662e313ecd03609ad
 +				}
 +			}
 +		},
++		onigiriNitroManifestOverride,
 +		onigiriCompilerPlugin(onigiriCompilerOptions),
 +		onigiriManifestPlugin({ stub: true })
 +	];

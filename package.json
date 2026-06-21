@@ -5,7 +5,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:e2e:dev": "vitest run --config vitest.e2e.config.ts test/e2e/dev.test.ts",
+    "test:e2e:prod": "vitest run --config vitest.e2e.config.ts test/e2e/prod.test.ts"
   },
   "dependencies": {
     "@antfu/eslint-config": "^7.7.3",
@@ -38,5 +41,10 @@
     "vue-onigiri": "^0.3.0",
     "wrangler": "^4.78.0"
   },
-  "packageManager": "pnpm@11.2.2+sha512.36e6621fad506178936455e70247b8808ef4ec25797a9f437a93281a020484e2607f6a469a22e982987c3dbb8866e3071514ab10a4a1749e06edcd1ec118436f"
+  "packageManager": "pnpm@11.2.2+sha512.36e6621fad506178936455e70247b8808ef4ec25797a9f437a93281a020484e2607f6a469a22e982987c3dbb8866e3071514ab10a4a1749e06edcd1ec118436f",
+  "devDependencies": {
+    "@nuxt/test-utils": "^4.0.3",
+    "playwright-core": "^1.60.0",
+    "vitest": "^4.1.8"
+  }
 }

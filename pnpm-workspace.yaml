@@ -16,8 +16,9 @@ onlyBuiltDependencies:
   - core-js
   - esbuild
   - sharp
+overrides:
+  vue-onigiri: file:../vue-onigiri/packages/core/vue-onigiri-0.3.2.tgz
 patchedDependencies:
   '@nuxt/nitro-server': patches/@nuxt__nitro-server.patch
   '@nuxt/vite-builder': patches/@nuxt__vite-builder.patch
   nuxt: patches/nuxt.patch
-  vue-onigiri@0.3.0: patches/vue-onigiri@0.3.0.patch
