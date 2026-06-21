@@ -11,7 +11,7 @@
     "test:e2e:prod": "vitest run --config vitest.e2e.config.ts test/e2e/prod.test.ts"
   },
   "dependencies": {
-    "@antfu/eslint-config": "^7.7.3",
+    "@antfu/eslint-config": "^9.0.0",
     "@iconify-json/bi": "^1.2.7",
     "@iconify-json/lucide": "^1.2.100",
     "@nuxt/a11y": "1.0.0-alpha.1",
