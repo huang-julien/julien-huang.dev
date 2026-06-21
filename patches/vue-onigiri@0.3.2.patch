@@ -1,0 +1,528 @@
+diff --git a/dist/template-compiler/codegen/components.js b/dist/template-compiler/codegen/components.js
+index 6d7320275d90f3f107f8b8735a479000d8b48e67..9de83e313229756173eec00365be469e3f8341ee 100644
+--- a/dist/template-compiler/codegen/components.js
++++ b/dist/template-compiler/codegen/components.js
+@@ -3,7 +3,7 @@ import {
+ } from "@vue/compiler-dom";
+ import { genImport } from "knitwork";
+ import { VServerComponentType } from "../../runtime/shared.js";
+-import { genNode } from "./vnode.js";
++import { withoutRenderlessChildren, genNode } from "./vnode.js";
+ import { genExpressionAsValue, prefixIdentifiers } from "./expressions.js";
+ import { genProps } from "./props.js";
+ import { genSlotsObject } from "./slots.js";
+@@ -66,7 +66,7 @@ function genSuspense(children, context) {
+   context.push(", [");
+   const filtered = children.filter((c) => c.type !== NodeTypes.ELEMENT || c.tag !== "template");
+   const defaultSlotChildren = children.filter((c) => c.type === NodeTypes.ELEMENT && c.tag === "template").flatMap((c) => c.children ?? []);
+-  const all = [...filtered, ...defaultSlotChildren];
++  const all = withoutRenderlessChildren([...filtered, ...defaultSlotChildren]);
+   for (const [i, child] of all.entries()) {
+     if (i > 0) context.push(", ");
+     genNode(child, context);
+@@ -77,7 +77,7 @@ function genFragmentPassthrough(children, context) {
+   context.push("[");
+   context.push(VServerComponentType.Fragment.toString());
+   context.push(", [");
+-  for (const [i, child] of children.entries()) {
++  for (const [i, child] of withoutRenderlessChildren(children).entries()) {
+     if (i > 0) context.push(", ");
+     genNode(child, context);
+   }
+diff --git a/dist/template-compiler/codegen/control-flow.js b/dist/template-compiler/codegen/control-flow.js
+index 26091274cd625faf957956f3463acb5968951855..d390cadf529eae0c5ff03c71160b67f2d8a4bc39 100644
+--- a/dist/template-compiler/codegen/control-flow.js
++++ b/dist/template-compiler/codegen/control-flow.js
+@@ -2,19 +2,20 @@ import {
+   NodeTypes
+ } from "@vue/compiler-dom";
+ import { VServerComponentType } from "../../runtime/shared.js";
+-import { genNode } from "./vnode.js";
+-import { genExpressionAsValue } from "./expressions.js";
++import { withoutRenderlessChildren, genNode } from "./vnode.js";
++import { collectBindingNames, genExpressionAsValue } from "./expressions.js";
+ function genChildrenAsNodeOrFragment(children, context) {
+-  if (children.length === 1 && children[0]?.type !== NodeTypes.FOR) {
+-    genNode(children[0], context);
++  const renderable = withoutRenderlessChildren(children);
++  if (renderable.length === 1 && renderable[0]?.type !== NodeTypes.FOR) {
++    genNode(renderable[0], context);
+     return;
+   }
+   context.push("[");
+   context.push(VServerComponentType.Fragment.toString());
+   context.push(", [");
+-  for (let i = 0; i < children.length; i++) {
++  for (let i = 0; i < renderable.length; i++) {
+     if (i > 0) context.push(", ");
+-    genNode(children[i], context);
++    genNode(renderable[i], context);
+   }
+   context.push("]]");
+ }
+@@ -56,9 +57,8 @@ function isNumericLiteral(node) {
+ }
+ export function genFor(node, context) {
+   const { source, value, key, index } = node.parseResult;
+-  const loopVars = [];
+-  const valueVar = value?.content || "item";
+-  loopVars.push(valueVar);
++  const valueVar = value?.content || value?.loc?.source?.trim() || "item";
++  const loopVars = collectBindingNames(valueVar);
+   if (key) {
+     loopVars.push(key.content);
+   }
+@@ -85,13 +85,17 @@ export function genFor(node, context) {
+     context.push(index.content);
+   }
+   context.push(") => ");
++  const added = [];
+   for (const v of loopVars) {
+-    context.localVars.add(v);
++    if (!context.localVars.has(v)) {
++      context.localVars.add(v);
++      added.push(v);
++    }
+   }
+   try {
+     genChildrenAsNodeOrFragment(node.children, context);
+   } finally {
+-    for (const v of loopVars) {
++    for (const v of added) {
+       context.localVars.delete(v);
+     }
+   }
+diff --git a/dist/template-compiler/codegen/directives.js b/dist/template-compiler/codegen/directives.js
+index e9c2b621c8d768a0345589bc0cdd65ec28e249ae..53b03fad52e30fd4978fb641141d4d1514743d24 100644
+--- a/dist/template-compiler/codegen/directives.js
++++ b/dist/template-compiler/codegen/directives.js
+@@ -64,7 +64,9 @@ export function genDirectiveBinding(dir, context) {
+     context.push('"modifiers": {');
+     for (let i = 0; i < dir.modifiers.length; i++) {
+       if (i > 0) context.push(", ");
+-      context.push(`"${dir.modifiers[i]}": true`);
++      const mod = dir.modifiers[i];
++      const modName = typeof mod === "string" ? mod : mod.content;
++      context.push(`${JSON.stringify(modName)}: true`);
+     }
+     context.push("}");
+   }
+diff --git a/dist/template-compiler/codegen/elements.js b/dist/template-compiler/codegen/elements.js
+index a223231cbca2d325c59ed55bf26f2891014aa229..4088971d833200aa5a314fb39719a1f6efa91b89 100644
+--- a/dist/template-compiler/codegen/elements.js
++++ b/dist/template-compiler/codegen/elements.js
+@@ -1,6 +1,6 @@
+ import { genImport } from "knitwork";
+ import { VServerComponentType } from "../../runtime/shared.js";
+-import { genNode } from "./vnode.js";
++import { withoutRenderlessChildren, genNode } from "./vnode.js";
+ import { genComponent } from "./components.js";
+ import { genSlotOutlet } from "./slots.js";
+ import { genPropsWithScopeId } from "./props.js";
+@@ -76,11 +76,12 @@ function genHtmlElement(node, context) {
+   }
+   if (!isVoidElement) {
+     context.push(", ");
+-    if (children.length === 0) {
++    const renderableChildren = withoutRenderlessChildren(children);
++    if (renderableChildren.length === 0) {
+       context.push("undefined");
+     } else {
+       context.push("[");
+-      for (const [i, child] of children.entries()) {
++      for (const [i, child] of renderableChildren.entries()) {
+         if (i > 0) context.push(", ");
+         genNode(child, context);
+       }
+diff --git a/dist/template-compiler/codegen/expressions.d.ts b/dist/template-compiler/codegen/expressions.d.ts
+index 533d8fad985f2c8989dc678c6a902d4dcdbe6567..8497c257e97978e203016d7b5392fe0404f1dbaa 100644
+--- a/dist/template-compiler/codegen/expressions.d.ts
++++ b/dist/template-compiler/codegen/expressions.d.ts
+@@ -1,5 +1,14 @@
+ import { type BindingMetadata, type ExpressionNode } from "@vue/compiler-dom";
+ import type { CodegenContext } from "./context";
++/**
++ * Extract the identifier names a binding pattern declares. `v-for`
++ * values and slot-scope props are arbitrary destructuring patterns
++ * (`{ id, name }`, `[a, b]`, `{ a: alias = 1, ...rest }`), and
++ * `prefixIdentifiers` needs the individual names in `localVars`.
++ * Seeding the raw pattern string would match nothing, so every binding
++ * would be wrongly rewritten to `_ctx.<name>`.
++ */
++export declare function collectBindingNames(pattern: string): string[];
+ /**
+  * Prefix free identifiers with `_ctx.` so the compiled render reads
+  * bindings off the instance proxy. Parses with `@babel/parser` (TS
+diff --git a/dist/template-compiler/codegen/expressions.js b/dist/template-compiler/codegen/expressions.js
+index 5f360920b6e9f2828e7d61924363aedacdef48bd..53eed684bd873ac6deb75de635d3ebb7fe1757ce 100644
+--- a/dist/template-compiler/codegen/expressions.js
++++ b/dist/template-compiler/codegen/expressions.js
+@@ -44,6 +44,48 @@ function classifyExpression(content) {
+     return "statement";
+   }
+ }
++export function collectBindingNames(pattern) {
++  const trimmed = pattern.trim();
++  if (!trimmed) return [];
++  if (/^[A-Za-z_$][\w$]*$/.test(trimmed)) return [trimmed];
++  try {
++    const arrow = parseExpression(`(${trimmed}) => 0`, { plugins: ["typescript"] });
++    const names = [];
++    const walk = (n) => {
++      if (!n) return;
++      switch (n.type) {
++        case "Identifier": {
++          names.push(n.name);
++          return;
++        }
++        case "ObjectPattern": {
++          for (const p of n.properties) walk(p);
++          return;
++        }
++        case "ObjectProperty": {
++          walk(n.value);
++          return;
++        }
++        case "ArrayPattern": {
++          for (const el of n.elements) walk(el);
++          return;
++        }
++        case "AssignmentPattern": {
++          walk(n.left);
++          return;
++        }
++        case "RestElement": {
++          walk(n.argument);
++          return;
++        }
++      }
++    };
++    for (const param of arrow.params ?? []) walk(param);
++    return names;
++  } catch {
++    return [trimmed];
++  }
++}
+ function collectTsStripRanges(node, s) {
+   if (!node || typeof node !== "object") return;
+   switch (node.type) {
+diff --git a/dist/template-compiler/codegen/index.d.ts b/dist/template-compiler/codegen/index.d.ts
+index e77b9f98b152d243f003bb9aac519e2552421f19..7676ab7dc73ce9083e7e9a740e819b938704c427 100644
+--- a/dist/template-compiler/codegen/index.d.ts
++++ b/dist/template-compiler/codegen/index.d.ts
+@@ -2,4 +2,4 @@
+  * Code generation utilities for the onigiri template compiler.
+  */
+ export { createCodegenContext, type CodegenContext } from "./context";
+-export { genNode, genElement, genText, genInterpolation, genCompoundExpression, genIf, genFor, genProps, } from "./vnode";
++export { withoutRenderlessChildren, genNode, genElement, genText, genInterpolation, genCompoundExpression, genIf, genFor, genProps, } from "./vnode";
+diff --git a/dist/template-compiler/codegen/index.js b/dist/template-compiler/codegen/index.js
+index 816d1899e7a2a8f5f0c92694ce38555df184476a..84e97491ef1fa24244a33dd8f9d2e1b7534ce6bd 100644
+--- a/dist/template-compiler/codegen/index.js
++++ b/dist/template-compiler/codegen/index.js
+@@ -1,5 +1,6 @@
+ export { createCodegenContext } from "./context.js";
+ export {
++  withoutRenderlessChildren,
+   genNode,
+   genElement,
+   genText,
+diff --git a/dist/template-compiler/codegen/props.js b/dist/template-compiler/codegen/props.js
+index 6dfc7f122df57b0cce6d42351a5ae782dec9a5f2..ef7875998fe4155f81ecb6bf5499d3f59fc46dc5 100644
+--- a/dist/template-compiler/codegen/props.js
++++ b/dist/template-compiler/codegen/props.js
+@@ -58,6 +58,44 @@ export function genPropsWithScopeId(props, context) {
+   }
+   genPropsObjectWithScopeId(props, context);
+ }
++function isDynamicArg(arg) {
++  if (!arg || typeof arg !== "object") return false;
++  if (arg.type === NodeTypes.SIMPLE_EXPRESSION) return !arg.isStatic;
++  return true;
++}
++function genDirectivePropEntry(prop, context) {
++  if (prop.name === "on") {
++    if (isDynamicArg(prop.arg)) {
++      context.imports.add(genImport("vue", [{ name: "toHandlerKey", as: "_toHandlerKey" }]));
++      context.push("[_toHandlerKey(");
++      genExpressionAsValue(prop.arg, context);
++      context.push(")]: ");
++    } else {
++      const eventName = prop.arg && typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
++      const onEventName = "on" + eventName.charAt(0).toUpperCase() + eventName.slice(1);
++      context.push(`"${onEventName}": `);
++    }
++    if (prop.exp) {
++      genEventHandler(prop.exp, context);
++    } else {
++      context.push("() => {}");
++    }
++    return;
++  }
++  if (isDynamicArg(prop.arg)) {
++    context.push("[");
++    genExpressionAsValue(prop.arg, context);
++    context.push("]: ");
++  } else {
++    const propName = prop.arg && typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
++    context.push(`"${propName}": `);
++  }
++  if (prop.exp) {
++    genExpressionAsValue(prop.exp, context);
++  } else {
++    context.push("true");
++  }
++}
+ function genPropsObjectWithScopeId(props, context) {
+   context.push("{");
+   let first = true;
+@@ -78,29 +116,10 @@ function genPropsObjectWithScopeId(props, context) {
+     } else if (prop.type === NodeTypes.DIRECTIVE) {
+       if (STRIPPED_DIRECTIVES.has(prop.name)) continue;
+       if (shouldWrapDirective(prop.name)) continue;
++      if (prop.name !== "on" && !(prop.name === "bind" && prop.arg)) continue;
+       if (!first) context.push(", ");
+       first = false;
+-      if (prop.name === "on") {
+-        const eventName = prop.arg && typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
+-        const onEventName = "on" + eventName.charAt(0).toUpperCase() + eventName.slice(1);
+-        context.push(`"${onEventName}": `);
+-        if (prop.exp) {
+-          genEventHandler(prop.exp, context);
+-        } else {
+-          context.push("() => {}");
+-        }
+-        continue;
+-      }
+-      if (prop.name === "bind" && prop.arg) {
+-        const propName = prop.arg && typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
+-        context.push(`"${propName}": `);
+-        if (prop.exp) {
+-          genExpressionAsValue(prop.exp, context);
+-        } else {
+-          context.push("true");
+-        }
+-        continue;
+-      }
++      genDirectivePropEntry(prop, context);
+     }
+   }
+   context.push("}");
+@@ -121,29 +140,10 @@ function genPropsObject(props, context) {
+     } else if (prop.type === NodeTypes.DIRECTIVE) {
+       if (STRIPPED_DIRECTIVES.has(prop.name)) continue;
+       if (shouldWrapDirective(prop.name)) continue;
++      if (prop.name !== "on" && !(prop.name === "bind" && prop.arg)) continue;
+       if (!first) context.push(", ");
+       first = false;
+-      if (prop.name === "on") {
+-        const eventName = prop.arg && typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
+-        const onEventName = "on" + eventName.charAt(0).toUpperCase() + eventName.slice(1);
+-        context.push(`"${onEventName}": `);
+-        if (prop.exp) {
+-          genEventHandler(prop.exp, context);
+-        } else {
+-          context.push("() => {}");
+-        }
+-        continue;
+-      }
+-      if (prop.name === "bind" && prop.arg) {
+-        const attrName = typeof prop.arg === "object" && "content" in prop.arg ? prop.arg.content : "";
+-        context.push(`"${attrName}": `);
+-        if (prop.exp) {
+-          genExpressionAsValue(prop.exp, context);
+-        } else {
+-          context.push("true");
+-        }
+-        continue;
+-      }
++      genDirectivePropEntry(prop, context);
+     }
+   }
+   context.push("}");
+diff --git a/dist/template-compiler/codegen/slots.js b/dist/template-compiler/codegen/slots.js
+index bda66d55bf6cac0465852800bc9ce0af72acfaed..aaceba9773317c1413f874284e87479723d46b69 100644
+--- a/dist/template-compiler/codegen/slots.js
++++ b/dist/template-compiler/codegen/slots.js
+@@ -2,12 +2,9 @@ import {
+   NodeTypes
+ } from "@vue/compiler-dom";
+ import { genImport } from "knitwork";
+-import { genNode } from "./vnode.js";
+-import { genExpressionAsValue } from "./expressions.js";
++import { withoutRenderlessChildren, genNode } from "./vnode.js";
++import { collectBindingNames, genExpressionAsValue } from "./expressions.js";
+ import { genProps } from "./props.js";
+-function dropRenderlessChildren(children) {
+-  return children.filter((c) => c?.type !== NodeTypes.COMMENT);
+-}
+ function parseSlots(children) {
+   const slots = [];
+   const defaultChildren = [];
+@@ -32,14 +29,14 @@ function parseSlots(children) {
+         slots.push({
+           name: slotName,
+           slotProps,
+-          children: dropRenderlessChildren(child.children || [])
++          children: withoutRenderlessChildren(child.children || [])
+         });
+         continue;
+       }
+     }
+     defaultChildren.push(child);
+   }
+-  const renderableDefaults = dropRenderlessChildren(defaultChildren);
++  const renderableDefaults = withoutRenderlessChildren(defaultChildren);
+   if (renderableDefaults.length > 0) {
+     slots.push({
+       name: "default",
+@@ -65,12 +62,24 @@ export function genSlotsObject(children, context, asFunction) {
+       } else {
+         context.push("() => ");
+       }
+-      context.push("[");
+-      for (const [j, child] of slot.children.entries()) {
+-        if (j > 0) context.push(", ");
+-        genNode(child, context);
++      const slotLocals = slot.slotProps ? collectBindingNames(slot.slotProps) : [];
++      const added = [];
++      for (const name of slotLocals) {
++        if (!context.localVars.has(name)) {
++          context.localVars.add(name);
++          added.push(name);
++        }
++      }
++      try {
++        context.push("[");
++        for (const [j, child] of slot.children.entries()) {
++          if (j > 0) context.push(", ");
++          genNode(child, context);
++        }
++        context.push("]");
++      } finally {
++        for (const name of added) context.localVars.delete(name);
+       }
+-      context.push("]");
+     } else {
+       if (slot.slotProps) {
+         throw new Error(
+@@ -123,7 +132,7 @@ export function genSlotOutlet(node, context) {
+     context.push("undefined");
+   }
+   context.push(", ");
+-  const renderableChildren = dropRenderlessChildren(children);
++  const renderableChildren = withoutRenderlessChildren(children);
+   if (renderableChildren.length > 0) {
+     context.push("() => [");
+     for (const [i, child] of renderableChildren.entries()) {
+diff --git a/dist/template-compiler/codegen/vnode.d.ts b/dist/template-compiler/codegen/vnode.d.ts
+index f14c4680e5bd3cd82d43497193be263bffdb6534..da5bf40a66e7ab1636df36849e84e51994b384b2 100644
+--- a/dist/template-compiler/codegen/vnode.d.ts
++++ b/dist/template-compiler/codegen/vnode.d.ts
+@@ -1,4 +1,5 @@
+ import type { CodegenContext } from "./context";
++export declare function withoutRenderlessChildren(children: any[]): any[];
+ export declare function genNode(node: any, context: CodegenContext): void;
+ export { genElement } from "./elements";
+ export { genIf, genFor } from "./control-flow";
+diff --git a/dist/template-compiler/codegen/vnode.js b/dist/template-compiler/codegen/vnode.js
+index bd0d3a642b0a41de767d5fa9ebc4c6c61a838466..9e666d49c9dd262bb0e240c7d56d3968a3d299ba 100644
+--- a/dist/template-compiler/codegen/vnode.js
++++ b/dist/template-compiler/codegen/vnode.js
+@@ -5,6 +5,9 @@ import { genCompoundExpression, genInterpolation, genText, genTextCall } from ".
+ const TEXT_CALL = 12;
+ const VNODE_CALL = 13;
+ const JS_CALL_EXPRESSION = 14;
++export function withoutRenderlessChildren(children) {
++  return children.filter((c) => c?.type !== NodeTypes.COMMENT);
++}
+ export function genNode(node, context) {
+   switch (node.type) {
+     case NodeTypes.ELEMENT: {
+diff --git a/dist/template-compiler/index.js b/dist/template-compiler/index.js
+index bef97a28e2bd8543c3730d1e77e4688fc2aab1c9..b0f3b00c0c41a9cc3064fff451a6d2bb8300ff3f 100644
+--- a/dist/template-compiler/index.js
++++ b/dist/template-compiler/index.js
+@@ -8,7 +8,7 @@ import {
+ } from "@vue/compiler-dom";
+ import { isVoidTag } from "@vue/shared";
+ import { VServerComponentType } from "../runtime/shared.js";
+-import { createCodegenContext, genNode } from "./codegen/index.js";
++import { createCodegenContext, withoutRenderlessChildren, genNode } from "./codegen/index.js";
+ const [baseNodeTransforms] = getBaseTransformPreset(true);
+ const transformVOnEventKind = (node, context) => {
+   if (node.type !== NodeTypes.ELEMENT) return;
+@@ -52,11 +52,12 @@ export function compileOnigiri(template, options = {}) {
+     resolveChunkUrl: options.resolveChunkUrl,
+     registerTarget: options.registerTarget
+   });
+-  if (ast.children.length === 0) {
++  const rootChildren = withoutRenderlessChildren(ast.children);
++  if (rootChildren.length === 0) {
+     bodyContext.push("null");
+-  } else if (ast.children.length === 1) {
++  } else if (rootChildren.length === 1) {
+     const before = bodyContext.code.length;
+-    genNode(ast.children[0], bodyContext);
++    genNode(rootChildren[0], bodyContext);
+     const produced = bodyContext.code.slice(before);
+     if (produced.startsWith("...")) {
+       bodyContext.code = bodyContext.code.slice(0, before) + "[" + VServerComponentType.Fragment.toString() + ", [" + produced + "]]";
+@@ -65,9 +66,9 @@ export function compileOnigiri(template, options = {}) {
+     bodyContext.push("[");
+     bodyContext.push(VServerComponentType.Fragment.toString());
+     bodyContext.push(", [");
+-    for (let i = 0; i < ast.children.length; i++) {
++    for (let i = 0; i < rootChildren.length; i++) {
+       if (i > 0) bodyContext.push(", ");
+-      genNode(ast.children[i], bodyContext);
++      genNode(rootChildren[i], bodyContext);
+     }
+     bodyContext.push("]]");
+   }
+@@ -114,11 +115,12 @@ export function compileOnigiriInline(template, options = {}) {
+     resolveChunkUrl: options.resolveChunkUrl,
+     registerTarget: options.registerTarget
+   });
+-  if (ast.children.length === 0) {
++  const rootChildren = withoutRenderlessChildren(ast.children);
++  if (rootChildren.length === 0) {
+     context.push("null");
+-  } else if (ast.children.length === 1) {
++  } else if (rootChildren.length === 1) {
+     const before = context.code.length;
+-    genNode(ast.children[0], context);
++    genNode(rootChildren[0], context);
+     const produced = context.code.slice(before);
+     if (produced.startsWith("...")) {
+       context.code = context.code.slice(0, before) + "[" + VServerComponentType.Fragment.toString() + ", [" + produced + "]]";
+@@ -127,9 +129,9 @@ export function compileOnigiriInline(template, options = {}) {
+     context.push("[");
+     context.push(VServerComponentType.Fragment.toString());
+     context.push(", [");
+-    for (let i = 0; i < ast.children.length; i++) {
++    for (let i = 0; i < rootChildren.length; i++) {
+       if (i > 0) context.push(", ");
+-      genNode(ast.children[i], context);
++      genNode(rootChildren[i], context);
+     }
+     context.push("]]");
+   }
+diff --git a/dist/vite/compiler/inject-setup.js b/dist/vite/compiler/inject-setup.js
+index 546c6da78572e5a295f026dbaa4244f7c9a4fd03..3aff3d36ac276ca15dcc2c73066a873736d8533f 100644
+--- a/dist/vite/compiler/inject-setup.js
++++ b/dist/vite/compiler/inject-setup.js
+@@ -19,7 +19,12 @@ function buildBridgeObject(bindingMetadata) {
+         entries.push(`get ${name}() { return __onigiri_unref(${name}) }`);
+         break;
+       }
+-      case "setup-const": {
++      case "setup-const":
++      // `const TITLE = "literal"` in `<script setup>` is still a plain
++      // closure binding. Without a bridge entry the lookup falls through
++      // to `_ctx[k]`, which is empty under `__ssrInlineRender` (no
++      // exposed setupState) and renders `undefined`.
++      case "literal-const": {
+         entries.push(`get ${name}() { return ${name} }`);
+         break;
+       }
