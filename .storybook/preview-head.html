@@ -1,0 +1,20 @@
+<script>
+  // @nuxtjs/color-mode's client plugin captures `window.__NUXT_COLOR_MODE__` at module-eval time —
+  // a helper Nuxt normally injects via an inline <head> script before hydration. Storybook's preview
+  // iframe has no such script, so the plugin crashes ("Cannot read properties of undefined (reading
+  // 'preference')"). Define the helper here, in <head>, so it exists before the preview bundle (and
+  // therefore the color-mode plugin module) is loaded.
+  (function () {
+    if (window.__NUXT_COLOR_MODE__) return;
+    var getColorScheme = function () {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    window.__NUXT_COLOR_MODE__ = {
+      preference: 'system',
+      value: getColorScheme(),
+      getColorScheme: getColorScheme,
+      addColorScheme: function () {},
+      removeColorScheme: function () {},
+    };
+  })();
+</script>

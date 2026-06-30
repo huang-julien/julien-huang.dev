@@ -1,3 +1,5 @@
+import { experimental_vitePlugin } from '@storybook/builder-vite'
+
 export default defineNuxtConfig({
   devtools: {
     enabled: true,
@@ -26,9 +28,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxt/ui',
-    "@nuxt/content",
-    '@nuxt/hints',
-    '@nuxt/a11y',
+    "@nuxt/content", 
   ],
 
   build: {
@@ -55,13 +55,35 @@ export default defineNuxtConfig({
     // just the compiler from the client Vite config. The manifest plugin must
     // stay — `vue-onigiri/runtime/loader.js` imports `virtual:onigiri/manifest`
     // on the client.
-    'vite:extendConfig'(config, { isClient }) {
+    'vite:extendConfig': async (config, { isClient }) => {
       if (!isClient || !config.plugins) return
       config.plugins = config.plugins.filter((p) => {
         const name = (p as { name?: string } | null | undefined)?.name
         return name !== 'vite:vue-onigiri-compiler'
       })
-    }
+
+     },
+
+    // Storybook's manager/preview websocket channel (added by experimental_vitePlugin) must
+    // receive `upgrade` events at the page origin. Under `nuxt dev`, Vite runs in middleware mode
+    // (no own http server), so the upgrade lands on Nitro's dev server instead. Forward the
+    // channel upgrades into the EventEmitter the @storybook/builder-vite patch listens on.
+    listen(server) {
+      // Storybook's channel must be the SOLE handler for /storybook-server-channel. Nitro's dev
+      // server already has an `upgrade` listener (vite HMR / devtools) that would also handshake
+      // the same socket → "Invalid frame header". Take over `upgrade`: route the channel path to
+      // Storybook's bridge, delegate every other upgrade to the original listeners (HMR etc.).
+      const original = server.rawListeners('upgrade') as Array<(...a: unknown[]) => void>
+      server.removeAllListeners('upgrade')
+      server.on('upgrade', (req, socket, head) => {
+        if (req.url?.startsWith('/storybook-server-channel')) {
+          (globalThis as { __SB_CHANNEL_UPGRADE__?: { emit: (e: string, ...a: unknown[]) => void } })
+            .__SB_CHANNEL_UPGRADE__?.emit('upgrade', req, socket, head)
+          return
+        }
+        for (const fn of original) fn.call(server, req, socket, head)
+      })
+    },
   },
 
   i18n: {
@@ -72,8 +94,9 @@ export default defineNuxtConfig({
   
 
   compatibilityDate: '2025-04-05',
-  vite: {
-    build: {
-     }
-  }
+vite: {
+  plugins: [
+    await experimental_vitePlugin({})
+  ]
+}
 })

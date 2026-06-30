@@ -98,3 +98,5 @@ sw.*
 
 .data
 .wrangler
+*storybook.log
+storybook-static

@@ -10,14 +10,36 @@ allowBuilds:
 ignoredBuiltDependencies:
   - vue-demi
 
+minimumReleaseAgeExclude:
+  - '@storybook/addon-a11y@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/addon-docs@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/csf-plugin@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/vue3@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/vue3-vite@0.0.0-pr-35247-sha-45858977'
+  - eslint-plugin-storybook@0.0.0-pr-35247-sha-45858977
+  - storybook@0.0.0-pr-35247-sha-45858977
+
+# Force the Storybook graph onto the same PR-preview build so internal APIs line up.
+overrides:
+  '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
+  '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
+  '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
+  '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
+
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - better-sqlite3
   - core-js
   - esbuild
   - sharp
+# Patch keys are version-pinned to 4.4.2 so they don't try to apply to the older
+# @nuxt/vite-builder@3.21.8 that @storybook-vue/nuxt drags in. That mismatch aborts
+# the whole install, which is what left node_modules (and the Vite+ binding) incomplete.
 patchedDependencies:
-  '@nuxt/nitro-server': patches/@nuxt__nitro-server.patch
-  '@nuxt/vite-builder': patches/@nuxt__vite-builder.patch
-  nuxt: patches/nuxt.patch
+  '@nuxt/nitro-server@4.4.2': patches/@nuxt__nitro-server.patch
+  '@nuxt/vite-builder@4.4.2': patches/@nuxt__vite-builder.patch
+  '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
+  nuxt@4.4.2: patches/nuxt.patch
   vue-onigiri@0.3.2: patches/vue-onigiri@0.3.2.patch

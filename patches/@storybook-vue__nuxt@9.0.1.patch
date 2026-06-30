@@ -1,0 +1,135 @@
+diff --git a/dist/preset.cjs b/dist/preset.cjs
+index 68f9e974b08899476a3976071493f9f2ec77dcb4..db1784ab712dd46828e4e779c1ac38310ed419b7 100644
+--- a/dist/preset.cjs
++++ b/dist/preset.cjs
+@@ -3160,6 +3160,11 @@ function vuePlugin(rawOptions = {}) {
+         if (!filter.value(filename) && !query.vue) {
+           return;
+         }
++        // Embedded under `nuxt dev`, this plugin's `buildStart` (which sets options.compiler) is
++        // skipped for the late-assembled `storybook` Vite environment, leaving compiler null so
++        // createDescriptor crashes ("Cannot read properties of null (reading 'parse')"). Resolve
++        // the SFC compiler lazily on first transform instead of relying on buildStart timing.
++        options.value.compiler || (options.value.compiler = resolveCompiler(options.value.root));
+         if (!query.vue) {
+           return transformMain(
+             code,
+@@ -3248,8 +3253,8 @@ function extendComponents(nuxt) {
+     if (!nuxtLink) {
+       throw new Error("NuxtLink component not found");
+     }
+-    nuxtLink.filePath = path.join(runtimeDir, "components/nuxt-link");
+-    nuxtLink.shortPath = path.join(runtimeDir, "components/nuxt-link");
++    nuxtLink.filePath = pathe.normalize(path.join(runtimeDir, "components/nuxt-link"));
++    nuxtLink.shortPath = pathe.normalize(path.join(runtimeDir, "components/nuxt-link"));
+     nuxt.options.build.transpile.push(nuxtLink.filePath);
+   });
+ }
+@@ -3258,26 +3263,17 @@ async function extendComposables(nuxt) {
+   nuxt.options.build.transpile.push(composablesDir);
+   addImportsSources({
+     imports: ["useRouter"],
+-    from: path.join(composablesDir, "router")
++    // pathe.normalize → forward slashes; node path.join yields backslashes on Windows,
++    // which break this value when it is emitted as an auto-import module specifier.
++    from: pathe.normalize(path.join(composablesDir, "router"))
+   });
+ }
+ async function loadNuxtViteConfig(root) {
+-  const { loadNuxt, tryUseNuxt, buildNuxt, extendPages } = await import('@nuxt/kit');
+-  let nuxt = tryUseNuxt();
+-  if (nuxt) {
+-    const nuxtRes = nuxt;
+-    return new Promise((resolve2) => {
+-      nuxtRes.hook("vite:configResolved", (config, { isClient }) => {
+-        if (isClient) {
+-          resolve2({
+-            viteConfig: config,
+-            nuxt: nuxtRes
+-          });
+-        }
+-      });
+-    });
+-  }
+-  nuxt = await loadNuxt({
++  const { loadNuxt, buildNuxt, extendPages } = await import('@nuxt/kit');
++  // Always build a fresh Nuxt to read its resolved Vite config, so Storybook receives the REAL
++  // merged config. (Reusing the host Nuxt isn't possible here: this runs during Nuxt config
++  // evaluation, before the Nuxt instance exists, so tryUseNuxt() is null.)
++  const nuxt = await loadNuxt({
+     cwd: root,
+     ready: false,
+     dev: false,
+@@ -3375,8 +3371,8 @@ function mergeViteConfig(storybookConfig, nuxtConfig, nuxt) {
+ const core = async (config) => {
+   return {
+     ...config,
+-    builder: await getPackageDir("@storybook/builder-vite"),
+-    renderer: await getPackageDir("@storybook/vue3")
++    builder: require.resolve("@storybook/builder-vite"),
++    renderer: require.resolve("@storybook/vue3/preset")
+   };
+ };
+ function createResolver(base) {
+diff --git a/dist/preset.mjs b/dist/preset.mjs
+index c63db7b3f1e713961918ecf8a2b24e5cdc1907ba..8bed3286f0930d019546941f08b49b06a548f046 100644
+--- a/dist/preset.mjs
++++ b/dist/preset.mjs
+@@ -3235,8 +3235,8 @@ function extendComponents(nuxt) {
+     if (!nuxtLink) {
+       throw new Error("NuxtLink component not found");
+     }
+-    nuxtLink.filePath = join(runtimeDir, "components/nuxt-link");
+-    nuxtLink.shortPath = join(runtimeDir, "components/nuxt-link");
++    nuxtLink.filePath = normalize(join(runtimeDir, "components/nuxt-link"));
++    nuxtLink.shortPath = normalize(join(runtimeDir, "components/nuxt-link"));
+     nuxt.options.build.transpile.push(nuxtLink.filePath);
+   });
+ }
+@@ -3245,24 +3245,23 @@ async function extendComposables(nuxt) {
+   nuxt.options.build.transpile.push(composablesDir);
+   addImportsSources({
+     imports: ["useRouter"],
+-    from: join(composablesDir, "router")
++    // normalize → forward slashes; node path join yields backslashes on Windows,
++    // which break this value when it is emitted as an auto-import module specifier.
++    from: normalize(join(composablesDir, "router"))
+   });
+ }
+ async function loadNuxtViteConfig(root) {
+   const { loadNuxt, tryUseNuxt, buildNuxt, extendPages } = await import('@nuxt/kit');
+   let nuxt = tryUseNuxt();
+   if (nuxt) {
+-    const nuxtRes = nuxt;
+-    return new Promise((resolve2) => {
+-      nuxtRes.hook("vite:configResolved", (config, { isClient }) => {
+-        if (isClient) {
+-          resolve2({
+-            viteConfig: config,
+-            nuxt: nuxtRes
+-          });
+-        }
+-      });
+-    });
++    // A Nuxt instance already exists in context: either an external `nuxt dev`/build we are
++    // embedded in via @storybook/builder-vite's experimental_vitePlugin, or this function's
++    // own in-progress buildNuxt() (re-entrancy through Nuxt's vite:extendConfig hook). In both
++    // cases we are running INSIDE vite:extendConfig, so awaiting vite:configResolved would
++    // deadlock (it cannot fire until extendConfig returns). Return an empty config to break the
++    // cycle; experimental_vitePlugin only consumes finalConfig.plugins, and the host Nuxt vite
++    // already carries Nuxt's own config.
++    return { viteConfig: {}, nuxt };
+   }
+   nuxt = await loadNuxt({
+     cwd: root,
+@@ -3362,8 +3361,8 @@ function mergeViteConfig(storybookConfig, nuxtConfig, nuxt) {
+ const core = async (config) => {
+   return {
+     ...config,
+-    builder: await getPackageDir("@storybook/builder-vite"),
+-    renderer: await getPackageDir("@storybook/vue3")
++    builder: import.meta.resolve("@storybook/builder-vite"),
++    renderer: import.meta.resolve("@storybook/vue3/preset")
+   };
+ };
+ function createResolver(base) {
