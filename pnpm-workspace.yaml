@@ -20,9 +20,15 @@ minimumReleaseAgeExclude:
   - '@storybook/vue3-vite@0.0.0-pr-35247-sha-45858977'
   - eslint-plugin-storybook@0.0.0-pr-35247-sha-45858977
   - storybook@0.0.0-pr-35247-sha-45858977
+  - '@storybook/addon-a11y@0.0.0-pr-35247-sha-b1e0dc56'
+  - '@storybook/addon-docs@0.0.0-pr-35247-sha-b1e0dc56'
+  - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-b1e0dc56'
+  - eslint-plugin-storybook@0.0.0-pr-35247-sha-b1e0dc56
+  - storybook@0.0.0-pr-35247-sha-b1e0dc56
 
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
+  'vue-onigiri>vite': ^7.0.0
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
@@ -41,5 +47,6 @@ patchedDependencies:
   '@nuxt/nitro-server@4.4.2': patches/@nuxt__nitro-server.patch
   '@nuxt/vite-builder@4.4.2': patches/@nuxt__vite-builder.patch
   '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
+  '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977': patches/@storybook__builder-vite@0.0.0-pr-35247-sha-45858977.patch
   nuxt@4.4.2: patches/nuxt.patch
   vue-onigiri@0.3.2: patches/vue-onigiri@0.3.2.patch

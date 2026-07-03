@@ -1,0 +1,885 @@
+diff --git a/dist/_node-chunks/chunk-CVNFOEH4.js b/dist/_node-chunks/chunk-4FQEZJET.js
+similarity index 95%
+rename from dist/_node-chunks/chunk-CVNFOEH4.js
+rename to dist/_node-chunks/chunk-4FQEZJET.js
+index 2af4056093f7f035ee40b143f97047713f1a5132..4fec4bda5626839f2691d1c4b27084089c57cd25 100644
+--- a/dist/_node-chunks/chunk-CVNFOEH4.js
++++ b/dist/_node-chunks/chunk-4FQEZJET.js
+@@ -1,10 +1,10 @@
+-import CJS_COMPAT_NODE_URL_s1jx7dg4j79 from 'node:url';
+-import CJS_COMPAT_NODE_PATH_s1jx7dg4j79 from 'node:path';
+-import CJS_COMPAT_NODE_MODULE_s1jx7dg4j79 from "node:module";
++import CJS_COMPAT_NODE_URL_co0660c196i from 'node:url';
++import CJS_COMPAT_NODE_PATH_co0660c196i from 'node:path';
++import CJS_COMPAT_NODE_MODULE_co0660c196i from "node:module";
+ 
+-var __filename = CJS_COMPAT_NODE_URL_s1jx7dg4j79.fileURLToPath(import.meta.url);
+-var __dirname = CJS_COMPAT_NODE_PATH_s1jx7dg4j79.dirname(__filename);
+-var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
++var __filename = CJS_COMPAT_NODE_URL_co0660c196i.fileURLToPath(import.meta.url);
++var __dirname = CJS_COMPAT_NODE_PATH_co0660c196i.dirname(__filename);
++var require = CJS_COMPAT_NODE_MODULE_co0660c196i.createRequire(import.meta.url);
+ 
+ // ------------------------------------------------------------
+ // end of CJS compatibility banner, injected by Storybook's esbuild configuration
+@@ -13,7 +13,7 @@ import {
+   isAbsolute,
+   normalize,
+   resolve
+-} from "./chunk-ZMDCEUMZ.js";
++} from "./chunk-W7KUJJZJ.js";
+ 
+ // src/preset.ts
+ import { findConfigFile } from "storybook/internal/common";
+@@ -26,8 +26,6 @@ function storybookConfigPlugin(options) {
+       name: "storybook:config-plugin",
+       enforce: "pre",
+       async config(config) {
+-        if (config.environments?.storybook)
+-          return;
+         let { defaultClientConditions = [] } = await import("vite"), existingEnvPrefix = config.envPrefix, mergedEnvPrefix = existingEnvPrefix ? Array.from(
+           /* @__PURE__ */ new Set([
+             ...Array.isArray(existingEnvPrefix) ? existingEnvPrefix : [existingEnvPrefix],
+@@ -41,14 +39,6 @@ function storybookConfigPlugin(options) {
+           },
+           envPrefix: mergedEnvPrefix
+         };
+-      },
+-      configEnvironment(name) {
+-        if (name === "storybook")
+-          return {
+-            resolve: {
+-              conditions: ["storybook", "stories", "test"]
+-            }
+-          };
+       }
+     },
+     {
+@@ -117,7 +107,7 @@ function storybookOptimizeDepsPlugin(options) {
+   return {
+     name: "storybook:optimize-deps-plugin",
+     async config(config, { command }) {
+-      if (command !== "serve" || config.environments?.storybook)
++      if (command !== "serve")
+         return;
+       let optimizeDeps = await getOptimizeDeps();
+       return {
+@@ -129,10 +119,6 @@ function storybookOptimizeDepsPlugin(options) {
+           include: [...optimizeDeps.include, ...config.optimizeDeps?.include ?? []]
+         }
+       };
+-    },
+-    async configEnvironment(name, _config, env) {
+-      if (!(name !== "storybook" || env.command !== "serve"))
+-        return { optimizeDeps: await getOptimizeDeps() };
+     }
+   };
+ }
+@@ -410,15 +396,9 @@ async function storybookSanitizeEnvs(options) {
+   return envs && Object.keys(envs).length > 0 && plugins.push({
+     name: "storybook:env-plugin",
+     config(config) {
+-      return config.environments?.storybook ? void 0 : {
++      return {
+         define: stringifyProcessEnvs(envs, config.envPrefix)
+       };
+-    },
+-    configEnvironment(name) {
+-      if (name === "storybook")
+-        return {
+-          define: stringifyProcessEnvs(envs, ["VITE_", "STORYBOOK_"])
+-        };
+     }
+   }), plugins;
+ }
+diff --git a/dist/_node-chunks/chunk-ZMDCEUMZ.js b/dist/_node-chunks/chunk-W7KUJJZJ.js
+similarity index 95%
+rename from dist/_node-chunks/chunk-ZMDCEUMZ.js
+rename to dist/_node-chunks/chunk-W7KUJJZJ.js
+index 5d4d09d96240013cfddd42e3fdbc8682744aeb02..c42b3a223374c0269ed144e6a8e18f89f2c22747 100644
+--- a/dist/_node-chunks/chunk-ZMDCEUMZ.js
++++ b/dist/_node-chunks/chunk-W7KUJJZJ.js
+@@ -1,10 +1,10 @@
+-import CJS_COMPAT_NODE_URL_s1jx7dg4j79 from 'node:url';
+-import CJS_COMPAT_NODE_PATH_s1jx7dg4j79 from 'node:path';
+-import CJS_COMPAT_NODE_MODULE_s1jx7dg4j79 from "node:module";
++import CJS_COMPAT_NODE_URL_co0660c196i from 'node:url';
++import CJS_COMPAT_NODE_PATH_co0660c196i from 'node:path';
++import CJS_COMPAT_NODE_MODULE_co0660c196i from "node:module";
+ 
+-var __filename = CJS_COMPAT_NODE_URL_s1jx7dg4j79.fileURLToPath(import.meta.url);
+-var __dirname = CJS_COMPAT_NODE_PATH_s1jx7dg4j79.dirname(__filename);
+-var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
++var __filename = CJS_COMPAT_NODE_URL_co0660c196i.fileURLToPath(import.meta.url);
++var __dirname = CJS_COMPAT_NODE_PATH_co0660c196i.dirname(__filename);
++var require = CJS_COMPAT_NODE_MODULE_co0660c196i.createRequire(import.meta.url);
+ 
+ // ------------------------------------------------------------
+ // end of CJS compatibility banner, injected by Storybook's esbuild configuration
+diff --git a/dist/_node-chunks/dist-RTHKBGJ7.js b/dist/_node-chunks/dist-NEFO3CZM.js
+similarity index 61%
+rename from dist/_node-chunks/dist-RTHKBGJ7.js
+rename to dist/_node-chunks/dist-NEFO3CZM.js
+index db46f01cb1cc77dd0772279483b80f47d030d0e5..d4a3f68c74a3ea0ac90bd741f479762a1b861b41 100644
+--- a/dist/_node-chunks/dist-RTHKBGJ7.js
++++ b/dist/_node-chunks/dist-NEFO3CZM.js
+@@ -1,10 +1,10 @@
+-import CJS_COMPAT_NODE_URL_s1jx7dg4j79 from 'node:url';
+-import CJS_COMPAT_NODE_PATH_s1jx7dg4j79 from 'node:path';
+-import CJS_COMPAT_NODE_MODULE_s1jx7dg4j79 from "node:module";
++import CJS_COMPAT_NODE_URL_co0660c196i from 'node:url';
++import CJS_COMPAT_NODE_PATH_co0660c196i from 'node:path';
++import CJS_COMPAT_NODE_MODULE_co0660c196i from "node:module";
+ 
+-var __filename = CJS_COMPAT_NODE_URL_s1jx7dg4j79.fileURLToPath(import.meta.url);
+-var __dirname = CJS_COMPAT_NODE_PATH_s1jx7dg4j79.dirname(__filename);
+-var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
++var __filename = CJS_COMPAT_NODE_URL_co0660c196i.fileURLToPath(import.meta.url);
++var __dirname = CJS_COMPAT_NODE_PATH_co0660c196i.dirname(__filename);
++var require = CJS_COMPAT_NODE_MODULE_co0660c196i.createRequire(import.meta.url);
+ 
+ // ------------------------------------------------------------
+ // end of CJS compatibility banner, injected by Storybook's esbuild configuration
+@@ -25,7 +25,7 @@ import {
+   resolve,
+   sep,
+   toNamespacedPath
+-} from "./chunk-ZMDCEUMZ.js";
++} from "./chunk-W7KUJJZJ.js";
+ export {
+   basename,
+   path as default,
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+deleted file mode 100644
+index 818ccd217263a2035d77199c0bc7c0a2baa294c0..0000000000000000000000000000000000000000
+diff --git a/dist/index.js b/dist/index.js
+index 742d7df0d0c61cf041de25bc6e3b5978d5c44c90..98b35a7f8707e3a82b21e8a2f0c7696c9b1945cb 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,10 +1,10 @@
+-import CJS_COMPAT_NODE_URL_s1jx7dg4j79 from 'node:url';
+-import CJS_COMPAT_NODE_PATH_s1jx7dg4j79 from 'node:path';
+-import CJS_COMPAT_NODE_MODULE_s1jx7dg4j79 from "node:module";
++import CJS_COMPAT_NODE_URL_co0660c196i from 'node:url';
++import CJS_COMPAT_NODE_PATH_co0660c196i from 'node:path';
++import CJS_COMPAT_NODE_MODULE_co0660c196i from "node:module";
+ 
+-var __filename = CJS_COMPAT_NODE_URL_s1jx7dg4j79.fileURLToPath(import.meta.url);
+-var __dirname = CJS_COMPAT_NODE_PATH_s1jx7dg4j79.dirname(__filename);
+-var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
++var __filename = CJS_COMPAT_NODE_URL_co0660c196i.fileURLToPath(import.meta.url);
++var __dirname = CJS_COMPAT_NODE_PATH_co0660c196i.dirname(__filename);
++var require = CJS_COMPAT_NODE_MODULE_co0660c196i.createRequire(import.meta.url);
+ 
+ // ------------------------------------------------------------
+ // end of CJS compatibility banner, injected by Storybook's esbuild configuration
+@@ -19,17 +19,16 @@ import {
+   getResolvedVirtualModuleId,
+   getUniqueImportPaths,
+   viteCorePlugins
+-} from "./_node-chunks/chunk-CVNFOEH4.js";
++} from "./_node-chunks/chunk-4FQEZJET.js";
+ import {
+   __commonJS,
+   __toESM,
+   dirname,
+   join,
+   normalize,
+-  parse,
+   relative,
+   resolve
+-} from "./_node-chunks/chunk-ZMDCEUMZ.js";
++} from "./_node-chunks/chunk-W7KUJJZJ.js";
+ 
+ // ../../../node_modules/picocolors/picocolors.js
+ var require_picocolors = __commonJS({
+@@ -97,7 +96,7 @@ var require_picocolors = __commonJS({
+ 
+ // src/index.ts
+ import { readFile as readFile3 } from "node:fs/promises";
+-import { fileURLToPath as fileURLToPath7 } from "node:url";
++import { fileURLToPath as fileURLToPath5 } from "node:url";
+ import { NoStatsForViteDevError } from "storybook/internal/server-errors";
+ 
+ // src/build.ts
+@@ -459,8 +458,8 @@ var ImportType;
+   A2[A2.Static = 1] = "Static", A2[A2.Dynamic = 2] = "Dynamic", A2[A2.ImportMeta = 3] = "ImportMeta", A2[A2.StaticSourcePhase = 4] = "StaticSourcePhase", A2[A2.DynamicSourcePhase = 5] = "DynamicSourcePhase", A2[A2.StaticDeferPhase = 6] = "StaticDeferPhase", A2[A2.DynamicDeferPhase = 7] = "DynamicDeferPhase";
+ })(ImportType || (ImportType = {}));
+ var A = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+-function parse2(E2, g = "@") {
+-  if (!C) return init.then((() => parse2(E2)));
++function parse(E2, g = "@") {
++  if (!C) return init.then((() => parse(E2)));
+   let I = E2.length + 1, w = (C.__heap_base.value || C.__heap_base) + 4 * I - C.memory.buffer.byteLength;
+   w > 0 && C.memory.grow(Math.ceil(w / 65536));
+   let K = C.sa(I - 1);
+@@ -1165,7 +1164,7 @@ async function injectExportOrderPlugin() {
+       async handler(code, id) {
+         if (!filter(id))
+           return;
+-        let [, exports] = await parse2(code), exportNames = exports.map((e) => code.substring(e.s, e.e));
++        let [, exports] = await parse(code), exportNames = exports.map((e) => code.substring(e.s, e.e));
+         if (exportNames.includes("__namedExportsOrder"))
+           return;
+         let s = new MagicString(code), orderedExports = exportNames.filter((e) => e !== "default");
+@@ -1385,7 +1384,7 @@ async function storybookExternalGlobalsPlugin(options) {
+     name: "storybook:external-globals-plugin",
+     enforce: "post",
+     async config(config, { command }) {
+-      if (command !== "serve" || config.environments?.storybook)
++      if (command !== "serve")
+         return;
+       let aliases = await getAliases(), newAlias = mergeAlias([], config.resolve?.alias);
+       return newAlias.push(...aliases), {
+@@ -1406,7 +1405,7 @@ async function storybookExternalGlobalsPlugin(options) {
+       async handler(code, id) {
+         if (globalsList.every((glob) => !code.includes(glob)))
+           return;
+-        let [imports] = parse2(code), src = new MagicString(code);
++        let [imports] = parse(code), src = new MagicString(code);
+         return imports.forEach(({ n: path, ss: startPosition, se: endPosition }) => {
+           let packageName = path;
+           if (packageName && globalsList.includes(packageName)) {
+@@ -1608,85 +1607,25 @@ async function createViteServer(options, devServer) {
+ }
+ 
+ // src/vite-plugin/index.ts
+-import { fileURLToPath as fileURLToPath6 } from "node:url";
+ import {
+   experimental_loadStorybook
+ } from "storybook/internal/core-server";
+ import { getPort } from "get-port-please";
+ import { createProxyMiddleware } from "http-proxy-middleware";
+ import polka from "polka";
+-
+-// src/vite-plugin/build/index.ts
+-import { cp, writeFile as writeFile2 } from "node:fs/promises";
+-import { fileURLToPath as fileURLToPath3 } from "node:url";
+-import { logger as logger4 } from "storybook/internal/node-logger";
+ import {
+-  buildFrameworkGlobalsFromOptions,
+-  readTemplate,
+-  renderHTML
+-} from "storybook/internal/builder-manager";
+-var storybookPackageDir = dirname(fileURLToPath3(import.meta.resolve("storybook/package.json"))), CORE_MANAGER_DIR = join(storybookPackageDir, "dist/manager");
+-async function buildStorybookEnvironment(builder, options, outputDir) {
+-  let storybookEnv = builder.environments.storybook;
+-  if (!storybookEnv) {
+-    logger4.warn("Storybook environment not found, skipping storybook build.");
+-    return;
+-  }
+-  logger4.info("Building Storybook..."), await builder.build(storybookEnv), await buildManagerStatic(options, outputDir), await buildStoryIndex(options, outputDir), await cp(CORE_MANAGER_DIR, join(outputDir, "sb-manager"), {
+-    filter: (src) => {
+-      let { ext } = parse(src);
+-      return ext ? ext === ".js" : !0;
+-    },
+-    recursive: !0
+-  }), logger4.info(`Storybook built to ${outputDir}`);
+-}
+-async function buildManagerStatic(options, outputDir) {
+-  let { getRefs } = await import("storybook/internal/common"), { basename } = await import("./_node-chunks/dist-RTHKBGJ7.js"), refs = getRefs(options), favicon = options.presets.apply("favicon").then((p) => basename(p)), features = options.presets.apply("features"), logLevel = options.presets.apply("logLevel"), title = options.presets.apply("title"), docsOptions = options.presets.apply("docs", {}), tagsOptions = options.presets.apply("tags", {}), template = readTemplate("template.ejs"), customHead = options.presets.apply("managerHead"), globals = await buildFrameworkGlobalsFromOptions(options), html = await renderHTML(
+-    template,
+-    title,
+-    favicon,
+-    customHead,
+-    [],
+-    [],
+-    features,
+-    refs,
+-    logLevel,
+-    docsOptions,
+-    tagsOptions,
+-    {
+-      ...options,
+-      configType: "PRODUCTION",
+-      previewUrl: "iframe.html"
+-    },
+-    globals
+-  );
+-  await writeFile2(join(outputDir, "index.html"), html);
+-}
+-async function buildStoryIndex(options, outputDir) {
+-  let storyIndex = await (await options.presets.apply("storyIndexGenerator")).getIndex();
+-  await writeFile2(join(outputDir, "index.json"), JSON.stringify(storyIndex));
+-}
+-function buildStorybookPlugin(options) {
+-  return {
+-    name: "storybook:build",
+-    apply: (_, { command, mode }) => command === "build" && mode === "storybook",
+-    config() {
+-      return {
+-        builder: {
+-          async buildApp(builder) {
+-            await buildStorybookEnvironment(builder, options, "storybook-static");
+-          }
+-        }
+-      };
+-    }
+-  };
+-}
++  BuildEnvironment,
++  DevEnvironment,
++  resolveConfig
++} from "vite";
++import { AsyncLocalStorage } from "node:async_hooks";
++import EventEmitter from "node:events";
+ 
+ // src/vite-plugin/middlewares/channel.ts
+ import { Channel, HEARTBEAT_INTERVAL } from "storybook/internal/channels";
+ import { experimental_UniversalStore as UniversalStore } from "storybook/internal/core-server";
+-import { isJSON, parse as parse3, stringify } from "telejson";
+-import WebSocket, { WebSocketServer } from "ws";
++import { isJSON, parse as parse2, stringify } from "telejson";
++import { WebSocket, WebSocketServer } from "ws";
+ var PluginChannelTransport = class {
+   constructor(server2, channelPath, token) {
+     this.channelPath = channelPath;
+@@ -1714,12 +1653,12 @@ Connection: close\r
+       }
+     }), this.socket.on("connection", (wss) => {
+       wss.on("message", (raw) => {
+-        let data = raw.toString(), event = typeof data == "string" && isJSON(data) ? parse3(data, {}) : data;
++        let data = raw.toString(), event = typeof data == "string" && isJSON(data) ? parse2(data, {}) : data;
+         this.handler?.(event);
+       });
+     });
+     let interval = setInterval(() => {
+-      this.send({ type: "ping" });
++      this.send({ type: "ping", from: "server", args: [] });
+     }, HEARTBEAT_INTERVAL);
+     this.socket.on("close", () => {
+       clearInterval(interval);
+@@ -1738,101 +1677,44 @@ function createServerChannel(server2, channelPath, token) {
+   return UniversalStore.__prepare(channel, UniversalStore.Environment.SERVER), channel;
+ }
+ 
+-// src/vite-plugin/middlewares/iframe.ts
+-import { readFile as readFile2 } from "node:fs/promises";
+-import { fileURLToPath as fileURLToPath4 } from "node:url";
+-
+-// src/vite-plugin/middlewares/module-router.ts
+-import { readFile } from "fs/promises";
+-var STORYBOOK_MODULE_PREFIX = "/@storybook-env";
+-function getStorybookModulePrefix() {
+-  return STORYBOOK_MODULE_PREFIX;
+-}
+-function registerEnvironmentModuleMiddleware(server2) {
+-  let router = createEnvironmentModuleRouter(server2);
+-  server2.middlewares.use(router);
+-}
+-function rewriteImportPaths(code) {
+-  return code.replace(
+-    /((?:from\s+|import\s*\(\s*|import\s+)["'])(\/@?[^"']+)(["'])/g,
+-    (_match, prefix, path, suffix) => path.startsWith(STORYBOOK_MODULE_PREFIX) ? _match : `${prefix}${STORYBOOK_MODULE_PREFIX}${path}${suffix}`
+-  );
+-}
+-function createEnvironmentModuleRouter(server2) {
+-  let DEPS_STORYBOOK_PREFIX = "/node_modules/.vite/deps_storybook/";
+-  return async (req, res, next) => {
+-    let url = req.url;
+-    if (!url?.startsWith(STORYBOOK_MODULE_PREFIX + "/"))
+-      return next();
+-    let storybookEnv = server2.environments.storybook;
+-    if (!storybookEnv)
+-      return next();
+-    let actualUrl = url.slice(STORYBOOK_MODULE_PREFIX.length), cleanUrl = actualUrl.split("?")[0];
+-    if (cleanUrl.startsWith(DEPS_STORYBOOK_PREFIX)) {
+-      let root = server2.config.root, filePath = join(root, cleanUrl);
+-      try {
+-        let content = await readFile(filePath), isMap = cleanUrl.endsWith(".map");
+-        res.setHeader("Content-Type", isMap ? "application/json" : "application/javascript"), res.setHeader("Cache-Control", "max-age=31536000, immutable"), res.statusCode = 200, res.end(content);
+-        return;
+-      } catch {
+-        return next();
+-      }
+-    }
+-    if (actualUrl.startsWith("/") && !actualUrl.startsWith("/@") && !actualUrl.startsWith("/node_modules")) {
+-      let bare = actualUrl.slice(1);
+-      bare.includes(":") && (actualUrl = bare);
+-    }
+-    actualUrl.startsWith("/@id/__x00__") ? actualUrl = "\0" + actualUrl.slice(12) : actualUrl.startsWith("/@id/") && (actualUrl = actualUrl.slice(5));
+-    try {
+-      let result = await storybookEnv.transformRequest(actualUrl);
+-      if (!result)
+-        return actualUrl.includes(".mdx") && console.log("[module-router] MDX transform returned null"), next();
+-      let rewrittenCode = rewriteImportPaths(result.code);
+-      res.setHeader("Content-Type", "application/javascript"), res.setHeader("Cache-Control", "no-cache"), result.etag && res.setHeader("ETag", result.etag), res.statusCode = 200, res.end(rewrittenCode);
+-    } catch (error) {
+-      next(error);
+-    }
+-  };
+-}
++// src/vite-plugin/middlewares/dispatch.ts
++import { access, readFile as readFile2 } from "fs/promises";
+ 
+ // src/vite-plugin/middlewares/iframe.ts
+-function registerIframeMiddleware(server2, options, basePath = "/__storybook/") {
+-  let iframePath = `${basePath}iframe.html`;
+-  server2.middlewares.use(async (req, res, next) => {
+-    if (!req.url?.startsWith(iframePath))
+-      return next();
+-    let indexHtml = await readFile2(
+-      fileURLToPath4(import.meta.resolve("@storybook/builder-vite/input/iframe.html")),
+-      {
+-        encoding: "utf8"
+-      }
+-    ), transformed = await transformIframeHtml(indexHtml, options), envPrefix = getStorybookModulePrefix(), storybookAppSrc = `${envPrefix}/${SB_VIRTUAL_FILES.VIRTUAL_APP_FILE}`, APP_SCRIPT_PLACEHOLDER = "<!--__STORYBOOK_APP_SCRIPT__-->", appScriptMatch = transformed.match(
+-      /<script\s+[^>]*src="\/@id\/__x00__virtual:\/@storybook\/builder-vite\/vite-app\.js"[^>]*><\/script>/
+-    ), appScriptTag = appScriptMatch ? appScriptMatch[0].replace(
+-      /src="\/@id\/__x00__virtual:\/@storybook\/builder-vite\/vite-app\.js"/,
+-      `src="${envPrefix}/@id/__x00__virtual:/@storybook/builder-vite/vite-app.js"`
+-    ) : `<script type="module" src="${storybookAppSrc}"></script>`;
+-    appScriptMatch && (transformed = transformed.replace(appScriptMatch[0], APP_SCRIPT_PLACEHOLDER));
+-    let finalHtml = (await server2.transformIndexHtml(iframePath, transformed)).replace(APP_SCRIPT_PLACEHOLDER, appScriptTag);
+-    finalHtml = finalHtml.replace(
+-      /src="\/vite-inject-mocker-entry\.js"/,
+-      `src="${envPrefix}/vite-inject-mocker-entry.js"`
+-    ), res.setHeader("Content-Type", "text/html"), res.statusCode = 200, res.write(finalHtml), res.end();
+-  });
++import { readFile } from "node:fs/promises";
++import { fileURLToPath as fileURLToPath3 } from "node:url";
++async function renderIframeHtml(server2, options, basePath) {
++  let iframePath = `${basePath}iframe.html`, indexHtml = await readFile(
++    fileURLToPath3(import.meta.resolve("@storybook/builder-vite/input/iframe.html")),
++    {
++      encoding: "utf8"
++    }
++  ), transformed = await transformIframeHtml(indexHtml, options), envPrefix = basePath.replace(/\/+$/, ""), storybookAppSrc = `${envPrefix}/${SB_VIRTUAL_FILES.VIRTUAL_APP_FILE}`, APP_SCRIPT_PLACEHOLDER = "<!--__STORYBOOK_APP_SCRIPT__-->", appScriptMatch = transformed.match(
++    /<script\s+[^>]*src="\/@id\/__x00__virtual:\/@storybook\/builder-vite\/vite-app\.js"[^>]*><\/script>/
++  ), appScriptTag = appScriptMatch ? appScriptMatch[0].replace(
++    /src="\/@id\/__x00__virtual:\/@storybook\/builder-vite\/vite-app\.js"/,
++    `src="${envPrefix}/@id/__x00__virtual:/@storybook/builder-vite/vite-app.js"`
++  ) : `<script type="module" src="${storybookAppSrc}"></script>`;
++  appScriptMatch && (transformed = transformed.replace(appScriptMatch[0], APP_SCRIPT_PLACEHOLDER));
++  let finalHtml = (await server2.transformIndexHtml(iframePath, transformed)).replace(APP_SCRIPT_PLACEHOLDER, appScriptTag);
++  return finalHtml = finalHtml.replace(
++    /src="\/vite-inject-mocker-entry\.js"/,
++    `src="${envPrefix}/vite-inject-mocker-entry.js"`
++  ), finalHtml;
+ }
+ 
+ // src/vite-plugin/middlewares/manager.ts
+-import { fileURLToPath as fileURLToPath5 } from "node:url";
++import { fileURLToPath as fileURLToPath4 } from "node:url";
+ import sirv from "sirv";
+ import {
+-  buildFrameworkGlobalsFromOptions as buildFrameworkGlobalsFromOptions2,
+-  readTemplate as readTemplate2,
+-  renderHTML as renderHTML2
++  buildFrameworkGlobalsFromOptions,
++  readTemplate,
++  renderHTML
+ } from "storybook/internal/builder-manager";
+-var storybookPackageDir2 = dirname(fileURLToPath5(import.meta.resolve("storybook/package.json"))), CORE_MANAGER_DIR2 = join(storybookPackageDir2, "dist/manager");
++var storybookPackageDir = dirname(fileURLToPath4(import.meta.resolve("storybook/package.json"))), CORE_MANAGER_DIR = join(storybookPackageDir, "dist/manager");
+ async function buildManager(options, basePath, channelPath) {
+-  let { getRefs } = await import("storybook/internal/common"), { basename } = await import("./_node-chunks/dist-RTHKBGJ7.js"), refs = getRefs(options), favicon = options.presets.apply("favicon").then((p) => basename(p)), features = options.presets.apply("features"), logLevel = options.presets.apply("logLevel"), title = options.presets.apply("title"), docsOptions = options.presets.apply("docs", {}), tagsOptions = options.presets.apply("tags", {}), template = readTemplate2("template.ejs"), customHead = options.presets.apply("managerHead"), globals = await buildFrameworkGlobalsFromOptions2(options);
+-  return globals.CHANNEL_OPTIONS ? globals.CHANNEL_OPTIONS.channelPath = channelPath : globals.CHANNEL_OPTIONS = { channelPath }, await renderHTML2(
++  let { getRefs } = await import("storybook/internal/common"), { basename } = await import("./_node-chunks/dist-NEFO3CZM.js"), refs = getRefs(options), favicon = options.presets.apply("favicon").then((p) => basename(p)), features = options.presets.apply("features"), logLevel = options.presets.apply("logLevel"), title = options.presets.apply("title"), docsOptions = options.presets.apply("docs", {}), tagsOptions = options.presets.apply("tags", {}), template = readTemplate("template.ejs"), customHead = options.presets.apply("managerHead"), globals = await buildFrameworkGlobalsFromOptions(options);
++  return globals.CHANNEL_OPTIONS ? globals.CHANNEL_OPTIONS.channelPath = channelPath : globals.CHANNEL_OPTIONS = { channelPath }, await renderHTML(
+     template,
+     title,
+     favicon,
+@@ -1851,22 +1733,113 @@ async function buildManager(options, basePath, channelPath) {
+     globals
+   );
+ }
+-function registerManagerMiddleware(server2, managerHtml, basePath) {
+-  let basePathNoSlash = basePath.replace(/\/$/, ""), managerIndexPath = `${basePath}index.html`, managerHtmlMiddleware = (req, res, next) => {
+-    if (!req.url)
+-      return next();
+-    let pathname = req.url.split("?")[0];
+-    pathname === basePathNoSlash || pathname === basePath || req.url === managerIndexPath ? (res.statusCode = 200, res.setHeader("Content-Type", "text/html"), res.write(managerHtml), res.end()) : next();
+-  }, sbManagerPath = `${basePath}sb-manager`, sbManagerHandler = sirv(CORE_MANAGER_DIR2, {
++function createManagerAssetsHandler() {
++  return sirv(CORE_MANAGER_DIR, {
+     maxAge: 3e5,
+     dev: !0,
+     immutable: !0
+-  }), sbManagerMiddleware = (req, res, next) => {
+-    if (!req.url?.startsWith(sbManagerPath))
++  });
++}
++
++// src/vite-plugin/middlewares/dispatch.ts
++var knownJsSrcRE = /\.(?:[jt]sx?|m[jt]s|vue|marko|svelte|astro|imba|mdx?)(?:$|\?)/, cssLangsRE = /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/, importQueryRE = /(\?|&)import=?(?:&|$)/, htmlProxyRE = /(\?|&)html-proxy\b/;
++function isTransformableRequest(url) {
++  let clean = url.split("?")[0];
++  return knownJsSrcRE.test(clean) || cssLangsRE.test(clean) || importQueryRE.test(url) || htmlProxyRE.test(url) ? !0 : !/\.\w+$/.test(clean) && !clean.endsWith("/");
++}
++function runHandlerChain(handlers, req, res) {
++  return new Promise((resolve4, reject) => {
++    let onFinish = () => resolve4(!1);
++    res.once("finish", onFinish);
++    let i = 0, step = (err) => {
++      if (err)
++        return res.off("finish", onFinish), reject(err);
++      let handler = handlers[i++];
++      if (!handler)
++        return res.off("finish", onFinish), resolve4(!0);
++      handler(req, res, step);
++    };
++    step();
++  });
++}
++function registerStorybookMiddleware(server2, middlewareOptions) {
++  server2.middlewares.use(createStorybookMiddleware(server2, middlewareOptions));
++}
++function createStorybookMiddleware(server2, {
++  options,
++  basePath,
++  managerHtml,
++  storyIndexGenerator,
++  staticHandlers,
++  proxy
++}) {
++  let DEPS_STORYBOOK_PREFIX = "/node_modules/.cache/storybook-vite-deps/deps/", prefix = basePath.replace(/\/+$/, ""), managerAssets = createManagerAssetsHandler();
++  return async (req, res, next) => {
++    let originalUrl = req.url;
++    if (!originalUrl || !(originalUrl === prefix || originalUrl.startsWith(prefix + "/")))
+       return next();
+-    req.url = req.url.slice(sbManagerPath.length) || "/", sbManagerHandler(req, res, next);
++    let url = originalUrl.slice(prefix.length) || "/", pathname = url.split("?")[0];
++    try {
++      if (staticHandlers.length > 0) {
++        if (req.url = url, !await runHandlerChain(staticHandlers, req, res))
++          return;
++        req.url = originalUrl;
++      }
++      if (pathname === "/index.json") {
++        let index = await storyIndexGenerator.getIndex();
++        res.setHeader("Content-Type", "application/json"), res.statusCode = 200, res.end(JSON.stringify(index));
++        return;
++      }
++      if (pathname === "" || pathname === "/" || pathname === "/index.html") {
++        res.setHeader("Content-Type", "text/html"), res.statusCode = 200, res.end(managerHtml);
++        return;
++      }
++      if (pathname.startsWith("/sb-manager/")) {
++        req.url = url.slice(11) || "/", managerAssets(req, res, () => {
++          req.url = originalUrl, res.statusCode = 404, res.end();
++        });
++        return;
++      }
++      if (pathname === "/iframe.html") {
++        let html = await renderIframeHtml(server2, options, basePath);
++        res.setHeader("Content-Type", "text/html"), res.statusCode = 200, res.end(html);
++        return;
++      }
++      if (pathname.startsWith(DEPS_STORYBOOK_PREFIX)) {
++        try {
++          let content = await readFile2(join(server2.config.root, pathname)), isMap = pathname.endsWith(".map");
++          res.setHeader("Content-Type", isMap ? "application/json" : "application/javascript"), res.setHeader("Cache-Control", "max-age=31536000, immutable"), res.statusCode = 200, res.end(content);
++        } catch {
++          res.statusCode = 404, res.end();
++        }
++        return;
++      }
++      let storybookEnv = server2.environments.storybook;
++      if (storybookEnv && isTransformableRequest(url)) {
++        let moduleUrl = url;
++        if (moduleUrl.startsWith("/") && !moduleUrl.startsWith("/@") && !moduleUrl.startsWith("/node_modules")) {
++          let bare = moduleUrl.slice(1);
++          bare.includes(":") && (moduleUrl = bare);
++        }
++        moduleUrl.startsWith("/@id/__x00__") ? moduleUrl = "\0" + moduleUrl.slice(12) : moduleUrl.startsWith("/@id/") && (moduleUrl = moduleUrl.slice(5));
++        let result = await storybookEnv.transformRequest(moduleUrl);
++        if (result) {
++          res.setHeader("Content-Type", "application/javascript"), res.setHeader("Cache-Control", "no-cache"), result.etag && res.setHeader("ETag", result.etag), res.statusCode = 200, res.end(result.code);
++          return;
++        }
++      } else {
++        if (pathname.startsWith("/@fs/"))
++          return req.url = url, next();
++        try {
++          return await access(join(server2.config.root, pathname)), req.url = url, next();
++        } catch {
++        }
++      }
++      req.url = originalUrl, proxy(req, res, next);
++    } catch (error) {
++      next(error);
++    }
+   };
+-  server2.middlewares.use(managerHtmlMiddleware), server2.middlewares.use(sbManagerMiddleware);
+ }
+ 
+ // src/vite-plugin/middlewares/static.ts
+@@ -1885,7 +1858,10 @@ async function createStaticMiddlewares(options, basePath) {
+       }), middleware = (req, res, next) => {
+         if (!req.url?.startsWith(mountPath))
+           return next();
+-        req.url = req.url.slice(mountPath.length) || "/", handler(req, res, next);
++        let originalUrl = req.url;
++        req.url = req.url.slice(mountPath.length) || "/", handler(req, res, () => {
++          req.url = originalUrl, next();
++        });
+       };
+       middlewares.push(middleware);
+     } catch {
+@@ -1893,47 +1869,34 @@ async function createStaticMiddlewares(options, basePath) {
+   return middlewares;
+ }
+ 
+-// src/vite-plugin/middlewares/story-index.ts
+-function createStoryIndexMiddleware(storyIndexGenerator, basePath) {
+-  let indexPath = `${basePath}index.json`;
+-  return async (req, res, next) => {
+-    if (req.url !== indexPath)
+-      return next();
+-    try {
+-      let index = await storyIndexGenerator.getIndex();
+-      res.setHeader("Content-Type", "application/json"), res.statusCode = 200, res.write(JSON.stringify(index)), res.end();
+-    } catch (error) {
+-      next(error);
+-    }
+-  };
+-}
+-function registerStoryIndexMiddleware(server2, storyIndexGenerator, basePath) {
+-  let storyIndexMiddleware = createStoryIndexMiddleware(storyIndexGenerator, basePath);
+-  server2.middlewares.use(storyIndexMiddleware);
+-}
+-
+ // src/vite-plugin/index.ts
+-async function experimental_vitePlugin(options) {
++var ViteAsyncLocalStorage = new AsyncLocalStorage();
++function experimental_vitePlugin(options) {
++  return ViteAsyncLocalStorage.getStore() ? Promise.resolve([]) : Promise.resolve(main(options));
++}
++function main(options) {
+   let finalOptions = {
+     base: "/__storybook",
+     configDir: resolve(options?.configDir ?? ".storybook"),
+     ...options
+-  }, sb = await experimental_loadStorybook({
+-    configDir: finalOptions.configDir,
+-    packageJson: {}
+-  }), sbPlugins = await pluginConfig(sb), finalConfig = await sb.presets.apply("viteFinal", { plugins: sbPlugins }), allPlugins = await Promise.all(
+-    (finalConfig.plugins ?? []).flat(3).filter(Boolean)
+-  ), iframePath = fileURLToPath6(
+-    import.meta.resolve("@storybook/builder-vite/input/iframe.html")
+-  ), baseNoSlash = finalOptions.base.replace(/\/+$/, "") || "", baseEscaped = baseNoSlash.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), basePath = baseNoSlash === "" ? "/" : `${baseNoSlash}/`, applyToStorybookOnly = (_, env2) => env2.command === "serve" || env2.mode === "storybook";
++  }, storybookPromise, loadStorybook = () => storybookPromise ??= ViteAsyncLocalStorage.run(!0, async () => {
++    let sb = await experimental_loadStorybook({
++      configDir: finalOptions.configDir,
++      packageJson: {}
++    }), sbPlugins = await pluginConfig(sb), finalConfig = await sb.presets.apply("viteFinal", {
++      plugins: sbPlugins
++    });
++    return { sb, finalConfig };
++  }), baseNoSlash = finalOptions.base.replace(/\/+$/, "") || "", baseEscaped = baseNoSlash.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), basePath = baseNoSlash === "" ? "/" : `${baseNoSlash}/`;
+   return [
+     {
+       name: "storybook-env",
+-      apply: applyToStorybookOnly,
+-      config(_, { command, mode }) {
++      apply: (_, env2) => env2.command === "serve" || env2.mode === "storybook",
++      async config(_, { command, mode }) {
++        let { sb } = await loadStorybook();
+         return sb.configType = command === "build" ? "PRODUCTION" : "DEVELOPMENT", mode === "storybook" && (basePath = "/"), {
+           envPrefix: ["VITE_", "STORYBOOK_"],
+-          server: { fs: { allow: [finalOptions.configDir] } },
++          ...mode === "storybook" ? { server: { fs: { allow: [finalOptions.configDir] } } } : {},
+           environments: { storybook: { consumer: "client" } }
+         };
+       },
+@@ -1941,90 +1904,107 @@ async function experimental_vitePlugin(options) {
+         if (name === "storybook")
+           return {
+             build: {
+-              outDir: "storybook-static",
+-              emptyOutDir: !1,
+-              [bundlerOptionsKey]: {
+-                input: iframePath,
+-                external: [/\.\/sb-common-assets\/.*\.woff2/]
++              async createEnvironment() {
++                let { finalConfig } = await loadStorybook(), sbConfig = await resolveConfig(
++                  {
++                    ...finalConfig,
++                    cacheDir: "node_modules/.cache/storybook-vite-deps",
++                    build: {
++                      ...finalConfig.build,
++                      outDir: "storybook-static",
++                      emptyOutDir: !1
++                    }
++                  },
++                  "build",
++                  "production",
++                  "production"
++                );
++                return new BuildEnvironment("client", sbConfig);
++              }
++            },
++            dev: {
++              async createEnvironment(name2, config, context) {
++                let { finalConfig } = await loadStorybook(), sbConfig = await resolveConfig(
++                  {
++                    ...finalConfig,
++                    plugins: [
++                      ...finalConfig.plugins ?? [],
++                      {
++                        // Plugin config hooks override the inline config during resolveConfig;
++                        // e.g. Nuxt's `nuxt:environments` plugin (merged in by the framework's
++                        // viteFinal) returns `base: './'`, which is invalid in dev and would
++                        // collapse the base to '/'. Re-assert it after all other config hooks.
++                        name: "storybook:enforce-env-base",
++                        enforce: "post",
++                        config: () => ({ base: basePath })
++                      }
++                    ],
++                    cacheDir: "node_modules/.cache/storybook-vite-deps",
++                    base: basePath
++                  },
++                  "serve"
++                );
++                return Object.defineProperty(sbConfig, "webSocketToken", {
++                  value: config.webSocketToken,
++                  configurable: !0,
++                  writable: !0
++                }), new DevEnvironment("client", sbConfig, {
++                  ...context,
++                  hot: !0
++                });
+               }
+             }
+           };
+       },
+       async configureServer(server2) {
+-        let storyIndexGenerator = await sb.presets.apply("storyIndexGenerator"), wsToken = (await sb.presets.apply(
++        let { sb } = await loadStorybook(), storyIndexGenerator = await sb.presets.apply("storyIndexGenerator"), wsToken = (await sb.presets.apply(
+           "core",
+           {}
+-        )).channelOptions?.wsToken ?? "", staticMiddlewares = await createStaticMiddlewares(sb, basePath);
+-        for (let middleware of staticMiddlewares)
+-          server2.middlewares.use(middleware);
+-        let port = await getPort(), polkaServer = polka();
+-        if (polkaServer.listen(port), sb.port = server2.config.server.port, await sb.presets.apply("experimental_devServer", polkaServer, sb), registerStoryIndexMiddleware(server2, storyIndexGenerator, basePath), server2.middlewares.use(
+-          baseNoSlash || "/",
+-          createProxyMiddleware({
+-            target: `http://localhost:${port}`,
+-            changeOrigin: !0,
+-            ws: !0,
+-            pathRewrite: (path) => baseNoSlash ? path.replace(new RegExp(`^${baseEscaped}`), "") : path
+-          })
+-        ), server2.httpServer) {
++        )).channelOptions?.wsToken ?? "", staticHandlers = await createStaticMiddlewares(sb, "/"), port = await getPort({ random: !0, host: "127.0.0.1" }), polkaServer = polka();
++        if (polkaServer.listen(port, "127.0.0.1"), sb.port = server2.config.server.port, await sb.presets.apply("experimental_devServer", polkaServer, sb), server2.httpServer?.prependListener("upgrade", (req) => {
++          let protocol = req.headers["sec-websocket-protocol"];
++          basePath !== "/" && (protocol === "vite-hmr" || protocol === "vite-ping") && req.url?.startsWith(basePath) && (req.url = req.url.slice(basePath.length - 1) || "/");
++        }), server2.httpServer) {
+           let channel = createServerChannel(
+             server2.httpServer,
+             "/storybook-server-channel",
+             wsToken
+           );
+           sb.channel = channel, await sb.presets.apply("experimental_serverChannel", channel);
+-          let managerHtml = await buildManager(sb, basePath, "/storybook-server-channel");
+-          registerManagerMiddleware(server2, managerHtml, basePath);
++        } else {
++          let globalWithChannel = globalThis, sharedUpgrades = globalWithChannel.__SB_CHANNEL_UPGRADE__ ??= new EventEmitter();
++          globalWithChannel.__SB_CHANNEL__ || (globalWithChannel.__SB_CHANNEL__ = createServerChannel(
++            sharedUpgrades,
++            "/storybook-server-channel",
++            wsToken
++          ), await sb.presets.apply("experimental_serverChannel", globalWithChannel.__SB_CHANNEL__)), sb.channel = globalWithChannel.__SB_CHANNEL__;
+         }
+-        registerIframeMiddleware(server2, sb, basePath), registerEnvironmentModuleMiddleware(server2), storyIndexGenerator.onInvalidated(() => {
++        let managerHtml = await buildManager(sb, basePath, "/storybook-server-channel");
++        registerStorybookMiddleware(server2, {
++          options: sb,
++          basePath,
++          managerHtml,
++          storyIndexGenerator,
++          staticHandlers,
++          proxy: createProxyMiddleware({
++            target: `http://127.0.0.1:${port}`,
++            changeOrigin: !0,
++            ws: !0,
++            pathRewrite: (path) => baseNoSlash ? path.replace(new RegExp(`^${baseEscaped}`), "") : path
++          })
++        }), storyIndexGenerator.onInvalidated(() => {
+           server2.watcher.emit("change", "\0virtual:/@storybook/builder-vite/storybook-stories.js");
+         });
+-      },
+-      transformIndexHtml: {
+-        order: "post",
+-        handler(html, ctx) {
+-          let expectedIframePath = `${basePath}iframe.html`;
+-          return ctx.path !== expectedIframePath && ctx.path !== "/iframe.html" ? html : html.replace(
+-            /window\.CHANNEL_OPTIONS\s*=\s*(\{[^;]*\});/,
+-            (_match, optionsJson) => {
+-              try {
+-                let parsed = JSON.parse(optionsJson);
+-                return parsed.channelPath = "/storybook-server-channel", `window.CHANNEL_OPTIONS = ${JSON.stringify(parsed)};`;
+-              } catch {
+-                return `window.CHANNEL_OPTIONS = ${JSON.stringify({ channelPath: "/storybook-server-channel" })};`;
+-              }
+-            }
+-          );
+-        }
+       }
+-    },
+-    ...scopeToStorybookEnv(allPlugins, basePath, applyToStorybookOnly),
+-    buildStorybookPlugin(sb)
++    }
+   ];
+ }
+-function scopeToStorybookEnv(plugins, basePath, apply) {
+-  return plugins.map((plugin) => ({
+-    ...plugin,
+-    apply,
+-    applyToEnvironment(environment) {
+-      return environment.name === "storybook";
+-    },
+-    transformIndexHtml: plugin.transformIndexHtml ? wrapTransformIndexHtml(plugin.transformIndexHtml, basePath) : void 0
+-  }));
+-}
+-function wrapTransformIndexHtml(transform, basePath) {
+-  if (typeof transform == "function")
+-    return async function(html, ctx) {
+-      if (ctx.path.startsWith(basePath))
+-        return transform.apply(this, [html, ctx]);
+-    };
+-}
+ 
+ // src/index.ts
+ function iframeHandler(options, server2) {
+   return async (req, res) => {
+     let indexHtml = await readFile3(
+-      fileURLToPath7(import.meta.resolve("@storybook/builder-vite/input/iframe.html")),
++      fileURLToPath5(import.meta.resolve("@storybook/builder-vite/input/iframe.html")),
+       {
+         encoding: "utf8"
+       }
+diff --git a/dist/preset.js b/dist/preset.js
+index f249a333e7471551d8a7f52dc10c87a6b7566e8e..adb9afa8e55773b1b95e9101ecbb898b18501298 100644
+--- a/dist/preset.js
++++ b/dist/preset.js
+@@ -1,10 +1,10 @@
+-import CJS_COMPAT_NODE_URL_s1jx7dg4j79 from 'node:url';
+-import CJS_COMPAT_NODE_PATH_s1jx7dg4j79 from 'node:path';
+-import CJS_COMPAT_NODE_MODULE_s1jx7dg4j79 from "node:module";
++import CJS_COMPAT_NODE_URL_co0660c196i from 'node:url';
++import CJS_COMPAT_NODE_PATH_co0660c196i from 'node:path';
++import CJS_COMPAT_NODE_MODULE_co0660c196i from "node:module";
+ 
+-var __filename = CJS_COMPAT_NODE_URL_s1jx7dg4j79.fileURLToPath(import.meta.url);
+-var __dirname = CJS_COMPAT_NODE_PATH_s1jx7dg4j79.dirname(__filename);
+-var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
++var __filename = CJS_COMPAT_NODE_URL_co0660c196i.fileURLToPath(import.meta.url);
++var __dirname = CJS_COMPAT_NODE_PATH_co0660c196i.dirname(__filename);
++var require = CJS_COMPAT_NODE_MODULE_co0660c196i.createRequire(import.meta.url);
+ 
+ // ------------------------------------------------------------
+ // end of CJS compatibility banner, injected by Storybook's esbuild configuration
+@@ -12,8 +12,8 @@ var require = CJS_COMPAT_NODE_MODULE_s1jx7dg4j79.createRequire(import.meta.url);
+ import {
+   optimizeViteDeps,
+   viteCorePlugins
+-} from "./_node-chunks/chunk-CVNFOEH4.js";
+-import "./_node-chunks/chunk-ZMDCEUMZ.js";
++} from "./_node-chunks/chunk-4FQEZJET.js";
++import "./_node-chunks/chunk-W7KUJJZJ.js";
+ export {
+   optimizeViteDeps,
+   viteCorePlugins
