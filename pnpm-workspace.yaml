@@ -25,6 +25,7 @@ minimumReleaseAgeExclude:
   - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-b1e0dc56'
   - eslint-plugin-storybook@0.0.0-pr-35247-sha-b1e0dc56
   - storybook@0.0.0-pr-35247-sha-b1e0dc56
+  - vue-onigiri@0.4.0
 
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
@@ -49,4 +50,3 @@ patchedDependencies:
   '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
   '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977': patches/@storybook__builder-vite@0.0.0-pr-35247-sha-45858977.patch
   nuxt@4.4.2: patches/nuxt.patch
-  vue-onigiri@0.3.2: patches/vue-onigiri@0.3.2.patch
