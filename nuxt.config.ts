@@ -62,28 +62,11 @@ export default defineNuxtConfig({
         return name !== 'vite:vue-onigiri-compiler'
       })
 
-     },
+      config.plugins.push(
+      experimental_vitePlugin({}))
 
-    // Storybook's manager/preview websocket channel (added by experimental_vitePlugin) must
-    // receive `upgrade` events at the page origin. Under `nuxt dev`, Vite runs in middleware mode
-    // (no own http server), so the upgrade lands on Nitro's dev server instead. Forward the
-    // channel upgrades into the EventEmitter the @storybook/builder-vite patch listens on.
-    listen(server) {
-      // Storybook's channel must be the SOLE handler for /storybook-server-channel. Nitro's dev
-      // server already has an `upgrade` listener (vite HMR / devtools) that would also handshake
-      // the same socket → "Invalid frame header". Take over `upgrade`: route the channel path to
-      // Storybook's bridge, delegate every other upgrade to the original listeners (HMR etc.).
-      const original = server.rawListeners('upgrade') as Array<(...a: unknown[]) => void>
-      server.removeAllListeners('upgrade')
-      server.on('upgrade', (req, socket, head) => {
-        if (req.url?.startsWith('/storybook-server-channel')) {
-          (globalThis as { __SB_CHANNEL_UPGRADE__?: { emit: (e: string, ...a: unknown[]) => void } })
-            .__SB_CHANNEL_UPGRADE__?.emit('upgrade', req, socket, head)
-          return
-        }
-        for (const fn of original) fn.call(server, req, socket, head)
-      })
-    },
+     },
+ 
   },
 
   i18n: {
@@ -96,7 +79,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-04-05',
 vite: {
   plugins: [
-    await experimental_vitePlugin({})
   ]
 }
 })
