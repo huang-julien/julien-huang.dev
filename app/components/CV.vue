@@ -318,6 +318,15 @@ const ossProjects = computed<OssProjects[]>(() => [
 
 const workExperience = computed<WorkExperience[]>(() => [
     {
+        company: 'Chromatic',
+        country: 'Open Source',
+        title: [t('oss.role.coreTeam'), t('oss.role.maintainer')].join(' - '),
+        timeline: ['2026', t('today')],
+        subtitle: t('work.experience.chromatic.subtitle'),
+        stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
+        description: (tm('work.experience.chromatic.description') as VueMessageType[]).map((desc) => rt(desc))
+    },
+    {
         company: 'Nuxt',
         country: 'Open Source',
         title: [t('oss.role.coreTeam'), t('oss.role.maintainer')].join(' - '),
@@ -330,7 +339,7 @@ const workExperience = computed<WorkExperience[]>(() => [
         company: 'Leetchi',
         country: 'France',
         title: t('work.experience.leetchi.title'),
-        timeline: ['2022', t('today')],
+        timeline: ['2022', '2026'],
         subtitle: t('work.experience.leetchi.subtitle'),
         stack: ['Nuxt 3', 'TypeScript', 'Tailwind CSS', 'Cypress', 'ASP.NET'],
         description: (tm('work.experience.leetchi.description') as VueMessageType[]).map((desc) => rt(desc))
@@ -430,6 +439,15 @@ p {
         "work": {
             "title": "Work Experience",
             "experience": {
+                "chromatic": {
+                    "name": "Chromatic",
+                    "title": "Senior Software Engineer",
+                    "subtitle": "Part of the Storybook team.",
+                    "description": [
+                        "Core member of the Storybook team, focusing on integrating Storybook into AI-assisted development.",
+                        "Creator of Storybook Vite Plugin"
+                    ]
+                },
                 "nuxt": {
                     "name": "Nuxt",
                     "title": "Core Team Member",
@@ -444,12 +462,12 @@ p {
                 "leetchi": {
                     "name": "Leetchi",
                     "title": "Frontend Developer - Frontend Technical Lead",
-                    "subtitle": "Joined the team as a Frontend developer in a 25 persons team, part of the complete remake of the Leetchi platform into a microservices architecture (Azure Cloud), this was a project with high technical and strategic stakes, involving challenges related to scalability, technical debt, and a major technology migration. Then I took the role of frontend technical lead in run phase and became more versatile as a support for Backend developers and QA. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery for upcoming features and maintenance.",
+                    "subtitle": "Joined the team as a Frontend developer in a 25 persons team, part of the complete remake of the Leetchi platform into a microservices architecture (Azure Cloud), this was a project with high technical and strategic stakes, due to multiple attempts from the company to rewrite the platform. Then I took the role of frontend technical lead in run phase and became more versatile as a support for Backend developers and QA. The build phase lasted 8 months, followed by a run/build phase to ensure continuous delivery for upcoming features and maintenance.",
                     "description": [
                         "Participation in technical decisions and design of features",
                         "Training and mentoring other frontend developers",
                         "Developed the complete redesign of Leetchi's front office using Nuxt 2 (bridge) with technical debt management",
-                        "Nuxt 2 to Nuxt 3 migration",
+                        "Migration from Nuxt 2 to Nuxt 3 and then Nuxt 4",
                         "Feature development and maintenance of the front office and back office",
                         "C# .NET feature development and maintenance",
                         "Supporting the QA team with Cypress tests",
@@ -525,9 +543,18 @@ p {
         "work": {
             "title": "Expérience professionnelle",
             "experience": {
+                "chromatic": {
+                    "name": "Chromatic",
+                    "title": "Senior Software Engineer",
+                    "subtitle": "Membre de l'équipe Storybook",
+                    "description": [
+                        "Membre core de l'équipe Storybook, focus sur l'intégration de Storybook dans le développement assisté par IA",
+                        "Créateur du plugin Storybook Vite"
+                    ]
+                },
                 "nuxt": {
                     "name": "Nuxt",
-                    "title": "Core Team Member",
+                    "title": "Membre de la Core Team",
                     "description": [
                         "Membre de la Core Team, maintenance et développement de Nuxt et de son écosystème.",
                         "Mainteneur de plusieurs projets open-source liés à Nuxt et Nitro.",
@@ -538,12 +565,12 @@ p {
                 },
                 "leetchi": {
                     "title": "Développeur frontend - Référent Frontend",
-                    "subtitle": "J'ai rejoint l'équipe en tant que développeur frontend dans une équipe de 25 personnes, dans le cadre de la refonte complète de la plateforme Leetchi vers une architecture microservices (Azure Cloud). Ce fut un projet à forts enjeux techniques et stratégiques, impliquant des défis liés à la scalabilité, la dette technique, et une migration technologique majeure. Puis j'ai pris le rôle de référent technique frontend en phase de run et suis devenu plus polyvalent en support aux développeurs Backend et à l'équipe QA. La phase de build a duré 8 mois, suivie d'une phase run/build (avec une réduction des équipes pour revenir à 10 devs) pour assurer la livraison continue des futures fonctionnalités et la maintenance.",
+                    "subtitle": "J'ai rejoint l'équipe en tant que développeur frontend dans une équipe de 25 personnes, dans le cadre de la refonte complète de la plateforme Leetchi. Ce fut un projet à forts enjeux techniques et stratégiques. Puis j'ai pris le rôle de lead technique frontend en phase de run et suis devenu plus polyvalent en support aux développeurs Backend et à l'équipe QA. La phase de build a duré 8 mois, suivie d'une phase run/build pour assurer la livraison continue des futures fonctionnalités et la maintenance.",
                     "description": [
                         "Participation aux décisions et à la conception technique des features",
                         "Formation et mentorat des autres développeurs frontend",
                         "Développement de la refonte complète du front office de Leetchi en Nuxt 2 (bridge) avec gestion de la dette technique",
-                        "Migration Nuxt 2 vers Nuxt 3",
+                        "Migration Nuxt 2 vers Nuxt 3 puis Nuxt 4",
                         "Développement de features et maintenance du front office et back office",
                         "Développement de features et maintenance en C# .NET",
                         "Support à l'équipe QA avec des tests Cypress",

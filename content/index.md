@@ -16,11 +16,11 @@ description: Open-source developer, contributing to anything I work with.
 
 Hello! 👋
 
-I'm Julien -- a frontend developer by day, open-source contributor by night.
+I'm Julien, Open-sourceror at Chromatic.
 
-I currently work at Leetchi in France as a frontend technical lead.
+I currently work at Chromatic as a Software Engineer in the Storybook Team.
 
-Outside of my day job, I'm part of the Nuxt Core Team. As a self-taught developer, open source has been a huge part of how I learn and grow.
+Outside of my day job, I'm also part of the Nuxt Core Team. As a self-taught developer, open source has been a huge part of how I learn and grow.
 
 When I’m not coding, you’ll probably find me playing video games, making music, or powerlifting.
 
