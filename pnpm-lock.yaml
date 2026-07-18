@@ -126,8 +126,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.39(vue@3.5.39(typescript@5.9.3)))(vue@3.5.39(typescript@5.9.3)))(esbuild@0.28.1)(magicast@0.5.3)(playwright-core@1.61.1)(rollup@4.62.2)(typescript@5.9.3)(vite@7.3.5(@types/node@26.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))(vitest@4.1.9(@types/node@26.1.0)(vite@7.3.5(@types/node@26.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0)))
       '@storybook/addon-a11y':
-        specifier: 0.0.0-pr-35247-sha-450c5adf
-        version: 0.0.0-pr-35247-sha-450c5adf(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))
+        specifier: 10.5.2
+        version: 10.5.2(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))
       '@storybook/addon-docs':
         specifier: 0.0.0-pr-35247-sha-450c5adf
         version: 0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@7.3.5(@types/node@26.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
@@ -3427,10 +3427,10 @@ packages:
       vite: ^5.2.0 || ^6.0.0 || ^7.0.0
       vue: ^3.4.0
 
-  '@storybook/addon-a11y@0.0.0-pr-35247-sha-450c5adf':
-    resolution: {integrity: sha512-669DB8oV0qXnOeLKF1A0ubbWK5LSOx7rure9Lavtxyh3LMB4Ca/g14wV1vxF3Hz78j7gTSoww9rRbwi2TJGSOA==}
+  '@storybook/addon-a11y@10.5.2':
+    resolution: {integrity: sha512-BMze+oj1Jz3QcGl0E6mjuVA32zPD/cTu3Ev4O4qNbKbqLXO4wA1G6aEd8+CGcQtTGEyMCsr0BH6I/WnXcwA1bQ==}
     peerDependencies:
-      storybook: ^0.0.0-pr-35247-sha-450c5adf
+      storybook: ^10.5.2
 
   '@storybook/addon-docs@0.0.0-pr-35247-sha-450c5adf':
     resolution: {integrity: sha512-g9tLbAfCyYMxmcLOMnQ+TUvIKUaOV6ZG6GX2wyNaZM8qYUZOBb+UQqqFXc+i76MXwvqWsS4fPuh7X0itqanp6w==}
@@ -12444,7 +12444,7 @@ snapshots:
       - webpack
       - yaml
 
-  '@storybook/addon-a11y@0.0.0-pr-35247-sha-450c5adf(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))':
+  '@storybook/addon-a11y@10.5.2(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))':
     dependencies:
       '@storybook/global': 5.0.0
       axe-core: 4.12.1
