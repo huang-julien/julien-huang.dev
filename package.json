@@ -51,7 +51,7 @@
     "@babel/plugin-syntax-jsx": "^8.0.1",
     "@nuxt/test-utils": "^4.0.3",
     "@storybook/addon-a11y": "0.0.0-pr-35247-sha-450c5adf",
-    "@storybook/addon-docs": "0.0.0-pr-35247-sha-450c5adf",
+    "@storybook/addon-docs": "10.5.2",
     "eslint-plugin-storybook": "0.0.0-pr-35247-sha-450c5adf",
     "playwright-core": "^1.60.0",
     "storybook": "0.0.0-pr-35247-sha-450c5adf",
