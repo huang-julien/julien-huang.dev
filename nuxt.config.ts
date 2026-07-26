@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     externals: {
       inline: ['unhead'],
     },
+    preset: 'cloudflare-pages',
    },
 
   hooks: {
