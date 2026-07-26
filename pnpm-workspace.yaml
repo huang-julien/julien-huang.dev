@@ -45,8 +45,8 @@ onlyBuiltDependencies:
 # @nuxt/vite-builder@3.21.8 that @storybook-vue/nuxt drags in. That mismatch aborts
 # the whole install, which is what left node_modules (and the Vite+ binding) incomplete.
 patchedDependencies:
-  '@nuxt/nitro-server@4.4.2': patches/@nuxt__nitro-server.patch
-  '@nuxt/vite-builder@4.4.2': patches/@nuxt__vite-builder.patch
+  '@nuxt/nitro-server': patches/@nuxt__nitro-server.patch
+  '@nuxt/vite-builder@4.5.0': patches/@nuxt__vite-builder.patch
   '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
   '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977': patches/@storybook__builder-vite@0.0.0-pr-35247-sha-45858977.patch
-  nuxt@4.4.2: patches/nuxt.patch
+  nuxt: patches/nuxt.patch
