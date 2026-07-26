@@ -1,0 +1,27 @@
+diff --git a/dist/vite/compiler/index.js b/dist/vite/compiler/index.js
+index b5b6b2c61d15abfbec1c2a05aca42c076fd032aa..c6dde31a455cc0faefb0dfe8d0cc9d422d5a74c7 100644
+--- a/dist/vite/compiler/index.js
++++ b/dist/vite/compiler/index.js
+@@ -1,3 +1,4 @@
++import { existsSync } from "node:fs";
+ import { ONIGIRI_PREFIX, ONIGIRI_SUFFIX } from "./constants.js";
+ import { loadVirtualOnigiriModule } from "./load-virtual.js";
+ import { injectIntoSetupAsync } from "./inject-setup.js";
+@@ -54,9 +55,15 @@ export function onigiriCompilerPlugin(options = {}) {
+         if (importer?.startsWith(ONIGIRI_PREFIX) && importer.endsWith(ONIGIRI_SUFFIX)) {
+           if (id.startsWith("/") && !id.startsWith("//") && !id.startsWith("/@") && !/^\/[A-Za-z]:/.test(id)) {
+             const abs = config.root.replace(/[/\\]+$/, "") + id;
+-            const resolved = await this.resolve(abs, void 0, { skipSelf: true });
++            // On POSIX an absolute path outside `config.root` (e.g. a
++            // node_modules component, since Nuxt's root is `<rootDir>/app`) is
++            // indistinguishable from a root-relative one, and joining root onto
++            // it yields a path that does not exist. Prefer whichever candidate
++            // is real; keep the root-joined form as the historical default.
++            const candidate = existsSync(abs) ? abs : existsSync(id) ? id : abs;
++            const resolved = await this.resolve(candidate, void 0, { skipSelf: true });
+             if (resolved) return resolved;
+-            return { id: abs };
++            return { id: candidate };
+           }
+           const encoded = importer.slice(ONIGIRI_PREFIX.length, -ONIGIRI_SUFFIX.length);
+           const originalFilePath = decodeURIComponent(encoded);

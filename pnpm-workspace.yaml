@@ -50,3 +50,4 @@ patchedDependencies:
   '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
   '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977': patches/@storybook__builder-vite@0.0.0-pr-35247-sha-45858977.patch
   nuxt: patches/nuxt.patch
+  vue-onigiri@0.4.0: patches/vue-onigiri@0.4.0.patch
