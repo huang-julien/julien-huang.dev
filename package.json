@@ -30,7 +30,7 @@
     "@nuxtjs/i18n": "10.2.4",
     "@nuxtjs/icon": "3.0.0-beta.16",
     "@storybook-vue/nuxt": "^9.0.1",
-    "@storybook/builder-vite": "0.0.0-pr-35247-sha-450c5adf",
+    "@storybook/builder-vite": "10.5.2",
     "@vueuse/core": "^14.2.1",
     "better-sqlite3": "^12.10.0",
     "eslint": "^10.1.0",

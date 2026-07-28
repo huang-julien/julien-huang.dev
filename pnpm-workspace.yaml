@@ -30,7 +30,7 @@ minimumReleaseAgeExclude:
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
   'vue-onigiri>vite': ^7.0.0
-  '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
+  '@storybook/builder-vite': 10.5.2
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
