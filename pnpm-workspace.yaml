@@ -33,7 +33,7 @@ overrides:
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
-  '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
+  '@storybook/vue3-vite': 10.5.9
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
