@@ -8,7 +8,7 @@ overrides:
   vue-onigiri>vite: ^7.0.0
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
-  '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
+  '@storybook/vue3': 10.5.9
   '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
 
 patchedDependencies:
@@ -3622,10 +3622,10 @@ packages:
       storybook: ^0.0.0-pr-35247-sha-45858977
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  '@storybook/vue3@0.0.0-pr-35247-sha-45858977':
-    resolution: {integrity: sha512-2ugbbOrS2M7Juze/vffRKwpYxtd09Ro8UTfQ5YWFAWf1WNyEx7IHTfNuFZH2qDgj9CeavyLrW/nBfiLkPvLXQQ==}
+  '@storybook/vue3@10.5.9':
+    resolution: {integrity: sha512-4VXkJmVRTntxIcIIBEOmWzWUy9ecwCap2Cnt13ioffCGwT6Yzk0fOW4niXSJFX7fO2b13Dtn747Nep7kH9TFqg==}
     peerDependencies:
-      storybook: ^0.0.0-pr-35247-sha-45858977
+      storybook: ^10.5.9
       vue: ^3.0.0
 
   '@stylistic/eslint-plugin@5.10.0':
@@ -5111,6 +5111,7 @@ packages:
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
+    deprecated: v4 is no longer maintained, upgrade to v5
 
   croner@10.0.1:
     resolution: {integrity: sha512-ixNtAJndqh173VQ4KodSdJEI6nuioBWI0V1ITNKhZZsO0pEMoDxz539T4FTTbSZ/xIOSuDnzxLVRqBVSvPNE2g==}
@@ -13166,7 +13167,7 @@ snapshots:
       '@nuxt/vite-builder': 3.21.8(4bfb2a30d6c60fc62bdc3fb432ddcf38)
       '@rollup/plugin-replace': 6.0.3(rollup@4.62.2)
       '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977(patch_hash=4b98064a0af1546838d242c007b0dee751dd5d71b2ef33ee2167ebb4cbce9e88)(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.1.5(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
-      '@storybook/vue3': 0.0.0-pr-35247-sha-45858977(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))
+      '@storybook/vue3': 10.5.9(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))
       '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.1.5(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.39(typescript@5.9.3))
       json-stable-stringify: 1.3.0
       mlly: 1.8.2
@@ -13280,7 +13281,7 @@ snapshots:
   '@storybook/vue3-vite@0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.1.5(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.39(typescript@5.9.3))':
     dependencies:
       '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977(patch_hash=4b98064a0af1546838d242c007b0dee751dd5d71b2ef33ee2167ebb4cbce9e88)(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.1.5(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
-      '@storybook/vue3': 0.0.0-pr-35247-sha-45858977(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))
+      '@storybook/vue3': 10.5.9(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))
       magic-string: 0.30.21
       storybook: 0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7)
       typescript: 5.9.3
@@ -13296,7 +13297,7 @@ snapshots:
       - vue
       - webpack
 
-  '@storybook/vue3@0.0.0-pr-35247-sha-45858977(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))':
+  '@storybook/vue3@10.5.9(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vue@3.5.39(typescript@5.9.3))':
     dependencies:
       '@storybook/global': 5.0.0
       storybook: 0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7)
