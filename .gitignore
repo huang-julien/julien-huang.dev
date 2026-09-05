@@ -100,3 +100,7 @@ sw.*
 .wrangler
 *storybook.log
 storybook-static
+
+.dev.vars*
+!.dev.vars.example
+!.env.example

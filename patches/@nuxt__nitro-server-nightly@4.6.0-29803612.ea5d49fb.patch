@@ -1,0 +1,567 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index ff02c6c608f464d6b0be7cae8b394716b1cda2de..516234b9555c639f223ef874fdeb6fd578731598 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -21,7 +21,7 @@ import { ImpoundPlugin } from "impound";
+ import { resolveModulePath } from "exsolve";
+ import { runtimeDependencies } from "nitropack/runtime/meta";
+ //#region package.json
+-var version = "4.6.0-29803612.ea5d49fb";
++var version = "4.5.2";
+ //#endregion
+ //#region src/utils.ts
+ function toArray(value) {
+@@ -452,7 +452,7 @@ async function bundle(nuxt) {
+ 		nuxt.options.nitro.virtual = defu(nuxt.options.nitro.virtual, { "#internal/dev-server-logs-options": () => `export const rootDir = ${JSON.stringify(nuxt.options.rootDir)};` });
+ 	}
+ 	if (nuxt.options.experimental.componentIslands) {
+-		const islandHandlerPath = JSON.stringify(resolve(distDir, "runtime/handlers/island"));
++		const islandHandlerPath = JSON.stringify(resolve(distDir, nuxt.options.experimental.componentIslands === "vue-onigiri" ? "runtime/handlers/island-onigiri" : "runtime/handlers/island"));
+ 		const h3Path = JSON.stringify(resolve(distDir, "h3"));
+ 		const ISLAND_RENDERER_KEY = "#internal/nuxt/island-renderer.mjs";
+ 		nuxt.options.nitro.virtual ||= {};
+diff --git a/dist/runtime/handlers/island-onigiri.mjs b/dist/runtime/handlers/island-onigiri.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..fdf3a3731d5b1793a6757bdf6d99a5552f4487e2
+--- /dev/null
++++ b/dist/runtime/handlers/island-onigiri.mjs
+@@ -0,0 +1,294 @@
++import { serverDiagnostics } from "../diagnostics.mjs";
++import { filterIslandProps, getIslandHash } from "../nuxt/src/app/island-hash.mjs";
++import { findReservedRootIslandPropKey, findUnsafeIslandPropKey } from "../nuxt/src/app/island-props.mjs";
++import { renderDiagnostics } from "../nuxt/src/app/diagnostics/render.mjs";
++import { traceAsync } from "../nuxt/src/app/internal/tracing.mjs";
++import { MAX_ISLAND_BODY_BYTES, exceedsMaxBytes, exceedsMaxDepth } from "../utils/island-props.mjs";
++import { islandCache, islandPropCache, prerenderRenderingURLs } from "../utils/cache.mjs";
++import { createSSRContext } from "../utils/renderer/app.mjs";
++import { getSSRRenderer, getServerEntry } from "../utils/renderer/build-files.mjs";
++import { renderInlineStyles } from "../utils/renderer/inline-styles.mjs";
++import { getQuery } from "ufo";
++import { createError, defineEventHandler, getQuery as getQuery$1, getRequestWebStream, setResponseHeader, setResponseHeaders, setResponseStatus } from "h3";
++import { useNitroApp } from "nitropack/runtime";
++import { destr as destr$1 } from "destr";
++import { VueResolver, walkResolver } from "@unhead/vue/utils";
++import { getRequestDependencies } from "vue-bundle-renderer/runtime";
++import { serializeApp } from "vue-onigiri/runtime/serialize";
++import { defineComponent, getCurrentInstance, h } from "vue";
++import { runtimeCompiler, tracingChannelNuxt } from "#internal/nuxt.config.mjs";
++//#region src/runtime/handlers/island-onigiri.ts
++const getComponentsIslands = () => import("#build/dist/server/components.islands.mjs").then((r) => typeof r.default === "function" ? r.default() : r);
++let _islandsPromise;
++function getIslands() {
++	_islandsPromise ||= getComponentsIslands();
++	return _islandsPromise;
++}
++const PAGE_ISLAND_PREFIX = "page_";
++function createPageIslandRoot(name, islands) {
++	return defineComponent({
++		name: "PageIslandRoot",
++		inheritAttrs: false,
++		setup(_, { attrs }) {
++			const route = getCurrentInstance().appContext.config.globalProperties.$route;
++			islands.providePageIslandDepth(route, islands.pageIslandRoutes[name]);
++			return () => h(islands.islandComponents[name], attrs);
++		}
++	});
++}
++const ISLAND_SUFFIX_RE = /\.json(?:\?.*)?$/;
++const ISLAND_PATH_PREFIX = "/__nuxt_island/";
++/**
++* Renders in flight, keyed by island path, so that pages prerendered in parallel share a
++* single render of an island they both embed instead of racing to write its cache entry
++* (which fails the build with `EPERM` on Windows).
++*/
++const inFlightIslands = import.meta.prerender ? /* @__PURE__ */ new Map() : null;
++const handler = defineEventHandler(async (event) => {
++	setResponseHeaders(event, {
++		"content-type": "application/json;charset=utf-8",
++		"x-powered-by": "Nuxt"
++	});
++	if (!import.meta.prerender) return toResponse(event, await renderIsland(event));
++	const islandPath = getIslandPath(event);
++	const stack = prerenderRenderingURLs.getStore();
++	if (stack?.includes(islandPath)) {
++		const chain = [...stack, islandPath].map((url) => `"${url}"`).join(" -> ");
++		throw createError({
++			statusCode: 508,
++			statusMessage: `Loop detected while prerendering island "${islandPath}" (${chain}).`
++		});
++	}
++	const inFlight = stack?.some((url) => url.startsWith(ISLAND_PATH_PREFIX)) ? void 0 : inFlightIslands.get(islandPath);
++	if (inFlight) {
++		const shared = await inFlight.catch((error) => {
++			throw createError({
++				statusCode: error?.statusCode,
++				statusMessage: error?.statusMessage,
++				message: error?.message,
++				cause: error
++			});
++		});
++		if (!("raw" in shared)) return toResponse(event, shared);
++	}
++	return toResponse(event, await prerenderIsland(event, islandPath));
++});
++function getIslandPath(event) {
++	return (event.path || "").replace(/\?.*$/, "");
++}
++function toResponse(event, result) {
++	if (!("raw" in result)) return result;
++	for (const header in result.raw.headers || {}) setResponseHeader(event, header, result.raw.headers[header]);
++	if (result.raw.statusCode) setResponseStatus(event, result.raw.statusCode, result.raw.statusMessage);
++	return result.raw.body;
++}
++function prerenderIsland(event, islandPath) {
++	const stack = prerenderRenderingURLs.getStore();
++	const promise = prerenderRenderingURLs.run([...stack || [], islandPath], async () => {
++		const cached = await islandCache.getItem(islandPath);
++		if (cached) return cached;
++		const result = await renderIsland(event);
++		if (!("raw" in result)) {
++			await islandCache.setItem(islandPath, result);
++			await islandPropCache.setItem(islandPath, event.path);
++		}
++		return result;
++	}).finally(() => {
++		if (inFlightIslands.get(islandPath) === promise) inFlightIslands.delete(islandPath);
++	});
++	inFlightIslands.set(islandPath, promise);
++	return promise;
++}
++async function renderIsland(event) {
++	const islandContext = await getIslandContext(event);
++	const ssrContext = {
++		...createSSRContext(event),
++		islandContext,
++		noSSR: false,
++		url: islandContext.url
++	};
++	const renderer = await getSSRRenderer();
++	const createSSRApp = await getServerEntry();
++	const islands = await getIslands();
++	if (!Object.hasOwn(islands.islandComponents, islandContext.name)) throw createError({
++		statusCode: 404,
++		statusMessage: `Island component not found: ${islandContext.name}`
++	});
++	const islandComponent = islands.islandComponents[islandContext.name];
++	const loader = islandComponent.__asyncLoader;
++	const reservedKey = findReservedRootIslandPropKey(islandContext.props, loader ? await loader() : islandComponent);
++	if (reservedKey) {
++		if (import.meta.dev) renderDiagnostics.NUXT_E4018({
++			name: islandContext.name,
++			key: reservedKey
++		});
++		throw createError({
++			statusCode: 400,
++			statusMessage: "Invalid island request props"
++		});
++	}
++	const rootComponent = islandContext.name.startsWith(PAGE_ISLAND_PREFIX) ? createPageIslandRoot(islandContext.name, islands) : islandComponent;
++	let renderError;
++	const ast = await (async () => {
++		const app = await createSSRApp(ssrContext, { rootComponent });
++		app.config.errorHandler ||= (error) => {
++			renderError ||= error;
++		};
++		return tracingChannelNuxt ? traceAsync("nuxt.island", {
++			event,
++			ssrContext,
++			islandContext
++		}, () => app.runWithContext(() => serializeApp(app, void 0, ssrContext))) : app.runWithContext(() => serializeApp(app, void 0, ssrContext));
++	})().catch(async (err) => {
++		if (ssrContext["~renderResponse"] && err?.message === "skipping render") return;
++		await ssrContext.nuxt?.hooks.callHook("app:error", err);
++		throw err;
++	});
++	await ssrContext.nuxt?.hooks.callHook("app:rendered", {
++		ssrContext,
++		renderResult: null
++	});
++	if (ssrContext["~renderResponse"]) {
++		const response = ssrContext["~renderResponse"];
++		if (response.statusCode && response.statusCode >= 400) throw createError({
++			statusCode: response.statusCode,
++			statusMessage: response.statusMessage
++		});
++		return { raw: response };
++	}
++	if (ssrContext.payload?.error) throw ssrContext.payload.error;
++	if (renderError) {
++		if (import.meta.dev) renderDiagnostics.NUXT_E4015({ name: islandContext.name });
++		await ssrContext.nuxt?.hooks.callHook("app:error", renderError);
++		throw renderError;
++	}
++	const inlinedStyles = await renderInlineStyles(ssrContext.modules ?? []);
++	if (inlinedStyles.length) ssrContext.head.push({ style: inlinedStyles });
++	if (import.meta.dev) {
++		const { styles } = getRequestDependencies(ssrContext, renderer.rendererContext);
++		const link = [];
++		for (const resource of Object.values(styles)) {
++			if ("inline" in getQuery(resource.file)) continue;
++			if (resource.file.includes("scoped") && !resource.file.includes("pages/")) link.push({
++				rel: "stylesheet",
++				href: renderer.rendererContext.buildAssetsURL(resource.file),
++				crossorigin: ""
++			});
++		}
++		if (link.length) ssrContext.head.push({ link });
++	}
++	const islandHead = {};
++	for (const entry of ssrContext.head.entries.values()) for (const [key, value] of Object.entries(walkResolver(entry.input, VueResolver))) {
++		const currentValue = islandHead[key];
++		if (Array.isArray(currentValue)) currentValue.push(...value);
++		else islandHead[key] = value;
++	}
++	const islandResponse = {
++		id: islandContext.id,
++		head: islandHead,
++		ast
++	};
++	await useNitroApp().hooks.callHook("render:island", islandResponse, {
++		event,
++		islandContext
++	});
++	return islandResponse;
++}
++const VALID_COMPONENT_NAME_RE = /^[a-z][\w.-]*$/i;
++async function readGuardedIslandBody(event) {
++	let overflowed = Number(event.headers.get("content-length")) > MAX_ISLAND_BODY_BYTES;
++	let received = 0;
++	let raw = "";
++	const stream = getRequestWebStream(event);
++	if (stream) {
++		const decoder = new TextDecoder();
++		const reader = stream.getReader();
++		try {
++			for (;;) {
++				const { done, value } = await reader.read();
++				if (done) break;
++				received += value.byteLength;
++				if (overflowed || received > 65536) {
++					overflowed = true;
++					continue;
++				}
++				raw += decoder.decode(value, { stream: true });
++			}
++		} finally {
++			reader.releaseLock();
++		}
++		raw += decoder.decode();
++	}
++	if (overflowed) throw createError({
++		statusCode: 413,
++		statusMessage: "Island request body too large"
++	});
++	if (!raw) return {};
++	if (exceedsMaxDepth(raw)) throw createError({
++		statusCode: 400,
++		statusMessage: "Island request body too deeply nested"
++	});
++	return destr$1(raw) || {};
++}
++async function getIslandContext(event) {
++	let url = event.path || "";
++	const islandPath = getIslandPath(event);
++	if (import.meta.prerender && await islandPropCache.hasItem(islandPath)) url = await islandPropCache.getItem(islandPath);
++	if (!url.startsWith(ISLAND_PATH_PREFIX)) throw createError({
++		statusCode: 400,
++		statusMessage: "Invalid island request path"
++	});
++	const componentParts = url.substring(15).replace(ISLAND_SUFFIX_RE, "").split("_");
++	const hashId = componentParts.length > 1 ? componentParts.pop() : void 0;
++	const componentName = componentParts.join("_");
++	if (!componentName || !VALID_COMPONENT_NAME_RE.test(componentName)) throw createError({
++		statusCode: 400,
++		statusMessage: "Invalid island component name"
++	});
++	const rawContext = event.method === "GET" ? getQuery$1(event) : await readGuardedIslandBody(event);
++	const serializedProps = typeof rawContext?.props === "string" ? rawContext.props : "{}";
++	if (exceedsMaxBytes(serializedProps)) throw createError({
++		statusCode: 413,
++		statusMessage: "Island request props too large"
++	});
++	if (exceedsMaxDepth(serializedProps)) throw createError({
++		statusCode: 400,
++		statusMessage: "Island request props too deeply nested"
++	});
++	const clientContext = {};
++	if (rawContext && typeof rawContext === "object") {
++		for (const key in rawContext) if (key !== "props") clientContext[key] = rawContext[key];
++	}
++	const parsed = destr$1(serializedProps);
++	if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) throw createError({
++		statusCode: 400,
++		statusMessage: "Invalid island request props"
++	});
++	const parsedProps = filterIslandProps(parsed);
++	const expectedHash = getIslandHash({
++		name: componentName,
++		props: parsedProps,
++		context: clientContext
++	});
++	if (!hashId || hashId !== expectedHash) throw createError({
++		statusCode: 400,
++		statusMessage: "Invalid island request hash"
++	});
++	if (runtimeCompiler && findUnsafeIslandPropKey(parsedProps)) {
++		if (import.meta.dev) serverDiagnostics.NUXT_E8005();
++		throw createError({
++			statusCode: 400,
++			statusMessage: "Invalid island request props"
++		});
++	}
++	return {
++		url: typeof rawContext?.url === "string" ? rawContext.url : "/",
++		id: hashId,
++		name: componentName,
++		props: parsedProps,
++		slots: {},
++		components: {}
++	};
++}
++//#endregion
++export { handler as default };
+diff --git a/dist/runtime/handlers/island.mjs b/dist/runtime/handlers/island.mjs
+index 973f7f9073f394cbdd4347f73f24ec40fbcd3985..3531f114ffb33e3cac689f7159bf827e854c21d4 100644
+--- a/dist/runtime/handlers/island.mjs
++++ b/dist/runtime/handlers/island.mjs
+@@ -1,8 +1,8 @@
+ import { serverDiagnostics } from "../diagnostics.mjs";
+ import { filterIslandProps, getIslandHash } from "../nuxt/src/app/island-hash.mjs";
+ import { findUnsafeIslandPropKey } from "../nuxt/src/app/island-props.mjs";
+-import { exceedsMaxBytes, exceedsMaxDepth } from "../utils/island-props.mjs";
+ import { traceAsync } from "../nuxt/src/app/internal/tracing.mjs";
++import { exceedsMaxBytes, exceedsMaxDepth } from "../utils/island-props.mjs";
+ import { islandCache, islandPropCache, prerenderRenderingURLs } from "../utils/cache.mjs";
+ import { createSSRContext } from "../utils/renderer/app.mjs";
+ import { getSSRRenderer } from "../utils/renderer/build-files.mjs";
+diff --git a/dist/runtime/nuxt/src/app/diagnostics/_shared.mjs b/dist/runtime/nuxt/src/app/diagnostics/_shared.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..2a5220c1cf16286580300de1c5be8153061e06d6
+--- /dev/null
++++ b/dist/runtime/nuxt/src/app/diagnostics/_shared.mjs
+@@ -0,0 +1,36 @@
++import { createConsoleReporter } from "nostics";
++import { ansiFormatter } from "nostics/formatters/ansi";
++import { createDevReporter } from "nostics/reporters/dev";
++//#region ../nuxt/src/app/diagnostics/_shared.ts
++/**
++* Shared configuration for the runtime (E<N>xxx) diagnostics catalogs.
++*
++* Catalogs are split by domain and imported directly where used (no barrel),
++* so the browser bundle only pulls in the codes a module references. Pair the
++* pure-call annotations on each `defineDiagnostics()` with dev-guarded,
++* statement-level report calls so report-only diagnostics strip from production.
++*
++* Codes are stable, fully-qualified `NUXT_E<NNNN>` identifiers. Codes with a
++* dedicated docs page resolve a `see:` URL via {@link docsBase}; the rest opt
++* out with `docs: false`.
++*/
++function docsBase(code) {
++	return `https://nuxt.com/docs/4.x/errors/${code.replace("NUXT_", "").toLowerCase()}`;
++}
++const ansi = (open, close) => (s) => `\x1B[${open}m${s}\x1B[${close}m`;
++const colors = {
++	red: ansi(31, 39),
++	yellow: ansi(33, 39),
++	cyan: ansi(36, 39),
++	gray: ansi(90, 39),
++	bold: ansi(1, 22),
++	dim: ansi(2, 22)
++};
++const devReporters = import.meta.dev && !import.meta.test ? [/* @__PURE__ */ createDevReporter()] : [];
++const reporters = [/* @__PURE__ */ createConsoleReporter(import.meta.client || import.meta.test ? void 0 : { formatter: ansiFormatter(colors) }), ...devReporters];
++const prodReporter = (diagnostic) => {
++	console.error(`[${diagnostic.name}]`);
++};
++const prodReporters = [prodReporter];
++//#endregion
++export { docsBase, prodReporters, reporters };
+diff --git a/dist/runtime/nuxt/src/app/diagnostics/render.mjs b/dist/runtime/nuxt/src/app/diagnostics/render.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..274360d73a5f584952ae4e76fc28c9bee0a8bc4d
+--- /dev/null
++++ b/dist/runtime/nuxt/src/app/diagnostics/render.mjs
+@@ -0,0 +1,125 @@
++import { docsBase, prodReporters, reporters } from "./_shared.mjs";
++import { defineDiagnostics, defineProdDiagnostics } from "nostics";
++//#region ../nuxt/src/app/diagnostics/render.ts
++/**
++* E4xxx
++* Layout / component / island rendering runtime diagnostics.
++*/
++const renderDiagnostics = !import.meta.dev ? /* #__PURE__ */ defineProdDiagnostics({
++	docsBase,
++	reporters: prodReporters
++}) : /* #__PURE__ */ defineDiagnostics({
++	docsBase,
++	reporters,
++	codes: {
++		NUXT_E4001: {
++			why: (p) => `Invalid layout \`${p.layout}\` selected. Available layouts: ${p.available}.`,
++			fix: (p) => `Create a \`layouts/${p.layout}.vue\` file, or use one of the available layouts.`,
++			docs: false
++		},
++		NUXT_E4002: {
++			why: (p) => `\`${p.name}\` layout does not have a single root node and will cause errors when navigating between routes.`,
++			fix: "Wrap the layout's template in a single root element (e.g. a `<div>`).",
++			docs: false
++		},
++		NUXT_E4003: {
++			why: "`<NuxtLayout>` needs to be passed a single root node in its default slot.",
++			fix: "Wrap the content inside `<NuxtLayout>` in a single root element.",
++			docs: false
++		},
++		NUXT_E4004: {
++			why: (p) => `\`${p.filename}\` does not have a single root node and will cause errors when navigating between routes.`,
++			fix: "Wrap the page component's template in a single root element (e.g. a `<div>`).",
++			docs: false
++		},
++		NUXT_E4005: {
++			why: (p) => `Server component "${p.name}" must have a single root element. (HTML comments are considered elements as well.)`,
++			fix: "Wrap the server component's template in a single root element (e.g. a `<div>`).",
++			docs: false
++		},
++		NUXT_E4006: {
++			why: "SSR rendering failed inside `<NuxtClientFallback>`, falling back to client-side rendering.",
++			fix: "Fix the SSR error in the wrapped component. The client-side fallback will be used until then.",
++			docs: false
++		},
++		NUXT_E4007: {
++			why: "Your project has layouts but the `<NuxtLayout />` component has not been used. If `<NuxtLayout>` is rendered conditionally, this warning can be triggered before it is mounted.",
++			fix: "Add `<NuxtLayout>` to your `app.vue`, or remove the `layouts/` directory if you don't use layouts.",
++			docs: false
++		},
++		NUXT_E4008: {
++			why: (p) => `Cannot access path outside of project root directory: \`${p.path}\`.`,
++			fix: "Use a path within the project root directory for the test component wrapper.",
++			docs: false
++		},
++		NUXT_E4009: {
++			why: "You can't nest one `<a>` inside another `<a>`. This will cause a hydration error on client-side.",
++			fix: "Pass the `custom` prop to take full control of the markup.",
++			docs: false
++		},
++		NUXT_E4010: {
++			why: (p) => `[${p.componentName}] \`${p.main}\` and \`${p.sub}\` cannot be used together. \`${p.sub}\` will be ignored.`,
++			fix: (p) => `Remove the \`${p.sub}\` prop and use only \`${p.main}\`.`,
++			docs: false
++		},
++		NUXT_E4011: {
++			why: "Your project has pages but the `<NuxtPage />` component has not been used. You might be using the `<RouterView />` component instead, which will not work correctly in Nuxt. If `<NuxtPage>` is rendered conditionally, this warning can be triggered before it is mounted.",
++			fix: "You can set `pages: false` in `nuxt.config` if you do not wish to use the Nuxt `vue-router` integration.",
++			docs: false
++		},
++		NUXT_E4012: {
++			why: (p) => `Failed to parse island response for \`${p.name}\` (HTTP ${p.status}): ${p.detail}`,
++			fix: "Check that the server component endpoint is returning valid HTML. The server may have returned an error page."
++		},
++		NUXT_E4013: {
++			why: (p) => `The v-for range expects an integer value but got ${p.source}.`,
++			fix: "Use `Math.floor()` or `Math.round()` to convert the value to an integer.",
++			docs: false
++		},
++		NUXT_E4014: {
++			why: (p) => `No pages found. \`<NuxtPage>\` requires at least one page component in the \`${p.dir}/\` directory.`,
++			fix: (p) => `Create an \`index.vue\` file inside the \`${p.dir}/\` directory.`,
++			docs: false
++		},
++		NUXT_E4015: {
++			why: (p) => `Error captured while rendering server component \`${p.name}\`.`,
++			fix: "Check the server component implementation for runtime errors.",
++			docs: false
++		},
++		NUXT_E4016: {
++			why: (p) => `The route \`${p.fullPath}\` matches a nested page (\`${p.childPath}\`), but the parent page (\`${p.parentPath}\`) does not render \`<NuxtPage />\`, so the nested page cannot be displayed. If \`<NuxtPage />\` is rendered conditionally, this warning can be triggered before it is mounted.`,
++			fix: (p) => `Add \`<NuxtPage />\` to the page component for \`${p.parentPath}\`, or restructure your \`pages/\` directory if you did not intend nesting.`
++		},
++		NUXT_E4017: {
++			why: (p) => `A \`v-for\` in a server component asked for ${p.source} iterations; only the first ${p.max} were rendered. Island props come from the request, so the count is capped to bound server-side expansion.`,
++			fix: (p) => `Paginate the data, or clamp the value to at most ${p.max} before passing it to the island.`,
++			docs: false
++		},
++		NUXT_E4018: {
++			why: (p) => `Island \`${p.name}\` was sent a top-level \`${p.key}\` prop it does not declare. An undeclared prop falls through as an attribute onto the island's root, where a polymorphic component would use it to resolve which component to render, so the request was rejected.`,
++			fix: (p) => `Declare \`${p.key}\` as a prop on the island, or set \`inheritAttrs: false\` so request input cannot reach the root element.`
++		},
++		NUXT_E4019: {
++			why: (p) => `\`<NuxtIsland>\` was passed a \`scopeId\` prop that is not a Vue scope attribute (\`${p.scopeId}\`) and it was ignored. The value is inserted into the island's opening tag, so only \`data-v-\` attributes are accepted.`,
++			fix: "Pass a compiler-generated scope ID such as `data-v-abc123`, or omit the prop.",
++			docs: false
++		},
++		NUXT_E4020: {
++			why: "`<NuxtClientFallback>` cannot server-render a vapor slot child. Its content is not expressed as VNodes, so the SSR attempt (and the fallback-on-error behaviour that depends on it) will not work.",
++			fix: "Wrap the content in a vdom component if you need server-side fallback.",
++			docs: false
++		},
++		NUXT_E4021: {
++			why: "`<ClientOnly>` cannot forward fallthrough attributes onto a vapor slot child.",
++			fix: "Move the attributes onto an element inside the slot, or wrap the content in a single vdom root.",
++			docs: false
++		},
++		NUXT_E4022: {
++			why: "A vapor component cannot be teleported as an interactive island. Island client hydration reads the wrapped component from its VNode, which a vapor slot does not expose.",
++			fix: "Use a vdom component for `nuxtClient` islands.",
++			docs: false
++		}
++	}
++});
++//#endregion
++export { renderDiagnostics };
+diff --git a/dist/runtime/nuxt/src/app/island-props.mjs b/dist/runtime/nuxt/src/app/island-props.mjs
+index 93a9c416589bf0eda8251f24c218f5791fda381b..e5b9016de390eb3deab74e95beba90c8ed02df2e 100644
+--- a/dist/runtime/nuxt/src/app/island-props.mjs
++++ b/dist/runtime/nuxt/src/app/island-props.mjs
+@@ -19,5 +19,24 @@ function findUnsafeIslandPropKey(value) {
+ 		}
+ 	}
+ }
++/**
++* Find a request-supplied `as` prop that the island does not declare. An undeclared prop falls
++* through as an attribute onto the island's root, so on a polymorphic root (e.g. `reka-ui` /
++* `@nuxt/ui`) it drives dynamic component resolution unbidden. A declared `as` is the island's
++* own API and is left alone, as is any island that opts out of attribute inheritance. Only the
++* top level is checked; props the author forwards into `<component :is>` are their responsibility.
++*
++* @internal
++*/
++function findReservedRootIslandPropKey(value, component) {
++	if (!value || typeof value !== "object" || Array.isArray(value) || !Object.hasOwn(value, "as")) return;
++	const options = component;
++	if (options.inheritAttrs === false || declaresProp(options.props, "as")) return;
++	return "as";
++}
++function declaresProp(props, name) {
++	if (!props) return false;
++	return Array.isArray(props) ? props.includes(name) : Object.hasOwn(props, name);
++}
+ //#endregion
+-export { findUnsafeIslandPropKey };
++export { findReservedRootIslandPropKey, findUnsafeIslandPropKey };
+diff --git a/dist/runtime/plugins/dev-server-logs.mjs b/dist/runtime/plugins/dev-server-logs.mjs
+index 31cd3e4694d7bdbeca0ff60b1dbbd2d70d0e1f42..179628823556d929a1bf125ad53af72872e0de92 100644
+--- a/dist/runtime/plugins/dev-server-logs.mjs
++++ b/dist/runtime/plugins/dev-server-logs.mjs
+@@ -1,12 +1,12 @@
+ import { serverDiagnostics } from "../diagnostics.mjs";
+ import { withTrailingSlash } from "ufo";
++import { isVNode } from "vue";
+ import { appId } from "#internal/nuxt.config.mjs";
+ import { AsyncLocalStorage } from "node:async_hooks";
+ import { stringify } from "devalue";
+ import { consola } from "consola";
+ import { getContext } from "unctx";
+ import { captureRawStackTrace, parseRawStackTrace } from "errx";
+-import { isVNode } from "vue";
+ import { rootDir } from "#internal/dev-server-logs-options";
+ //#region src/runtime/plugins/dev-server-logs.ts
+ const devReducers = {
+diff --git a/dist/runtime/utils/renderer/build-files.mjs b/dist/runtime/utils/renderer/build-files.mjs
+index 7ad0b4b5ffd11226be6e1f087f491e05f9a25104..64a06e33893e40cff0046a327ffef72ec9d8631b 100644
+--- a/dist/runtime/utils/renderer/build-files.mjs
++++ b/dist/runtime/utils/renderer/build-files.mjs
+@@ -70,4 +70,4 @@ const getServerApp = lazyCachedFunction(getServerEntry);
+ const getSSRStyles = lazyCachedFunction(() => import("nuxt/styles").then((r) => r.default || r));
+ const getInlinedCSS = lazyCachedFunction(() => import("nuxt/styles").then((r) => r.inlinedCSS || {}));
+ //#endregion
+-export { APP_ROOT_CLOSE_TAG, APP_ROOT_OPEN_TAG, getInlinedCSS, getRenderer, getSSRRenderer, getSSRStyles, getServerApp };
++export { APP_ROOT_CLOSE_TAG, APP_ROOT_OPEN_TAG, getInlinedCSS, getRenderer, getSSRRenderer, getSSRStyles, getServerApp, getServerEntry };

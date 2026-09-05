@@ -1,16 +1,19 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "pnpm run build && wrangler dev",
     "postinstall": "nuxt prepare",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "test:e2e:dev": "vitest run --config vitest.e2e.config.ts test/e2e/dev.test.ts",
     "test:e2e:prod": "vitest run --config vitest.e2e.config.ts test/e2e/prod.test.ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "deploy": "pnpm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@antfu/eslint-config": "^7.7.3",
@@ -41,9 +44,8 @@
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.3",
     "unhead": "^3.2.1",
-    "vue": "^3.5.31",
-    "vue-onigiri": "^0.4.0",
-    "wrangler": "^4.114.0"
+    "vue": "^3.5.42",
+    "vue-onigiri": "^0.6.1"
   },
   "packageManager": "pnpm@11.2.2+sha512.36e6621fad506178936455e70247b8808ef4ec25797a9f437a93281a020484e2607f6a469a22e982987c3dbb8866e3071514ab10a4a1749e06edcd1ec118436f",
   "devDependencies": {
@@ -53,15 +55,13 @@
     "@storybook/addon-a11y": "0.0.0-pr-35247-sha-450c5adf",
     "@storybook/addon-docs": "0.0.0-pr-35247-sha-450c5adf",
     "eslint-plugin-storybook": "0.0.0-pr-35247-sha-450c5adf",
+    "nitro-cloudflare-dev": "^0.2.2",
     "playwright-core": "^1.60.0",
     "storybook": "0.0.0-pr-35247-sha-450c5adf",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "wrangler": "^4.129.0"
   },
   "resolutions": {
-    "nuxt": "4.5.0",
-    "@nuxt/kit": "4.5.0",
-    "@nuxt/nitro-server": "4.5.0",
-    "@nuxt/vite-builder": "4.5.0",
     "unhead": "^3.2.1"
   }
 }

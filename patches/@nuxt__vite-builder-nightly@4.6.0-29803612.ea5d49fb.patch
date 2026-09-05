@@ -1,0 +1,178 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 6e4a0be7c23ac6992890b24672246a4e1fa3d475..d0f7664b0f8c9a1716aa1d408eb65bd5b2cd029c 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -10,6 +10,7 @@ import vuePlugin from "@vitejs/plugin-vue";
+ import { getQuery, joinURL, withLeadingSlash, withTrailingSlash, withoutBase, withoutLeadingSlash } from "ufo";
+ import { filename } from "pathe/utils";
+ import { resolveModulePath } from "exsolve";
++import { onigiriPlugins } from "vue-onigiri";
+ import process from "node:process";
+ import "unplugin";
+ import escapeStringRegexp from "escape-string-regexp";
+@@ -376,6 +377,7 @@ function ViteNodePlugin(nuxt) {
+ 	}
+ 	const runnerResolvedPath = resolveModulePath("#vite-node-runner", { from: import.meta.url });
+ 	const serverResolvedPath = resolveModulePath("#vite-node-entry", { from: import.meta.url });
++	const islandsResolvedPath = resolveModulePath("#vite-node-islands-entry", { from: import.meta.url });
+ 	const fetchResolvedPath = resolveModulePath("#vite-node", { from: import.meta.url });
+ 	const externalRuntimeUrls = new Set([
+ 		runnerResolvedPath,
+@@ -397,6 +399,9 @@ function ViteNodePlugin(nuxt) {
+ 	const runnerCode = `export { default } from ${JSON.stringify(pathToFileURL(runnerResolvedPath).href)}`;
+ 	nitro.options.virtual["#build/dist/server/runner.mjs"] = runnerCode;
+ 	nitro.options._config.virtual["#build/dist/server/runner.mjs"] = runnerCode;
++	const islandsCode = `export { default } from ${JSON.stringify(pathToFileURL(islandsResolvedPath).href)}`;
++	nitro.options.virtual["#build/dist/server/components.islands.mjs"] = islandsCode;
++	nitro.options._config.virtual["#build/dist/server/components.islands.mjs"] = islandsCode;
+ 	let legacySsrServer;
+ 	return {
+ 		name: "nuxt:vite-node-server",
+@@ -1412,6 +1417,7 @@ const clientEnvironment = (nuxt, entry) => {
+ 				"#head",
+ 				"virtual:nuxt:",
+ 				"virtual:nuxt:*",
++				"vue-onigiri",
+ 				...getTranspileStrings({
+ 					isDev: nuxt.options.dev,
+ 					isClient: true
+@@ -1665,7 +1671,8 @@ function ssr(nuxt) {
+ 			"/__vue-jsx",
+ 			"#app",
+ 			/^nuxt(\/|$)/,
+-			/(nuxt|nuxt3|nuxt-nightly)\/(dist|src|app)/
++			/(nuxt|nuxt3|nuxt-nightly)\/(dist|src|app)/,
++			"vue-onigiri"
+ 		]
+ 	};
+ }
+@@ -1677,7 +1684,10 @@ function ssrEnvironment(nuxt, serverEntry) {
+ 			outDir: resolve(nuxt.options.buildDir, "dist/server"),
+ 			ssr: true,
+ 			rolldownOptions: {
+-				input: { server: serverEntry },
++				input: {
++					"server": serverEntry,
++					"components.islands": resolve(nuxt.options.buildDir, "components.islands")
++				},
+ 				external: [
+ 					"nitro/runtime",
+ 					"#internal/nitro",
+@@ -2811,6 +2821,36 @@ const bundle = async (nuxt) => {
+ 	const helper = nuxt.options.nitro.imports !== false ? "" : "globalThis.";
+ 	const isIgnored = createIsIgnored(nuxt);
+ 	const serverEntry = nuxt.options.ssr ? entry : await resolvePath(resolve(nuxt.options.appDir, "entry-spa"));
++	const onigiriComponentImports = /* @__PURE__ */ new Map();
++	const ingestComponents = (components) => {
++		for (const c of components) {
++			if (!c.pascalName || !c.filePath) continue;
++			if (c._raw) continue;
++			onigiriComponentImports.set(c.pascalName, {
++				path: c.filePath.replaceAll("\\", "/"),
++				export: c.export
++			});
++		}
++	};
++	for (const app of Object.values(nuxt.apps)) if (app.components) ingestComponents(app.components);
++	nuxt.hook("components:extend", (components) => {
++		onigiriComponentImports.clear();
++		ingestComponents(components);
++	});
++	const onigiriExtraEntries = {};
++	for (const [, entry] of onigiriComponentImports) {
++		const path = entry?.path;
++		if (!path || path.startsWith("/") || path.startsWith(".") || /^[a-z]:[\\/]/i.test(path)) continue;
++		onigiriExtraEntries[path] = path;
++	}
++	const onigiriEnabled = nuxt.options.experimental.componentIslands === "vue-onigiri";
++	const onigiriVitePlugins = !onigiriEnabled ? [] : [...onigiriPlugins({
++		additionalImports: () => onigiriComponentImports,
++		clientInclude: "auto",
++		serverInclude: ["auto", "/pages/**/*.vue"],
++		extraEntries: onigiriExtraEntries,
++		componentIdGenerator: "filepath-source"
++	})];
+ 	const assetFileNames = nuxt.options.dev ? void 0 : (chunk) => withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, `${sanitizeFilePath(filename(chunk.names[0]))}.[hash].[ext]`));
+ 	const config = mergeConfig({
+ 		base: nuxt.options.dev ? joinURL(nuxt.options.app.baseURL.replace(/^\.\//, "/") || "/", nuxt.options.app.buildAssetsDir) : void 0,
+@@ -2890,8 +2930,15 @@ const bundle = async (nuxt) => {
+ 			ResolveDeepImportsPlugin(nuxt),
+ 			ResolveExternalsPlugin(nuxt),
+ 			...nuxt.options.experimental.viteEnvironmentApi ? [
+-				vuePlugin(viteConfig.vue),
++				vuePlugin(onigiriEnabled ? {
++					...viteConfig.vue,
++					features: {
++						...viteConfig.vue?.features,
++						componentIdGenerator: "filepath-source"
++					}
++				} : viteConfig.vue),
+ 				viteJsxPlugin(viteConfig.vueJsx),
++				...onigiriVitePlugins,
+ 				ClientManifestPlugin(nuxt),
+ 				ViteNodePlugin(nuxt),
+ 				DevServerPlugin(nuxt),
+diff --git a/dist/vite-node-entry.d.mts b/dist/vite-node-entry.d.mts
+index 10574ef6c5be2df876147121cf35533c39ac5715..7800ef5b30d33b70e9afb40a875b393be7946528 100644
+--- a/dist/vite-node-entry.d.mts
++++ b/dist/vite-node-entry.d.mts
+@@ -1,5 +1,5 @@
+ import { NuxtSSRContext } from "nuxt/app";
+ //#region src/vite-node-entry.d.ts
+-declare const _default: (ssrContext: NuxtSSRContext) => Promise<any>;
++declare const _default: (ssrContext: NuxtSSRContext, ...rest: any[]) => Promise<any>;
+ //#endregion
+ export { _default as default };
+\ No newline at end of file
+diff --git a/dist/vite-node-entry.mjs b/dist/vite-node-entry.mjs
+index c6982639ea7690e981d78f39935a0c5dd2d64108..b427d4f977184ed91271a1f493142f81bdfc5805 100644
+--- a/dist/vite-node-entry.mjs
++++ b/dist/vite-node-entry.mjs
+@@ -5,7 +5,7 @@ import { viteNodeFetch, viteNodeOptions } from "#vite-node";
+ import runner from "#vite-node-runner";
+ //#region src/vite-node-entry.ts
+ let render;
+-var vite_node_entry_default = async (ssrContext) => {
++var vite_node_entry_default = async (ssrContext, ...rest) => {
+ 	process.server = true;
+ 	import.meta.server = true;
+ 	const invalidates = await viteNodeFetch.getInvalidates();
+@@ -16,7 +16,7 @@ var vite_node_entry_default = async (ssrContext) => {
+ 		const time = Math.round((performance.now() - start) * 1e3) / 1e3;
+ 		consola.success(`Vite server hmr ${updates.size} files`, time ? `in ${time}ms` : "");
+ 	}
+-	return await render(ssrContext);
++	return await render(ssrContext, ...rest);
+ };
+ //#endregion
+ export { vite_node_entry_default as default };
+diff --git a/dist/vite-node-islands-entry.d.mts b/dist/vite-node-islands-entry.d.mts
+new file mode 100644
+index 0000000000000000000000000000000000000000..4fa41b81bff74a3cea57e7b11677abbbcc1619b9
+--- /dev/null
++++ b/dist/vite-node-islands-entry.d.mts
+@@ -0,0 +1,4 @@
++//#region src/vite-node-islands-entry.d.ts
++declare function loadIslandComponents(): Promise<Record<string, unknown>>;
++//#endregion
++export { loadIslandComponents as default };
+\ No newline at end of file
+diff --git a/dist/vite-node-islands-entry.mjs b/dist/vite-node-islands-entry.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..57dbd27535168411f62c9355e922c57230af7736
+--- /dev/null
++++ b/dist/vite-node-islands-entry.mjs
+@@ -0,0 +1,13 @@
++import process from "node:process";
++import { viteNodeFetch } from "#vite-node";
++import runner from "#vite-node-runner";
++//#region src/vite-node-islands-entry.ts
++async function loadIslandComponents() {
++	process.server = true;
++	import.meta.server = true;
++	const invalidates = await viteNodeFetch.getInvalidates();
++	runner.moduleCache.invalidateDepTree(invalidates);
++	return await runner.executeId("#build/components.islands.mjs");
++}
++//#endregion
++export { loadIslandComponents as default };

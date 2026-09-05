@@ -29,7 +29,13 @@ minimumReleaseAgeExclude:
 
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
-  'vue-onigiri>vite': ^7.0.0
+  # 4.x nightly built from the commit the vue-onigiri-4.x port is based on; the onigiri changes are applied as pnpm patches
+  nuxt: npm:nuxt-nightly@4.6.0-29803612.ea5d49fb
+  '@nuxt/kit': npm:@nuxt/kit-nightly@4.6.0-29803612.ea5d49fb
+  '@nuxt/schema': npm:@nuxt/schema-nightly@4.6.0-29803612.ea5d49fb
+  '@nuxt/vite-builder': npm:@nuxt/vite-builder-nightly@4.6.0-29803612.ea5d49fb
+  '@nuxt/nitro-server': npm:@nuxt/nitro-server-nightly@4.6.0-29803612.ea5d49fb
+  '@nuxt/vite-server': npm:@nuxt/vite-server-nightly@4.6.0-29803612.ea5d49fb
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
@@ -41,13 +47,9 @@ onlyBuiltDependencies:
   - core-js
   - esbuild
   - sharp
-# Patch keys are version-pinned to 4.4.2 so they don't try to apply to the older
-# @nuxt/vite-builder@3.21.8 that @storybook-vue/nuxt drags in. That mismatch aborts
-# the whole install, which is what left node_modules (and the Vite+ binding) incomplete.
+
 patchedDependencies:
-  '@nuxt/nitro-server': patches/@nuxt__nitro-server.patch
-  '@nuxt/vite-builder@4.5.0': patches/@nuxt__vite-builder.patch
-  '@storybook-vue/nuxt@9.0.1': patches/@storybook-vue__nuxt@9.0.1.patch
-  '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977': patches/@storybook__builder-vite@0.0.0-pr-35247-sha-45858977.patch
-  nuxt: patches/nuxt.patch
-  vue-onigiri@0.4.0: patches/vue-onigiri@0.4.0.patch
+  '@nuxt/nitro-server-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__nitro-server-nightly@4.6.0-29803612.ea5d49fb.patch
+  '@nuxt/schema-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__schema-nightly@4.6.0-29803612.ea5d49fb.patch
+  '@nuxt/vite-builder-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__vite-builder-nightly@4.6.0-29803612.ea5d49fb.patch
+  nuxt-nightly@4.6.0-29803612.ea5d49fb: patches/nuxt-nightly@4.6.0-29803612.ea5d49fb.patch
