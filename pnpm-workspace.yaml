@@ -10,32 +10,47 @@ allowBuilds:
 ignoredBuiltDependencies:
   - vue-demi
 
+# pkg.pr.new builds depend on each other through tarball URLs
+blockExoticSubdeps: false
+
+# Nitro v3's dev bundle (.nuxt/dev) imports these module server deps by bare name
+publicHoistPattern:
+  - '@intlify/h3'
+  - chokidar
+  # lets Vite resolve @nuxtjs/mdc's `@nuxtjs/mdc > unified`-style optimizeDeps.include entries
+  - '@nuxtjs/mdc'
+
 minimumReleaseAgeExclude:
-  - '@storybook/addon-a11y@0.0.0-pr-35247-sha-45858977'
-  - '@storybook/addon-docs@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/addon-a11y@0.0.0-pr-35247-sha-45858977 || 0.0.0-pr-35247-sha-b1e0dc56'
+  - '@storybook/addon-docs@0.0.0-pr-35247-sha-45858977 || 0.0.0-pr-35247-sha-b1e0dc56'
   - '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977'
   - '@storybook/csf-plugin@0.0.0-pr-35247-sha-45858977'
-  - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-45858977'
+  - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-45858977 || 0.0.0-pr-35247-sha-b1e0dc56'
   - '@storybook/vue3@0.0.0-pr-35247-sha-45858977'
   - '@storybook/vue3-vite@0.0.0-pr-35247-sha-45858977'
-  - eslint-plugin-storybook@0.0.0-pr-35247-sha-45858977
-  - storybook@0.0.0-pr-35247-sha-45858977
-  - '@storybook/addon-a11y@0.0.0-pr-35247-sha-b1e0dc56'
-  - '@storybook/addon-docs@0.0.0-pr-35247-sha-b1e0dc56'
-  - '@storybook/react-dom-shim@0.0.0-pr-35247-sha-b1e0dc56'
-  - eslint-plugin-storybook@0.0.0-pr-35247-sha-b1e0dc56
-  - storybook@0.0.0-pr-35247-sha-b1e0dc56
-  - vue-onigiri@0.4.0
+  - eslint-plugin-storybook@0.0.0-pr-35247-sha-45858977 || 0.0.0-pr-35247-sha-b1e0dc56
+  - storybook@0.0.0-pr-35247-sha-45858977 || 0.0.0-pr-35247-sha-b1e0dc56
+  - vue-onigiri@0.6.3
+  - '@nuxt/kit-nightly@5.0.0-29841792.9ceeba8c'
+  - '@nuxt/nitro-server-nightly@5.0.0-29841792.9ceeba8c'
+  - '@nuxt/schema-nightly@5.0.0-29841792.9ceeba8c'
+  - '@nuxt/vite-builder-nightly@5.0.0-29841792.9ceeba8c'
+  - '@nuxt/vite-server-nightly@5.0.0-29841792.9ceeba8c'
+  - nuxt-nightly@5.0.0-29841792.9ceeba8c
 
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
-  # 4.x nightly built from the commit the vue-onigiri-4.x port is based on; the onigiri changes are applied as pnpm patches
-  nuxt: npm:nuxt-nightly@4.6.0-29803612.ea5d49fb
-  '@nuxt/kit': npm:@nuxt/kit-nightly@4.6.0-29803612.ea5d49fb
-  '@nuxt/schema': npm:@nuxt/schema-nightly@4.6.0-29803612.ea5d49fb
-  '@nuxt/vite-builder': npm:@nuxt/vite-builder-nightly@4.6.0-29803612.ea5d49fb
-  '@nuxt/nitro-server': npm:@nuxt/nitro-server-nightly@4.6.0-29803612.ea5d49fb
-  '@nuxt/vite-server': npm:@nuxt/vite-server-nightly@4.6.0-29803612.ea5d49fb
+  # nuxt/nuxt#36217 (vue-onigiri) preview build, pinned to the commit nuxt's own deps point at so each package resolves once
+  nuxt: https://pkg.pr.new/nuxt/nuxt@c0e0c95fb97f80014ecb71a1650caf983301816a
+  '@nuxt/kit': https://pkg.pr.new/nuxt/nuxt/@nuxt/kit@c0e0c95fb97f80014ecb71a1650caf983301816a
+  '@nuxt/schema': https://pkg.pr.new/nuxt/nuxt/@nuxt/schema@c0e0c95fb97f80014ecb71a1650caf983301816a
+  '@nuxt/vite-builder': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-builder@c0e0c95fb97f80014ecb71a1650caf983301816a
+  '@nuxt/nitro-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/nitro-server@c0e0c95fb97f80014ecb71a1650caf983301816a
+  '@nuxt/vite-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-server@c0e0c95fb97f80014ecb71a1650caf983301816a
+  # nuxt's own range still locks 0.6.2; keep a single copy with the slot fix
+  vue-onigiri: ^0.6.3
+  # 20260927 adds a dev nitro plugin that Nuxt 5's import protection rejects
+  '@nuxt/cli': npm:@nuxt/cli-nightly@4.0.0-20260926-162335-6eaa0eb
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
@@ -48,8 +63,3 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
 
-patchedDependencies:
-  '@nuxt/nitro-server-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__nitro-server-nightly@4.6.0-29803612.ea5d49fb.patch
-  '@nuxt/schema-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__schema-nightly@4.6.0-29803612.ea5d49fb.patch
-  '@nuxt/vite-builder-nightly@4.6.0-29803612.ea5d49fb': patches/@nuxt__vite-builder-nightly@4.6.0-29803612.ea5d49fb.patch
-  nuxt-nightly@4.6.0-29803612.ea5d49fb: patches/nuxt-nightly@4.6.0-29803612.ea5d49fb.patch

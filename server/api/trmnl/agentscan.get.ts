@@ -27,6 +27,13 @@ const round = (value: number, precision = 2) => {
   return Math.round(value * factor) / factor
 }
 
+async function fetchHealth(): Promise<AgentScanHealth> {
+  const response = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(15_000) })
+  if (!response.ok)
+    throw new Error(`${response.status} ${response.statusText}`)
+  return await response.json()
+}
+
 function sumWindow(
   countsByDate: Record<string, ClassificationStats>,
   dates: string[],
@@ -51,9 +58,7 @@ function sumWindow(
  */
 export default defineCachedEventHandler(
   async () => {
-    const health = await $fetch<AgentScanHealth>(HEALTH_URL, {
-      timeout: 15_000,
-    }).catch((error) => {
+    const health = await fetchHealth().catch((error) => {
       throw createError({
         statusCode: 502,
         message: `AgentScan health API unavailable: ${error instanceof Error ? error.message : error}`,

@@ -1,4 +1,4 @@
-import { experimental_vitePlugin } from '@storybook/builder-vite'
+const I18N_SERVER_ENTRY = /(?<=i18n\/dist\/runtime\/composables\/)index-server(\.js)?$/
 
 export default defineNuxtConfig({
   devtools: {
@@ -28,7 +28,19 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/fonts',
     '@nuxt/ui',
-    "@nuxt/content", 
+    "@nuxt/content",
+    // Nuxt 5 builds Nitro through Vite, so i18n's server-only `#i18n` nitro alias leaks into the app bundle
+    (_, nuxt) => {
+      nuxt.options.vite.plugins ||= []
+      nuxt.options.vite.plugins.push({
+        name: 'i18n-app-alias',
+        enforce: 'pre',
+        resolveId(id, importer) {
+          if (!I18N_SERVER_ENTRY.test(id)) return
+          return this.resolve(id.replace(I18N_SERVER_ENTRY, 'index.js'), importer, { skipSelf: true })
+        },
+      })
+    },
   ],
 
   build: {
@@ -43,30 +55,27 @@ export default defineNuxtConfig({
     externals: {
       inline: ['unhead'],
     },
-    preset: 'cloudflare-pages',
-   },
+
+    preset: "cloudflare_module",
+
+    // The cloudflare preset's miniflare dev runner fails to load Vite's module runner on Windows
+    devServer: { runner: 'node-worker' },
+
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true
+    }
+  },
+
+  // Nuxt 5: Nitro v2 compatibility layer (h3 v1 imports, `nitropack` specifiers, v2 config shapes)
+  nitroLegacy: true,
+
+  experimental: { 
+     componentIslands: 'vue-onigiri',
+     nitroViteEnvironment: true, 
+  },
 
   hooks: {
-    // vue-onigiri's Vite compiler plugin injects a setup-bridge + Proxy and
-    // attaches `__onigiriRender` to every SFC so the SSR runtime can serialize
-    // them into an AST. The browser never injects the ONIGIRI_RENDER_SYMBOL,
-    // so all of that code is dead weight in the client bundle.
-    // The actual server-side compilation runs through Nitro's `rollup:before`
-    // hook (see onigiriNitroPlugins in @nuxt/vite-builder), so we can strip
-    // just the compiler from the client Vite config. The manifest plugin must
-    // stay — `vue-onigiri/runtime/loader.js` imports `virtual:onigiri/manifest`
-    // on the client.
-    'vite:extendConfig': async (config, { isClient }) => {
-      if (!isClient || !config.plugins) return
-      config.plugins = config.plugins.filter((p) => {
-        const name = (p as { name?: string } | null | undefined)?.name
-        return name !== 'vite:vue-onigiri-compiler'
-      })
-
-      config.plugins.push(
-      experimental_vitePlugin({}))
-
-     },
  
   },
 
@@ -77,7 +86,7 @@ export default defineNuxtConfig({
   },
   
 
-  compatibilityDate: '2025-04-05',
+  compatibilityDate: '2025-10-01',
 vite: {
   plugins: [
   ]
