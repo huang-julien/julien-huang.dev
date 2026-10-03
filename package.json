@@ -32,7 +32,7 @@
     "@nuxt/vite-builder": "https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-builder@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4",
     "@nuxtjs/i18n": "10.2.4",
     "@nuxtjs/icon": "3.0.0-beta.16",
-    "@storybook-vue/nuxt": "^9.0.1",
+    "@storybook-vue/nuxt": "^10.0.0",
     "@storybook/builder-vite": "0.0.0-pr-35247-sha-450c5adf",
     "@vueuse/core": "^14.2.1",
     "better-sqlite3": "^12.10.0",
