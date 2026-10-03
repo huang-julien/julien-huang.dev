@@ -49,7 +49,7 @@ overrides:
   '@nuxt/vite-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-server@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
   # 20260927 adds a dev nitro plugin that Nuxt 5's import protection rejects
   '@nuxt/cli': npm:@nuxt/cli-nightly@4.0.0-20260926-162335-6eaa0eb
-  '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
+  '@storybook/builder-vite': 10.6.1
   '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
@@ -60,4 +60,3 @@ onlyBuiltDependencies:
   - core-js
   - esbuild
   - sharp
-
