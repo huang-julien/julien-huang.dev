@@ -171,7 +171,7 @@ overrides:
   '@nuxt/vite-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-server@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
   '@nuxt/cli': npm:@nuxt/cli-nightly@4.0.0-20260926-162335-6eaa0eb
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977
-  '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977
+  '@storybook/csf-plugin': 10.5.10
   '@storybook/vue3': 0.0.0-pr-35247-sha-45858977
   '@storybook/vue3-vite': 0.0.0-pr-35247-sha-45858977
 
@@ -3755,12 +3755,12 @@ packages:
       storybook: ^0.0.0-pr-35247-sha-45858977
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  '@storybook/csf-plugin@0.0.0-pr-35247-sha-45858977':
-    resolution: {integrity: sha512-bc/eQ5UGVsf+iA3LbnBhLHo8skzJ31Yti3kkLshQdgzInTkuoPXGe4g/BUksmBYhhdI21vhchaFTbZvFXzBP9Q==}
+  '@storybook/csf-plugin@10.5.10':
+    resolution: {integrity: sha512-TaCLBrqVEr767+w58QDotDUiCTuE5cyRJuRcDlsKQyUIyGBv+lYD3lu8wBiVCYxgIjB/gu9HmqiC+0yx1rHzaw==}
     peerDependencies:
       esbuild: '*'
       rollup: '*'
-      storybook: ^0.0.0-pr-35247-sha-45858977
+      storybook: ^10.5.10
       vite: '*'
       webpack: '*'
     peerDependenciesMeta:
@@ -13709,7 +13709,7 @@ snapshots:
   '@storybook/addon-docs@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)':
     dependencies:
       '@mdx-js/react': 3.1.1(@types/react@19.2.17)(react@19.2.7)
-      '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)
+      '@storybook/csf-plugin': 10.5.10(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)
       '@storybook/icons': 2.1.0(react@19.2.7)
       '@storybook/react-dom-shim': 0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))
       react: 19.2.7
@@ -13727,7 +13727,7 @@ snapshots:
 
   '@storybook/builder-vite@0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(supports-color@10.2.2)(vite@8.3.1)':
     dependencies:
-      '@storybook/csf-plugin': 0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)
+      '@storybook/csf-plugin': 10.5.10(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)
       get-port-please: 3.2.0
       http-proxy-middleware: 3.0.5(supports-color@10.2.2)
       polka: 0.5.2
@@ -13745,7 +13745,7 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@storybook/csf-plugin@0.0.0-pr-35247-sha-45858977(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)':
+  '@storybook/csf-plugin@10.5.10(esbuild@0.28.1)(rollup@4.62.2)(storybook@0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7))(vite@8.3.1)':
     dependencies:
       storybook: 0.0.0-pr-35247-sha-450c5adf(@types/react@19.2.17)(prettier@3.9.4)(react@19.2.7)
       unplugin: 2.3.11
