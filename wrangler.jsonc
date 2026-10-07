@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "julien-huang-dev",
+  "main": "./.output/server/index.mjs",
+  "compatibility_date": "2026-09-03",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./.output/public/"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "CONTENT",
+      "database_id": "f48e238e-e2ba-4949-bbc2-d46bdb203bdf"
+    }
+  ]
+}

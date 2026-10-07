@@ -60,7 +60,7 @@
     "playwright-core": "^1.60.0",
     "storybook": "0.0.0-pr-35247-sha-450c5adf",
     "vitest": "^4.1.8",
-    "wrangler": "^4.129.0"
+    "wrangler": "^4.148.0"
   },
   "resolutions": {
     "unhead": "^3.2.1"
