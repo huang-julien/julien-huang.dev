@@ -41,12 +41,12 @@ minimumReleaseAgeExclude:
 # Force the Storybook graph onto the same PR-preview build so internal APIs line up.
 overrides:
   # nuxt/nuxt#36217 (vue-onigiri) preview build, pinned to the commit nuxt's own deps point at so each package resolves once
-  nuxt: https://pkg.pr.new/nuxt/nuxt@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
-  '@nuxt/kit': https://pkg.pr.new/nuxt/nuxt/@nuxt/kit@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
-  '@nuxt/schema': https://pkg.pr.new/nuxt/nuxt/@nuxt/schema@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
-  '@nuxt/vite-builder': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-builder@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
-  '@nuxt/nitro-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/nitro-server@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
-  '@nuxt/vite-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-server@ae7393c82c1d24d1e06dc1d0bfb2e8defe2cb4a4
+  nuxt: https://pkg.pr.new/nuxt/nuxt@ee90bd80b839306ab7e406c5372117fcb7d8b43f
+  '@nuxt/kit': https://pkg.pr.new/nuxt/nuxt/@nuxt/kit@ee90bd80b839306ab7e406c5372117fcb7d8b43f
+  '@nuxt/schema': https://pkg.pr.new/nuxt/nuxt/@nuxt/schema@ee90bd80b839306ab7e406c5372117fcb7d8b43f
+  '@nuxt/vite-builder': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-builder@ee90bd80b839306ab7e406c5372117fcb7d8b43f
+  '@nuxt/nitro-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/nitro-server@ee90bd80b839306ab7e406c5372117fcb7d8b43f
+  '@nuxt/vite-server': https://pkg.pr.new/nuxt/nuxt/@nuxt/vite-server@ee90bd80b839306ab7e406c5372117fcb7d8b43f
   # 20260927 adds a dev nitro plugin that Nuxt 5's import protection rejects
   '@nuxt/cli': npm:@nuxt/cli-nightly@4.0.0-20260926-162335-6eaa0eb
   '@storybook/builder-vite': 0.0.0-pr-35247-sha-45858977

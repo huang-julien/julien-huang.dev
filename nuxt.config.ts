@@ -76,7 +76,11 @@ export default defineNuxtConfig({
   },
 
   hooks: {
- 
+    // Nitro v3 dropped the v2 `build:` fs mount that @nuxt/content's dump handler reads during prerender
+    'nitro:config' (config) {
+      config.devStorage ||= {}
+      config.devStorage.build ||= { driver: 'fs', base: config.buildDir }
+    },
   },
 
   i18n: {
